@@ -5,8 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,13 +43,17 @@ public class User {
     @Column()
     private LocalDateTime joinedAt;
 
-    @ManyToMany
-    @JoinTable(
-        name = "watchlist", 
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "movie_id")
-    )
-    private Set<Movie> watchlist;
+    // @ManyToMany
+    // @JoinTable(
+    //     name = "watchlist", 
+    //     joinColumns = @JoinColumn(name = "user_id"),
+    //     inverseJoinColumns = @JoinColumn(name = "movie_id")
+    // )
+    // private Set<Movie> watchlist;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference    
+    private Set<UserMovie> watchlist;
 
     public User(String username, String email, String password, String profilePicture, LocalDateTime joinedAt){
         this.username = username;
@@ -104,11 +112,12 @@ public class User {
         return joinedAt;
     }
 
-    public void addMovieToWatchlist(Movie movie){
+    public void addMovieToWatchlist(UserMovie movie){
         watchlist.add(movie);
+        movie.setUser(this);
     }
 
-    public Set<Movie> getWatchList(){
+    public Set<UserMovie> getWatchList(){
         return watchlist;
     }
 }

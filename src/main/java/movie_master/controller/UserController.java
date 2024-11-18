@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import movie_master.model.Movie;
+import movie_master.model.UserMovie;
 import movie_master.service.UserService;
 
 @RestController
@@ -19,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/watchlist")
-    public Set<Movie> getWatchList(@RequestParam(required = true) int userId){
+    public Set<UserMovie> getWatchList(@RequestParam(required = true) int userId){
         return userService.getWatchList(userId);
     }
 
