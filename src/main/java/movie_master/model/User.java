@@ -1,6 +1,8 @@
 package movie_master.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -9,6 +11,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,7 +21,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long user_id;
+    private long id;
 
     @Column
     private String username;
@@ -33,6 +38,14 @@ public class User {
     @Column()
     private LocalDateTime joinedAt;
 
+    @ManyToMany
+    @JoinTable(
+        name = "watchlist", 
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "movie_id")
+    )
+    private Set<Movie> watchlist;
+
     public User(String username, String email, String password, String profilePicture, LocalDateTime joinedAt){
         this.username = username;
         this.email = email;
@@ -42,7 +55,7 @@ public class User {
     }
 
     public long getId(){
-        return user_id;
+        return id;
     }
 
     public void setUsername(String username){

@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,6 +26,9 @@ public class Movie {
     private double rating;
     @JsonAlias("poster_path")
     private String posterPath;
+
+    @ManyToMany(mappedBy = "watchlist")
+    private Set<User> users;
 
     public Movie(String posterPath, Date releaseDate, String language, String description, String title, long id) {
         this.posterPath = posterPath;
