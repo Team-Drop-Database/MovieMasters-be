@@ -4,9 +4,14 @@ plugins {
     id 'java'
 }
 
-group = 'com.drop_database'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+group = "com.drop_database"
+version = "0.0.1-SNAPSHOT"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -14,6 +19,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -23,3 +29,4 @@ dependencies {
 tasks.withType(Test) {
     useJUnitPlatform()
 }
+
