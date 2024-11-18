@@ -1,6 +1,7 @@
 package movie_master.model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,7 +53,11 @@ public class User {
         this.password = password;
         this.profilePicture = profilePicture;
         this.joinedAt = joinedAt;
+
+        watchlist = new HashSet<>();
     }
+
+    public User(){}
 
     public long getId(){
         return id;
@@ -97,6 +102,10 @@ public class User {
 
     public LocalDateTime getJoinedAt(){
         return joinedAt;
+    }
+
+    public void addMovieToWatchlist(Movie movie){
+        watchlist.add(movie);
     }
 
     public Set<Movie> getWatchList(){
