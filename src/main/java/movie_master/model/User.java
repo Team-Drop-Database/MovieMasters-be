@@ -98,4 +98,8 @@ public class User {
     public LocalDateTime getJoinedAt(){
         return joinedAt;
     }
+
+    public Set<Movie> getWatchList(){
+        return watchlist;
+    }
 }
