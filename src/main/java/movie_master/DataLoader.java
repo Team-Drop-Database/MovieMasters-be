@@ -23,26 +23,26 @@ public class DataLoader implements ApplicationRunner {
 
     public void run(ApplicationArguments args) {
         //TODO only do request if table is empty
-        OkHttpClient client = new OkHttpClient();
-        ObjectMapper objectMapper = new ObjectMapper();
+        // OkHttpClient client = new OkHttpClient();
+        // ObjectMapper objectMapper = new ObjectMapper();
 
-        Request request = new Request.Builder()
-                .url("https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1")
-                .get()
-                .addHeader("accept", "application/json")
-                .addHeader("Authorization", "Bearer ")
-                .build();
+        // Request request = new Request.Builder()
+        //         .url("https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1")
+        //         .get()
+        //         .addHeader("accept", "application/json")
+        //         .addHeader("Authorization", "Bearer ")
+        //         .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            assert response.body() != null;
+        // try (Response response = client.newCall(request).execute()) {
+        //     assert response.body() != null;
 
-            JsonNode arrayNode = objectMapper.readTree(response.body().string()).get("results");
-            for (JsonNode node : arrayNode) {
-                Movie movie = objectMapper.treeToValue(node, Movie.class);
-                movieRepository.save(movie);
-            }
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
+        //     JsonNode arrayNode = objectMapper.readTree(response.body().string()).get("results");
+        //     for (JsonNode node : arrayNode) {
+        //         Movie movie = objectMapper.treeToValue(node, Movie.class);
+        //         movieRepository.save(movie);
+        //     }
+        // } catch (Exception e){
+        //     throw new RuntimeException(e);
+        // }
     }
 }

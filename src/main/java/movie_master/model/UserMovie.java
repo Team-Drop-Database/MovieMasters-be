@@ -26,7 +26,7 @@ public class UserMovie {
     @Column(nullable = true)
     private double rating;
 
-    public UserMovie(User user, Movie movie, boolean watched, double rating){
+    public UserMovie(User user, Movie movie, boolean watched, double rating) {
         this.user = user;
         this.movie = movie;
         this.watched = watched;

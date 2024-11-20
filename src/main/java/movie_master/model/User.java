@@ -21,7 +21,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column
     private String username;
@@ -42,7 +42,7 @@ public class User {
     @JsonManagedReference    
     private Set<UserMovie> watchlist;
 
-    public User(String username, String email, String password, String profilePicture, LocalDateTime joinedAt){
+    public User(String username, String email, String password, String profilePicture, LocalDateTime joinedAt) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -52,33 +52,33 @@ public class User {
         watchlist = new HashSet<>();
     }
 
-    public User(){}
+    public User() {}
 
-    public long getId(){
+    public long getId() {
         return id;
     }
 
-    public void setUsername(String username){
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return username;
     }
 
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
-    public void setPassword(String password){
+    public void setPassword(String password) {
         this.password = password;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
@@ -86,25 +86,25 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    public String getProfilePicture(){
+    public String getProfilePicture() {
         return profilePicture;
     }
 
 
-    public void getJoinedAt(LocalDateTime joinedAt){
+    public void getJoinedAt(LocalDateTime joinedAt) {
         this.joinedAt = joinedAt;
     }
 
-    public LocalDateTime getJoinedAt(){
+    public LocalDateTime getJoinedAt() {
         return joinedAt;
     }
 
-    public void addMovieToWatchlist(UserMovie movie){
+    public void addMovieToWatchlist(UserMovie movie) {
         watchlist.add(movie);
         movie.setUser(this);
     }
 
-    public Set<UserMovie> getWatchList(){
+    public Set<UserMovie> getWatchList() {
         return watchlist;
     }
 }
