@@ -1,4 +1,4 @@
-package movie_master.model;
+package movie_master.api.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

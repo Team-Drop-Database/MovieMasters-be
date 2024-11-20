@@ -2,8 +2,9 @@ package movie_master;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import movie_master.model.Movie;
-import movie_master.repository.MovieRepository;
+
+import movie_master.api.model.Movie;
+import movie_master.api.repository.MovieRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

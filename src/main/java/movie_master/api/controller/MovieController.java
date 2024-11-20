@@ -1,7 +1,8 @@
-package movie_master.controller;
+package movie_master.api.controller;
 
-import movie_master.model.Movie;
-import movie_master.service.MovieService;
+import movie_master.api.model.Movie;
+import movie_master.api.service.MovieService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package movie_master.model;
+package movie_master.api.model;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

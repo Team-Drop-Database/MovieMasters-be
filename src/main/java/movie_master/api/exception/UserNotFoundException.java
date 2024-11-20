@@ -1,4 +1,4 @@
-package movie_master.api;
+package movie_master.api.exception;
 
 public class UserNotFoundException extends Exception {
     public UserNotFoundException(Long userId) {

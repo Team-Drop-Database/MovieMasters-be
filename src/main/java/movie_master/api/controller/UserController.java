@@ -1,4 +1,4 @@
-package movie_master.controller;
+package movie_master.api.controller;
 
 import java.util.Set;
 
@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import movie_master.api.UserNotFoundException;
-import movie_master.model.UserMovie;
-import movie_master.service.UserService;
+import movie_master.api.exception.UserNotFoundException;
+import movie_master.api.model.UserMovie;
+import movie_master.api.service.UserService;
+
 
 @RestController
 @RequestMapping("/users")

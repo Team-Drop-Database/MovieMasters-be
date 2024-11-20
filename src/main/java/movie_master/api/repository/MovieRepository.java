@@ -1,8 +1,9 @@
-package movie_master.repository;
+package movie_master.api.repository;
 
-import movie_master.model.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import movie_master.api.model.Movie;
 
 import java.util.List;
 

@@ -1,7 +1,8 @@
-package movie_master.service;
+package movie_master.api.service;
 
-import movie_master.model.Movie;
-import movie_master.repository.MovieRepository;
+import movie_master.api.model.Movie;
+import movie_master.api.repository.MovieRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package movie_master.service;
+package movie_master.api.service;
 
 import java.util.Optional;
 import java.util.Set;
@@ -6,10 +6,10 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import movie_master.api.UserNotFoundException;
-import movie_master.model.User;
-import movie_master.model.UserMovie;
-import movie_master.repository.UserRepository;
+import movie_master.api.exception.UserNotFoundException;
+import movie_master.api.model.User;
+import movie_master.api.model.UserMovie;
+import movie_master.api.repository.UserRepository;
 
 @Service
 public class UserService {
