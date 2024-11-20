@@ -38,14 +38,6 @@ public class User {
     @Column()
     private LocalDateTime joinedAt;
 
-    // @ManyToMany
-    // @JoinTable(
-    //     name = "watchlist", 
-    //     joinColumns = @JoinColumn(name = "user_id"),
-    //     inverseJoinColumns = @JoinColumn(name = "movie_id")
-    // )
-    // private Set<Movie> watchlist;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference    
     private Set<UserMovie> watchlist;
