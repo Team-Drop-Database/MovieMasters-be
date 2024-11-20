@@ -1,6 +1,6 @@
-package movie_master.repository;
+package movie_master.api.repository;
 
-import movie_master.model.WatchlistEntry;
+import movie_master.api.model.WatchlistEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

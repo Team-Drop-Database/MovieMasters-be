@@ -1,4 +1,4 @@
-package movie_master.model.helper;
+package movie_master.api.model.helper;
 
 
 import jakarta.persistence.Embeddable;

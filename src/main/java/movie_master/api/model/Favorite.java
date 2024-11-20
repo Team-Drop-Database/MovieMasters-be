@@ -1,6 +1,8 @@
-package movie_master.model;
+package movie_master.api.model;
 
 import jakarta.persistence.*;
+import movie_master.api.model.User;
+
 import java.time.LocalDateTime;
 
 @Entity

@@ -1,7 +1,7 @@
-package movie_master.model;
+package movie_master.api.model;
 
 import jakarta.persistence.*;
-import movie_master.model.helper.FriendshipId;
+import movie_master.api.model.helper.FriendshipId;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +17,6 @@ public class Friendship {
     @Column(name = "friendship_date", nullable = false)
     private LocalDateTime friendshipDate = LocalDateTime.now();
 
-    // Getters and Setters
     public FriendshipId getFriendshipId() {
         return friendshipId;
     }
