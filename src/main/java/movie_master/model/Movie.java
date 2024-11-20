@@ -25,13 +25,13 @@ public class Movie {
     @JsonAlias("poster_path")
     private String posterPath;
 
-    public Movie(String posterPath, Date releaseDate, String language, String description, String title, long id) {
-        this.posterPath = posterPath;
+    public Movie(long id, String title, String description, Date releaseDate, String language, String posterPath) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
         this.releaseDate = releaseDate;
         this.language = language;
-        this.description = description;
-        this.title = title;
-        this.id = id;
+        this.posterPath = posterPath;
     }
 
     public Movie() {
