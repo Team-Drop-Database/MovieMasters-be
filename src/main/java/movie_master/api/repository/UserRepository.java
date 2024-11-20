@@ -1,13 +1,13 @@
 package movie_master.api.repository;
 
-import java.util.Optional;
-
+import movie_master.api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import movie_master.api.model.User;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    public Optional<User> findById(long id);
+    Optional<User> findById(long id);
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 }
