@@ -7,26 +7,26 @@ import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.User;
 import movie_master.api.model.role.Roles;
 import movie_master.api.request.RegisterUserRequest;
-import movie_master.api.service.RegisterUserService;
+import movie_master.api.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 /**
  * A mock implementation of RegisterUserService for testing purpose
  */
-public class MockDefaultRegisterUserService implements RegisterUserService {
+public class MockDefaultUserService implements UserService {
     private List<UserDto> registeredUsers;
     private PasswordEncoder passwordEncoder;
     private UserDtoMapper userDtoMapper;
 
-    public MockDefaultRegisterUserService(List<UserDto> registeredUsers, PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper) {
+    public MockDefaultUserService(List<UserDto> registeredUsers, PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper) {
         this.registeredUsers = registeredUsers;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
     }
 
     @Override
-    public UserDto registerUser(RegisterUserRequest registerUserRequest) throws EmailHasAlreadyBeenTaken, UsernameHasAlreadyBeenTaken {
+    public UserDto register(RegisterUserRequest registerUserRequest) throws EmailHasAlreadyBeenTaken, UsernameHasAlreadyBeenTaken {
 
         if (registeredUsers.stream().anyMatch(userDto -> userDto.email().equals(registerUserRequest.email()))) {
             throw new EmailHasAlreadyBeenTaken(registerUserRequest.email());

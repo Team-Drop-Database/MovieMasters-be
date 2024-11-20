@@ -13,22 +13,22 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * The default implementation for registering a user
+ * The default implementation for the user service
  */
 @Service
-public class DefaultRegisterUserService implements RegisterUserService {
+public class DefaultUserService implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserDtoMapper userDtoMapper;
 
-    public DefaultRegisterUserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper) {
+    public DefaultUserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
     }
 
     @Override
-    public UserDto registerUser(RegisterUserRequest registerUserRequest) throws EmailHasAlreadyBeenTaken, UsernameHasAlreadyBeenTaken {
+    public UserDto register(RegisterUserRequest registerUserRequest) throws EmailHasAlreadyBeenTaken, UsernameHasAlreadyBeenTaken {
         Optional<User> userFoundByEmail = this.userRepository.findByEmail(registerUserRequest.email());
         Optional<User> userFoundByUsername = this.userRepository.findByUsername(registerUserRequest.username());
 

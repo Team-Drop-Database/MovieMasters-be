@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test class for the MockDefaultRegisterUserService class
  */
 @SpringBootTest
-public class RegisterUserServiceTests {
+public class UserServiceTests {
     private User user;
     private UserDtoMapper userDtoMapper;
     private PasswordEncoder passwordEncoder;
-    private MockDefaultRegisterUserService mockDefaultRegisterUserService;
+    private MockDefaultUserService mockDefaultRegisterUserService;
     private RegisterUserRequest firstRegisterUserRequest;
     private RegisterUserRequest secondRegisterUserRequest;
     private RegisterUserRequest thirdRegisterUserRequest;
@@ -33,7 +33,7 @@ public class RegisterUserServiceTests {
         user = new User("mock@gmail.com", "mock", "123", Roles.USER.name(), true);
         userDtoMapper = new UserDtoMapper();
         passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        mockDefaultRegisterUserService = new MockDefaultRegisterUserService(new ArrayList<>(), passwordEncoder, userDtoMapper);
+        mockDefaultRegisterUserService = new MockDefaultUserService(new ArrayList<>(), passwordEncoder, userDtoMapper);
         firstRegisterUserRequest = new RegisterUserRequest("mock@gmail.com", "mock12", "mocked123");
         secondRegisterUserRequest = new RegisterUserRequest("mock@gmail.com", "mock123", "mocked123");
         thirdRegisterUserRequest = new RegisterUserRequest("mock1@gmail.com", "mock12", "mocked123");
@@ -53,22 +53,22 @@ public class RegisterUserServiceTests {
 
     @Test
     void can_register_user() throws UsernameHasAlreadyBeenTaken, EmailHasAlreadyBeenTaken {
-        mockDefaultRegisterUserService.registerUser(firstRegisterUserRequest);
+        mockDefaultRegisterUserService.register(firstRegisterUserRequest);
 
         assertEquals(mockDefaultRegisterUserService.getRegisteredUsers().size(), 1);
     }
 
     @Test
     void cant_register_user_with_taken_email() throws UsernameHasAlreadyBeenTaken, EmailHasAlreadyBeenTaken {
-        mockDefaultRegisterUserService.registerUser(firstRegisterUserRequest);
+        mockDefaultRegisterUserService.register(firstRegisterUserRequest);
 
-        assertThrows(EmailHasAlreadyBeenTaken.class, () -> mockDefaultRegisterUserService.registerUser(secondRegisterUserRequest));
+        assertThrows(EmailHasAlreadyBeenTaken.class, () -> mockDefaultRegisterUserService.register(secondRegisterUserRequest));
     }
 
     @Test
     void cant_register_user_with_taken_username() throws UsernameHasAlreadyBeenTaken, EmailHasAlreadyBeenTaken {
-        mockDefaultRegisterUserService.registerUser(firstRegisterUserRequest);
+        mockDefaultRegisterUserService.register(firstRegisterUserRequest);
 
-        assertThrows(UsernameHasAlreadyBeenTaken.class, () -> mockDefaultRegisterUserService.registerUser(thirdRegisterUserRequest));
+        assertThrows(UsernameHasAlreadyBeenTaken.class, () -> mockDefaultRegisterUserService.register(thirdRegisterUserRequest));
     }
 }

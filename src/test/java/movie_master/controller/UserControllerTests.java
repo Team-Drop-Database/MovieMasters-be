@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-public class RegisterControllerTests {
+public class UserControllerTests {
     @Autowired
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;

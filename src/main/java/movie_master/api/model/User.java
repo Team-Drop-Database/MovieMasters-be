@@ -10,21 +10,13 @@ import java.time.LocalDate;
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "username"})})
 public class User {
     @Id
-    @SequenceGenerator(
-            name = "user_sequence",
-            sequenceName = "user_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "user_sequence"
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
     private String username;
     private String password;
-    private String profile_picture;
-    private LocalDate date_joined = LocalDate.now();
+    private String profilePicture;
+    private LocalDate dateJoined = LocalDate.now();
     private String roles;
     private boolean enabled;
 
@@ -57,7 +49,7 @@ public class User {
     }
 
     public String getProfilePicture() {
-        return profile_picture;
+        return profilePicture;
     }
 
     public void setPassword(String password) {
@@ -65,7 +57,7 @@ public class User {
     }
 
     public LocalDate getDateJoined() {
-        return date_joined;
+        return dateJoined;
     }
 
     public String getRoles() {
