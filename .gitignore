@@ -39,3 +39,6 @@ out/
 
 ## SQLTools files
 *.sql
+
+## Environment variables
+*.env

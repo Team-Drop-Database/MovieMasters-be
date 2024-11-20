@@ -1,7 +1,7 @@
 plugins {
-    id("java")
-    id("org.springframework.boot") version "3.3.5"
-    id("io.spring.dependency-management") version "1.1.6"
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'java'
 }
 
 group = "com.drop_database"
@@ -18,23 +18,31 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Spring Boot starters
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    implementation 'jakarta.persistence:jakarta.persistence-api'
-
+    // okhttp
     implementation 'com.squareup.okhttp3:okhttp'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // Dotenv
+    implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    // Runtime dependencies
     runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
+
+    // Testing dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.test {
+tasks.withType(Test) {
     useJUnitPlatform()
 }
