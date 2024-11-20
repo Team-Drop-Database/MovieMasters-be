@@ -28,9 +28,6 @@ public class Movie {
     @JsonAlias("poster_path")
     private String posterPath;
 
-    // @ManyToMany(mappedBy = "watchlist")
-    // private Set<User> users;
-
     @OneToMany(mappedBy = "movie")
     private Set<UserMovie> userMovies; 
 
