@@ -1,5 +1,14 @@
 # Backend
 
+Place the following `.env` file with your details in the root of the project:
+```
+DB_HOST=jdbc:mysql://example_host:3306
+DB_USERNAME=example_username
+DB_PASSWORD=example_password
+DB_NAME=example_name
+SHOW_SQL=true
+```
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
