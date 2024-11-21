@@ -33,23 +33,23 @@ public class User {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public String getProfilePicture() {
-        return profilePicture;
+        return this.profilePicture;
     }
 
     public void setPassword(String password) {
@@ -57,14 +57,14 @@ public class User {
     }
 
     public LocalDate getDateJoined() {
-        return dateJoined;
+        return this.dateJoined;
     }
 
     public String getRoles() {
-        return roles;
+        return this.roles;
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return this.enabled;
     }
 }

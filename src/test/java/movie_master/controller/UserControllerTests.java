@@ -41,7 +41,7 @@ public class UserControllerTests {
     public void register_user() throws Exception {
         String json = objectMapper.writeValueAsString(firstRegisterUserRequest);
 
-        mockMvc.perform(post("/register")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated());
@@ -51,7 +51,7 @@ public class UserControllerTests {
     public void cant_register_user_since_email_is_already_taken() throws Exception {
         String json = objectMapper.writeValueAsString(secondRegisterUserRequest);
 
-        mockMvc.perform(post("/register")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest()).andExpect(content().string(containsString("Email: %s has already been taken".formatted(secondRegisterUserRequest.email()))));
@@ -61,7 +61,7 @@ public class UserControllerTests {
     public void cant_register_user_since_username_is_already_taken() throws Exception {
         String json = objectMapper.writeValueAsString(thirdRegisterUserRequest);
 
-        mockMvc.perform(post("/register")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest()).andExpect(content().string(containsString("Username: %s has already been taken".formatted(thirdRegisterUserRequest.username()))));
@@ -71,7 +71,7 @@ public class UserControllerTests {
     public void cant_register_user_since_body_is_invalid() throws Exception {
         String json = objectMapper.writeValueAsString(fourthRegisterUserRequest);
 
-        mockMvc.perform(post("/register")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
