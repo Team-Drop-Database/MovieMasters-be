@@ -56,9 +56,4 @@ public class UserController {
             .body("User not found: " + exception.getMessage());
         }
     }
-
-    @GetMapping("test")
-    public String testEndPoint() {
-        return "hello!";
-    }
 }
