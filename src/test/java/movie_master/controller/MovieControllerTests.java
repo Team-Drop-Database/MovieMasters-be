@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -51,7 +50,7 @@ public class MovieControllerTests {
                 "/image.png");
 
         List<Movie> movies = Arrays.asList(movie1, movie2);
-        mockMvc.perform(get("api/v1/movies")
+        mockMvc.perform(get("/movies")
                 .content(objectMapper.writeValueAsString(movies))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
