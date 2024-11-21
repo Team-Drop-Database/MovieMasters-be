@@ -46,8 +46,7 @@ public class User {
         this.password = password;
         this.roles = roles;
         this.enabled = enabled;
-
-         watchlist = new HashSet<>();
+        watchlist = new HashSet<>();
     }
 
     public Long getId() {

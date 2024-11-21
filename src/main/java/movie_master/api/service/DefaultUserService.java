@@ -58,6 +58,7 @@ public class DefaultUserService implements UserService {
     @Override
     public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
         Optional<User> user = userRepository.findById(userId);
+        
         if(user.isPresent())
             return userRepository.findById(userId).get().getWatchList();
         else
