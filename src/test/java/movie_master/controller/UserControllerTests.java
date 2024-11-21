@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 public class UserControllerTests {
     @Autowired
     private MockMvc mockMvc;
+
     private ObjectMapper objectMapper;
     private RegisterUserRequest firstRegisterUserRequest;
     private RegisterUserRequest secondRegisterUserRequest;

@@ -36,3 +36,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+## SQLTools files
+*.sql
+
+## Environment variables
+*.env

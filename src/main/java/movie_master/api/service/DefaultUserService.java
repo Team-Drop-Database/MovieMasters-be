@@ -2,15 +2,18 @@ package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailHasAlreadyBeenTaken;
+import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.User;
+import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Roles;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The default implementation for the user service
@@ -50,5 +53,16 @@ public class DefaultUserService implements UserService {
         this.userRepository.save(userToCreate);
 
         return this.userDtoMapper.apply(userToCreate);
+    }
+
+    @Override
+    public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
+        Optional<User> user = userRepository.findById(userId);
+
+        if(user.isPresent()){
+            return user.get().getWatchList();
+        } else {
+            throw new UserNotFoundException(userId);
+        }
     }
 }
