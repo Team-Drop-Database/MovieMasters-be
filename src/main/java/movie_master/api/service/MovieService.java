@@ -1,23 +1,20 @@
 package movie_master.api.service;
 
 import movie_master.api.model.Movie;
-import movie_master.api.repository.MovieRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class MovieService {
-    @Autowired
-    private MovieRepository movieRepository;
+public interface MovieService {
+    List<Movie> findAll();
 
-    public List<Movie> findAll() {
-        return movieRepository.findAll();
-    }
+    List<Movie> findByTitleContaining(String title);
 
-    public List<Movie> findByTitleContaining(String title) {
-        return movieRepository.findMovieByTitleContaining(title);
-    }
+    Optional<Movie> findById(Long id);
+
+    void deleteById(Long id);
+
+    Movie save(Movie movie);
 }
