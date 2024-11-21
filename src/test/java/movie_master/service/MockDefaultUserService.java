@@ -2,14 +2,17 @@ package movie_master.service;
 
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailHasAlreadyBeenTaken;
+import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.User;
+import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Roles;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A mock implementation of RegisterUserService for testing purpose
@@ -52,5 +55,11 @@ public class MockDefaultUserService implements UserService {
 
     public List<UserDto> getRegisteredUsers() {
         return registeredUsers;
+    }
+
+    @Override
+    public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getWatchList'");
     }
 }

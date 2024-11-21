@@ -3,15 +3,27 @@ package movie_master.api.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import java.util.HashSet;
+import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+
 /**
  * User table for the database
  */
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "username"})})
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Table(name = "user", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "username"})})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
     private String email;
     private String username;
     private String password;
@@ -19,6 +31,10 @@ public class User {
     private LocalDate dateJoined = LocalDate.now();
     private String roles;
     private boolean enabled;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference      
+    private Set<UserMovie> watchlist;
 
     public User() {
 
@@ -30,26 +46,27 @@ public class User {
         this.password = password;
         this.roles = roles;
         this.enabled = enabled;
+        watchlist = new HashSet<>();
     }
 
     public Long getId() {
-        return this.id;
+        return userId;
     }
 
     public String getEmail() {
-        return this.email;
+        return email;
     }
 
     public String getUsername() {
-        return this.username;
+        return username;
     }
 
     public String getPassword() {
-        return this.password;
+        return password;
     }
 
     public String getProfilePicture() {
-        return this.profilePicture;
+        return profilePicture;
     }
 
     public void setPassword(String password) {
@@ -57,14 +74,23 @@ public class User {
     }
 
     public LocalDate getDateJoined() {
-        return this.dateJoined;
+        return dateJoined;
     }
 
     public String getRoles() {
-        return this.roles;
+        return roles;
     }
 
     public boolean isEnabled() {
-        return this.enabled;
+        return enabled;
+    }
+
+    public void addMovieToWatchlist(UserMovie movie) {
+        watchlist.add(movie);
+        movie.setUser(this);
+    }
+
+    public Set<UserMovie> getWatchList() {
+        return watchlist;
     }
 }
