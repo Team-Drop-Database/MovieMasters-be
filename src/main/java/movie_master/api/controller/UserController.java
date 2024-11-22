@@ -63,8 +63,8 @@ public class UserController {
      *  users opinion about the movie along with information 
      * about the movie itself.
      */
-    @GetMapping("/watchlist")
-    public ResponseEntity<?> getWatchList(@RequestParam(required = true) Long userId) {
+    @GetMapping("/{userId}/watchlist")
+    public ResponseEntity<?> getWatchList(@PathVariable Long userId) {
         try {
             Set<UserMovie> watchList = userService.getWatchList(userId);
             return ResponseEntity.ok(watchList);
