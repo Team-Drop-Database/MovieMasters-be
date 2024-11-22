@@ -84,7 +84,7 @@ public class UserController {
      * @return newly created watchitem (UserMovie)
      */
     @PutMapping("/watchlist/add/{userId}/{movieId}")
-    public ResponseEntity<?> putMethodName(@PathVariable Long userId, @PathVariable Long movieId) {
+    public ResponseEntity<?> addMovieToWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
         try {
             UserMovie watchItem = userService.addMovieToWatchlist(userId, movieId);
             return ResponseEntity.ok(Map.of(
@@ -98,5 +98,12 @@ public class UserController {
             .body("Could not associate user with movie. Exception message: "
              + exception.getMessage());
         }
+    }
+
+    @PutMapping("watchlist/update/{useId}/{itemId}")
+    public ResponseEntity<?> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long itemId) {
+        //TODO: process PUT request
+        
+        return null;
     }
 }
