@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping("/watchlist")
-    public ResponseEntity<?> getWatchList(@RequestParam(required = true) Long userId) {
+    private ResponseEntity<Object> getWatchList(@RequestParam(required = true) Long userId) {
         try {
             Set<UserMovie> watchList = userService.getWatchList(userId);
             return ResponseEntity.ok(watchList);

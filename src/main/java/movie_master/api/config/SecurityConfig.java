@@ -35,8 +35,10 @@ public class SecurityConfig {
                 .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/movies/**").permitAll()
-                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/users").permitAll()
+                        .requestMatchers("/users/watchlist").permitAll()
+                        .requestMatchers("/movies").permitAll()
+                        .requestMatchers("/movies/").permitAll()
                 )
                 .build();
     }
@@ -51,7 +53,7 @@ public class SecurityConfig {
         configuration.addAllowedOrigin(CLIENT_HOST);
         configuration.setAllowedHeaders(List.of(HttpHeaders.ACCEPT, HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION));
         configuration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.POST.name(),
-                HttpMethod.PUT.name(), HttpMethod.DELETE.name()));
+                HttpMethod.PUT.name(), HttpMethod.DELETE.name(), HttpMethod.OPTIONS.name()));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
