@@ -2,6 +2,7 @@ package movie_master.service;
 
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailHasAlreadyBeenTaken;
+import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
 import movie_master.api.mapper.UserDtoMapper;
@@ -61,5 +62,12 @@ public class MockDefaultUserService implements UserService {
     public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getWatchList'");
+    }
+
+    @Override
+    public UserMovie addMovieToWatchlist(Long userId, Long movieId)
+            throws UserNotFoundException, MovieNotFoundException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'addMovieToWatchlist'");
     }
 }

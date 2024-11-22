@@ -18,9 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 
 import movie_master.api.model.UserMovie;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 /**
  * Controller for users
@@ -54,6 +58,23 @@ public class UserController {
             // Return HTTP code with 404 error message if the user could not be found
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body("User not found: " + exception.getMessage());
+        }
+    }
+
+    @PutMapping("/watchlist/{userId}/{movieId}")
+    public ResponseEntity<?> putMethodName(@PathVariable Long userId, @PathVariable Long movieId) {
+        try {
+            UserMovie watchItem = userService.addMovieToWatchlist(userId, movieId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Successfully added to watchlist",
+                "userId", userId,
+                "movie_id", movieId,
+                "association_object", watchItem
+                ));
+        } catch(Exception exception) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+            .body("Could not associate user with movie. Exception message: "
+             + exception.getMessage());
         }
     }
 }

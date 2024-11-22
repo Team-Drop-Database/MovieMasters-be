@@ -5,6 +5,7 @@ import java.util.Set;
 import movie_master.api.dto.UserDto;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.exception.EmailHasAlreadyBeenTaken;
+import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
 import movie_master.api.model.UserMovie;
@@ -15,4 +16,5 @@ import movie_master.api.model.UserMovie;
 public interface UserService {
     UserDto register(RegisterUserRequest registerUserRequest) throws EmailHasAlreadyBeenTaken, UsernameHasAlreadyBeenTaken;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
+    UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
 }
