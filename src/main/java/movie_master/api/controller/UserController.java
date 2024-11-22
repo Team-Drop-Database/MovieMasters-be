@@ -38,6 +38,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * Registers a new user
+     * 
+     * @param httpServletRequest
+     * @param registerUserRequest
+     * @return data providing information about the new user.
+     */
     @PostMapping
     private ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
         try {
@@ -49,6 +56,14 @@ public class UserController {
         }
     }
 
+    /**
+     * Retrieve the watchlist of a given user.
+     * 
+     * @param userId id of the user
+     * @return  a list of objects containing data such as the
+     *  users opinion about the movie along with information 
+     * about the movie itself.
+     */
     @GetMapping("/watchlist")
     public ResponseEntity<?> getWatchList(@RequestParam(required = true) Long userId) {
         try {
@@ -61,6 +76,14 @@ public class UserController {
         }
     }
 
+    /**
+     * Updates the watchlist of a movie by adding a movie to it. Essentially an association
+     *  ()'MovieUser') is created between a user and a movie.
+     * 
+     * @param userId id of the user
+     * @param movieId id of the movie
+     * @return newly created watchitem (UserMovie)
+     */
     @PutMapping("/watchlist/{userId}/{movieId}")
     public ResponseEntity<?> putMethodName(@PathVariable Long userId, @PathVariable Long movieId) {
         try {
