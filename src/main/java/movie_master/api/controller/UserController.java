@@ -25,7 +25,6 @@ import movie_master.api.model.UserMovie;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
 /**
  * Controller for users
  */
@@ -78,7 +77,7 @@ public class UserController {
 
     /**
      * Updates the watchlist of a movie by adding a movie to it. Essentially an association
-     *  ()'MovieUser') is created between a user and a movie.
+     *  ('MovieUser') is created between a user and a movie.
      * 
      * @param userId id of the user
      * @param movieId id of the movie
