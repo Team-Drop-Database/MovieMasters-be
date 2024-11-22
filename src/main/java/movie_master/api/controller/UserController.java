@@ -83,7 +83,7 @@ public class UserController {
      * @param movieId id of the movie
      * @return newly created watchitem (UserMovie)
      */
-    @PutMapping("/watchlist/add/{userId}/{movieId}")
+    @PutMapping("/{userId}/watchlist/add/{movieId}")
     public ResponseEntity<?> addMovieToWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
         try {
             UserMovie watchItem = userService.addMovieToWatchlist(userId, movieId);
