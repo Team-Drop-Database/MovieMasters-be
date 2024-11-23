@@ -100,10 +100,29 @@ public class UserController {
         }
     }
 
-    @PutMapping("watchlist/update/{useId}/{itemId}")
-    public ResponseEntity<?> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long itemId) {
-        //TODO: process PUT request
-        
-        return null;
+    /**
+     * Updates the 'watched' status of an item on the watchlist.
+     * 
+     * @param userId id of the user
+     * @param itemId id of the watchlist item (UserMovie)
+     * @param watched whether the user has watched this movie or not
+     * @return updated watchitem
+     */
+    @PutMapping("{userId}/watchlist/update/{itemId}")
+    public ResponseEntity<?> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long itemId,
+     @RequestParam boolean watched) {
+        try {
+            UserMovie watchItem = userService.updateWatchItemStatus(userId, itemId, watched);
+            return ResponseEntity.ok(Map.of(
+                "message", "Successfully updated watchlist item",
+                "userId", userId,
+                "movie_id", itemId,
+                "association_object", watchItem
+                ));
+        } catch(Exception exception) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+            .body("Could not update 'watched' status. Exception message: "
+             + exception.getMessage());
+        }        
     }
 }

@@ -3,6 +3,7 @@ package movie_master.api.service;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailHasAlreadyBeenTaken;
 import movie_master.api.exception.MovieNotFoundException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
 import movie_master.api.mapper.UserDtoMapper;
@@ -132,5 +133,30 @@ public class DefaultUserService implements UserService {
         // Save the newly updated association and return it
         userRepository.save(user);
         return movieAssociation;
+    }
+
+    @Override
+    public UserMovie updateWatchItemStatus(Long userId, Long itemId, boolean watched) 
+            throws UserNotFoundException, UserMovieNotFoundException {
+
+        // Retrieve the user
+        Optional<User> userOpt = userRepository.findById(userId);
+        if(userOpt.isEmpty()){
+            throw new UserNotFoundException(userId);
+        }
+        User user = userOpt.get();
+
+        // Retrieve the watchlistitem using its ID (not the movie id!)
+        Optional<UserMovie> watchlistItemOpt = user.getWatchList()
+            .stream().filter(a -> a.getId().equals(itemId)).findFirst();
+        if(watchlistItemOpt.isEmpty()){
+            throw new UserMovieNotFoundException(itemId);
+        }
+        
+        // Set the new 'watched' value and return the updated UserMovie
+        UserMovie watchlistItem = watchlistItemOpt.get();
+        watchlistItem.setWatched(watched);
+        userRepository.save(user);
+        return watchlistItem;
     }
 }
