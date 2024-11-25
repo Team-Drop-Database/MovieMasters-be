@@ -43,16 +43,20 @@ public class DefaultUserService implements UserService {
             throw new UsernameHasAlreadyBeenTaken(registerUserRequest.username());
         }
 
+        String encodedPassword = passwordEncoder.encode(registerUserRequest.password());
+
         User userToCreate = new User(
                 registerUserRequest.email(),
                 registerUserRequest.username(),
-                passwordEncoder.encode(registerUserRequest.password()),
+                encodedPassword,
                 Roles.USER.name(),
                 true);
 
-        this.userRepository.save(userToCreate);
+        System.out.println(userToCreate.getPassword());
 
-        return this.userDtoMapper.apply(userToCreate);
+        User createdUser = this.userRepository.save(userToCreate);
+
+        return this.userDtoMapper.apply(createdUser);
     }
 
     @Override
