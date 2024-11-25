@@ -1,4 +1,4 @@
-package movie_master.cors;
+package movie_master.api.cors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import movie_master.api.request.RegisterUserRequest;

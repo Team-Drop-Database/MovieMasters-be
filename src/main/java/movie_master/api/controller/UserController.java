@@ -3,24 +3,18 @@ package movie_master.api.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
+import movie_master.api.exception.EmailTakenException;
+import movie_master.api.exception.UserNotFoundException;
+import movie_master.api.exception.UsernameTakenException;
+import movie_master.api.model.UserMovie;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.UserService;
-import movie_master.api.exception.EmailHasAlreadyBeenTaken;
-import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
-import movie_master.api.exception.UserNotFoundException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.net.URI;
 import java.util.Set;
-
-import movie_master.api.model.UserMovie;
 
 /**
  * Controller for users
@@ -35,25 +29,25 @@ public class UserController {
     }
 
     @PostMapping
-    private ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
+    ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
         try {
             UserDto userDto = userService.register(registerUserRequest);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(userDto);
         }
-        catch (EmailHasAlreadyBeenTaken | UsernameHasAlreadyBeenTaken e) {
+        catch (EmailTakenException | UsernameTakenException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/watchlist")
-    private ResponseEntity<Object> getWatchList(@RequestParam(required = true) Long userId) {
+    ResponseEntity<Object> getWatchList(@RequestParam(required = true) Long userId) {
         try {
             Set<UserMovie> watchList = userService.getWatchList(userId);
             return ResponseEntity.ok(watchList);
         } catch (UserNotFoundException exception) {
             // Return HTTP code with 404 error message if the user could not be found
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("User not found: " + exception.getMessage());
+                .body("User not found: " + exception.getMessage());
         }
     }
 }
