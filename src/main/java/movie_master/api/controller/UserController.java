@@ -20,9 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 
 import movie_master.api.model.UserMovie;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Controller for users
@@ -36,6 +39,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * Registers a new user
+     * 
+     * @param httpServletRequest
+     * @param registerUserRequest
+     * @return data providing information about the new user.
+     */
     @PostMapping
     private ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
         try {
@@ -57,8 +67,16 @@ public class UserController {
         }
     }
 
-    @GetMapping("/watchlist")
-    public ResponseEntity<?> getWatchList(@RequestParam(required = true) Long userId) {
+    /**
+     * Retrieve the watchlist of a given user.
+     * 
+     * @param userId id of the user
+     * @return  a list of objects containing data such as the
+     *  users opinion about the movie along with information 
+     * about the movie itself.
+     */
+    @GetMapping("/{userId}/watchlist")
+    public ResponseEntity<?> getWatchList(@PathVariable Long userId) {
         try {
             Set<UserMovie> watchList = userService.getWatchList(userId);
             return ResponseEntity.ok(watchList);
@@ -66,6 +84,31 @@ public class UserController {
             // Return HTTP code with 404 error message if the user could not be found
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body("User not found: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Updates the watchlist of a movie by adding a movie to it. Essentially an association
+     *  ('MovieUser') is created between a user and a movie.
+     * 
+     * @param userId id of the user
+     * @param movieId id of the movie
+     * @return newly created watchitem (UserMovie)
+     */
+    @PutMapping("/{userId}/watchlist/add/{movieId}")
+    public ResponseEntity<?> addMovieToWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
+        try {
+            UserMovie watchItem = userService.addMovieToWatchlist(userId, movieId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Successfully added to watchlist",
+                "userId", userId,
+                "movie_id", movieId,
+                "association_object", watchItem
+                ));
+        } catch(Exception exception) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+            .body("Could not associate user with movie. Exception message: "
+             + exception.getMessage());
         }
     }
 }
