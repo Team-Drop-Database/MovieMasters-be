@@ -15,6 +15,7 @@ import movie_master.api.model.UserMovie;
  */
 public interface UserService {
     UserDto register(RegisterUserRequest registerUserRequest) throws EmailHasAlreadyBeenTaken, UsernameHasAlreadyBeenTaken;
+    void deleteUserById(Long userId) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
 }
