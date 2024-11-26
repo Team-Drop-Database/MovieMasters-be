@@ -85,14 +85,6 @@ public class DefaultUserService implements UserService {
      *  watchlist of this user.
      */
     @Override
-    public void deleteUserById(Long userId) throws UserNotFoundException {
-        if (!this.userRepository.existsById(userId)) {
-            throw new UserNotFoundException(userId);
-        }
-        userRepository.deleteById(userId);
-    }
-
-    @Override
     public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
 
         // Retrieve the user in Optional form

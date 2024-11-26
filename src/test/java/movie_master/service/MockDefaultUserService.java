@@ -54,12 +54,6 @@ public class MockDefaultUserService implements UserService {
         return userDto;
     }
 
-    @Override
-    public void deleteUserById(Long userId) throws UserNotFoundException {
-        // TODO: auto-generated method stub, not in use
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUserById'");
-    }
-
     public List<UserDto> getRegisteredUsers() {
         return registeredUsers;
     }

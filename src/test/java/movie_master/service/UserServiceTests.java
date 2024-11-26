@@ -1,20 +1,14 @@
 package movie_master.service;
 
-import jakarta.transaction.Transactional;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailHasAlreadyBeenTaken;
-import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.User;
 import movie_master.api.model.role.Roles;
-import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
-import movie_master.api.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test class for the MockDefaultRegisterUserService class
  */
 @SpringBootTest
-@AutoConfigureMockMvc
-@Transactional // Makes sure that the database state is rolled back after each test to maintain isolation
 public class UserServiceTests {
     private User user;
     private UserDtoMapper userDtoMapper;
@@ -35,14 +27,6 @@ public class UserServiceTests {
     private RegisterUserRequest firstRegisterUserRequest;
     private RegisterUserRequest secondRegisterUserRequest;
     private RegisterUserRequest thirdRegisterUserRequest;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    UserRepository userRepository;
-
-    private User deleteUser;
 
     @BeforeEach
     void setup() {
@@ -53,10 +37,6 @@ public class UserServiceTests {
         firstRegisterUserRequest = new RegisterUserRequest("mock@gmail.com", "mock12", "mocked123");
         secondRegisterUserRequest = new RegisterUserRequest("mock@gmail.com", "mock123", "mocked123");
         thirdRegisterUserRequest = new RegisterUserRequest("mock1@gmail.com", "mock12", "mocked123");
-
-        deleteUser = new User("delete@gmail.com", "exampledelete",
-                "deleteme", Roles.USER.name(), true);
-        deleteUser = userRepository.save(deleteUser);
     }
 
     @Test
@@ -90,24 +70,5 @@ public class UserServiceTests {
         mockDefaultRegisterUserService.register(firstRegisterUserRequest);
 
         assertThrows(UsernameHasAlreadyBeenTaken.class, () -> mockDefaultRegisterUserService.register(thirdRegisterUserRequest));
-    }
-
-    @Test
-    void delete_user_succes() throws UserNotFoundException {
-        assertTrue(userRepository.existsById(deleteUser.getId()));
-
-        userService.deleteUserById(deleteUser.getId());
-
-        assertFalse(userRepository.existsById(deleteUser.getId()));
-    }
-
-    @Test
-    void delete_user_not_found() throws UserNotFoundException {
-        Long nonExistingId = 999L;
-
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUserById(nonExistingId));
-
-        // Making sure the repository was checked but nothing is deleted
-        assertTrue(userRepository.existsById(deleteUser.getId()));
     }
 }

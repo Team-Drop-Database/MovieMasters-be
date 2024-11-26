@@ -2,7 +2,6 @@ package movie_master.api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,11 +28,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/users").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/users/**").permitAll() //TODO: Make this for only authenticated users
                         .requestMatchers("/movies").permitAll()
                         .requestMatchers("/users/**").permitAll())
-
+                        
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .build();
     }
