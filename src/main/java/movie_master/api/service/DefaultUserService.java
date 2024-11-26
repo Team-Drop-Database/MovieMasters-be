@@ -56,6 +56,14 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public void deleteUserById(Long userId) throws UserNotFoundException {
+        if (!this.userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+        userRepository.deleteById(userId);
+    }
+
+    @Override
     public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
         Optional<User> user = userRepository.findById(userId);
 
