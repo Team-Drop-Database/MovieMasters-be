@@ -28,12 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class DefaultUserServiceTest {
 
     @Mock private UserRepository userRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private UserDtoMapper userDtoMapper;
-    @InjectMocks private UserService service;
+    @InjectMocks private DefaultUserService service;
 
     private final RegisterUserRequest registerRequest = new RegisterUserRequest("mock@gmail.com",
             "mock1234", "12345678");

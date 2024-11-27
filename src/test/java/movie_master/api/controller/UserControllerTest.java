@@ -9,7 +9,7 @@ import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.request.RegisterUserRequest;
-import movie_master.api.service.UserService;
+import movie_master.api.service.DefaultUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Mock private UserService userService;
+    @Mock private DefaultUserService defaultUserService;
     @InjectMocks UserController controller;
 
     @Test
@@ -41,7 +41,7 @@ class UserControllerTest {
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
         UserDto expectedBody = new UserDto(1L, "email", "username", "ugly", LocalDate.now(), "some");
 
-        Mockito.when(userService.register(request)).thenReturn(expectedBody);
+        Mockito.when(defaultUserService.register(request)).thenReturn(expectedBody);
         Mockito.when(httpServletRequest.getRequestURI()).thenReturn(uri);
 
         // When
@@ -59,7 +59,7 @@ class UserControllerTest {
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
         EmailTakenException exception = new EmailTakenException("Email already exists");
 
-        Mockito.when(userService.register(request)).thenThrow(exception);
+        Mockito.when(defaultUserService.register(request)).thenThrow(exception);
 
         // When
         ResponseEntity<Object> result = controller.register(httpServletRequest, request);
@@ -76,7 +76,7 @@ class UserControllerTest {
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
         UsernameTakenException exception = new UsernameTakenException("Username already exists");
 
-        Mockito.when(userService.register(request)).thenThrow(exception);
+        Mockito.when(defaultUserService.register(request)).thenThrow(exception);
 
         // When
         ResponseEntity<Object> result = controller.register(httpServletRequest, request);
@@ -100,7 +100,7 @@ class UserControllerTest {
             new UserMovie(user, movie3, false, 0.0)
         );
 
-        Mockito.when(userService.getWatchList(userId)).thenReturn(expectedBody);
+        Mockito.when(defaultUserService.getWatchList(userId)).thenReturn(expectedBody);
 
         // When
         ResponseEntity<Object> result = controller.getWatchList(userId);
@@ -117,7 +117,7 @@ class UserControllerTest {
         UserNotFoundException exception = new UserNotFoundException(userId);
         String expectedMessage = String.format("User not found: %s", exception.getMessage());
 
-        Mockito.when(userService.getWatchList(userId)).thenThrow(exception);
+        Mockito.when(defaultUserService.getWatchList(userId)).thenThrow(exception);
 
         // When
         ResponseEntity<Object> result = controller.getWatchList(userId);

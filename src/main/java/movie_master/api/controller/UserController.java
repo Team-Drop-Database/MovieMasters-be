@@ -8,7 +8,7 @@ import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.UserMovie;
 import movie_master.api.request.RegisterUserRequest;
-import movie_master.api.service.UserService;
+import movie_master.api.service.DefaultUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,16 +22,16 @@ import java.util.Set;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService;
+    private final DefaultUserService defaultUserService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(DefaultUserService defaultUserService) {
+        this.defaultUserService = defaultUserService;
     }
 
     @PostMapping
     ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
         try {
-            UserDto userDto = userService.register(registerUserRequest);
+            UserDto userDto = defaultUserService.register(registerUserRequest);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(userDto);
         }
         catch (EmailTakenException | UsernameTakenException e) {
@@ -42,7 +42,7 @@ public class UserController {
     @GetMapping("/watchlist")
     ResponseEntity<Object> getWatchList(@RequestParam(required = true) Long userId) {
         try {
-            Set<UserMovie> watchList = userService.getWatchList(userId);
+            Set<UserMovie> watchList = defaultUserService.getWatchList(userId);
             return ResponseEntity.ok(watchList);
         } catch (UserNotFoundException exception) {
             // Return HTTP code with 404 error message if the user could not be found
