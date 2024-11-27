@@ -1,4 +1,4 @@
-package movie_master.controller;
+package movie_master.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import movie_master.api.model.Movie;

@@ -1,18 +1,12 @@
 package movie_master.api.model;
 
-import jakarta.persistence.*;
-import java.time.LocalDate;
-
-import java.util.HashSet;
-import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * User table for the database
@@ -36,9 +30,7 @@ public class User {
     @JsonManagedReference      
     private Set<UserMovie> watchlist;
 
-    public User() {
-
-    }
+    public User() {}
 
     public User(String email, String username, String password, String roles, boolean enabled) {
         this.email = email;

@@ -7,6 +7,8 @@ DB_USERNAME=example_username
 DB_PASSWORD=example_password
 DB_NAME=example_name
 SHOW_SQL=true
+CLIENT_HOST=http://localhost:YOUR_PORT_NUMBER
+JWT_SECRET=SECRET_KEY
 ```
 
 ## Getting started

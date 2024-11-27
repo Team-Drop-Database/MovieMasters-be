@@ -1,10 +1,10 @@
 package movie_master.api.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.Claims;
-import org.springframework.stereotype.Component;
 import movie_master.api.config.JWTConfig;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Map;

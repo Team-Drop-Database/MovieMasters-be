@@ -22,6 +22,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String contextPath = request.getServletContext().getContextPath();
+        String path = request.getRequestURI();
+
+        return path.startsWith(contextPath + "/auth/login");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = request.getHeader("Authorization");
