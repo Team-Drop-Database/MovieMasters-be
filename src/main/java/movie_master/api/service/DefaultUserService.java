@@ -71,7 +71,8 @@ public class DefaultUserService implements UserService {
                         registerUserRequest.username(),
                         passwordEncoder.encode(registerUserRequest.password()),
                         Roles.USER.name(),
-                        true)
+                        true
+                        )
         );
 
         return this.userDtoMapper.apply(createdUser);
