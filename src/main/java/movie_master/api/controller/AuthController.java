@@ -1,6 +1,6 @@
 package movie_master.api.controller;
 
-import movie_master.api.security.JwTUtil;
+import movie_master.api.security.JWTUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,9 +13,9 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final JwTUtil jwtUtil;
+    private final JWTUtil jwtUtil;
 
-    public AuthController(JwTUtil jwtUtil) {
+    public AuthController(JWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 

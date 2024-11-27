@@ -1,7 +1,7 @@
 package movie_master.api.config;
 
-import movie_master.api.security.JwTAuthenticationFilter;
-import movie_master.api.security.JwTService;
+import movie_master.api.security.JWTAuthenticationFilter;
+import movie_master.api.security.JWTService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,10 +23,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwTService jwtService;
-    private final JwTConfig jwtConfig;
+    private final JWTService jwtService;
+    private final JWTConfig jwtConfig;
 
-    public SecurityConfig(JwTService jwtService, JwTConfig jwtConfig) {
+    public SecurityConfig(JWTService jwtService, JWTConfig jwtConfig) {
         this.jwtService = jwtService;
         this.jwtConfig = jwtConfig;
     }
@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated())  // All other routes require authentication
-                .addFilterBefore(new JwTAuthenticationFilter(jwtService, jwtConfig), UsernamePasswordAuthenticationFilter.class)  // Add the JWT filter
+                .addFilterBefore(new JWTAuthenticationFilter(jwtService, jwtConfig), UsernamePasswordAuthenticationFilter.class)  // Add the JWT filter
                 .build();
     }
 

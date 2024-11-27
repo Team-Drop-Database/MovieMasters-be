@@ -4,16 +4,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Component;
-import movie_master.api.config.JwTConfig;
+import movie_master.api.config.JWTConfig;
 
 import java.util.Date;
 import java.util.Map;
 
 @Component
-public class JwTUtil {
-    private final JwTConfig jwtConfig;
+public class JWTUtil {
+    private final JWTConfig jwtConfig;
 
-    public JwTUtil(JwTConfig jwtConfig) {
+    public JWTUtil(JWTConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
     }
 

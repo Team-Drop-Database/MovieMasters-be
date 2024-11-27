@@ -3,17 +3,17 @@ package movie_master.api.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import movie_master.api.config.JwTConfig;
+import movie_master.api.config.JWTConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Map;
 
 @Service
-public class JwTService {
-    private final JwTConfig jwtConfig;
+public class JWTService {
+    private final JWTConfig jwtConfig;
 
-    public JwTService(JwTConfig jwtConfig) {
+    public JWTService(JWTConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
     }
 
