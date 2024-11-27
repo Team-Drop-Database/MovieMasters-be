@@ -33,7 +33,7 @@ public class UserMovie {
         this.rating = rating;
     }
 
-    public UserMovie(){}
+    public UserMovie() {}
 
     public Long getId() {
         return id;

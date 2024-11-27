@@ -1,6 +1,5 @@
-package movie_master.service;
+package movie_master.api.service;
 
-import movie_master.api.service.MovieService;
 import movie_master.api.model.Movie;
 import movie_master.api.repository.MovieRepository;
 import org.junit.jupiter.api.Assertions;
