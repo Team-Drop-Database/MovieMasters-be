@@ -135,7 +135,7 @@ public class DefaultUserService implements UserService {
         Movie movie = movieOpt.get();
 
         // Create the association
-        UserMovie movieAssociation = new UserMovie(user, movie, false, -1.0);
+        UserMovie movieAssociation = new UserMovie(user, movie, false);
         user.addMovieToWatchlist(movieAssociation);
 
         // Save the newly updated association and return it

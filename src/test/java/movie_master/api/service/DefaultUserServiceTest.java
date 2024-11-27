@@ -112,9 +112,9 @@ public class DefaultUserServiceTest {
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there");
         Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there");
         Set<UserMovie> expectedResult = Set.of(
-            new UserMovie(user, movie1, false, 0.0),
-            new UserMovie(user, movie2, false, 0.0),
-            new UserMovie(user, movie3, false, 0.0)
+            new UserMovie(user, movie1, false),
+            new UserMovie(user, movie2, false),
+            new UserMovie(user, movie3, false)
         );
         for (UserMovie userMovie : expectedResult) {
             user.addMovieToWatchlist(userMovie);
