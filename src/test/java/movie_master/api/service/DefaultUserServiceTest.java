@@ -30,10 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 public class DefaultUserServiceTest {
 
+    //TODO mock movie repository
     @Mock private UserRepository userRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private UserDtoMapper userDtoMapper;
-    @InjectMocks private DefaultUserService service;
+    @InjectMocks private DefaultUserService defaultUserService;
 
     private final RegisterUserRequest registerRequest = new RegisterUserRequest("mock@gmail.com",
             "mock1234", "12345678");
@@ -41,18 +42,19 @@ public class DefaultUserServiceTest {
     @Test
     void registerUserSuccessfully() throws UsernameTakenException, EmailTakenException {
         // Given
-        String encodedpw = "volendam";
+        String encodedPassword = "#deijjdejide!";
+
         User userToCreate = new User(
             registerRequest.email(),
             registerRequest.username(),
-            encodedpw,
+            encodedPassword,
             Roles.USER.name(),
             true
         );
         User createdUser = new User(
             "ervin.@gmail.com",
             "dedede",
-            encodedpw,
+            encodedPassword,
             Roles.USER.name(),
             true
         );
@@ -70,10 +72,10 @@ public class DefaultUserServiceTest {
         Mockito.when(userDtoMapper.apply(createdUser)).thenReturn(userDto);
         Mockito.when(userRepository.findByEmail(registerRequest.email())).thenReturn(Optional.empty());
         Mockito.when(userRepository.findByUsername(registerRequest.username())).thenReturn(Optional.empty());
-        Mockito.when(passwordEncoder.encode(Mockito.any())).thenReturn(encodedpw);
+        Mockito.when(passwordEncoder.encode(Mockito.any())).thenReturn(encodedPassword);
 
         // When
-        UserDto registeredUser = service.register(registerRequest);
+        UserDto registeredUser = defaultUserService.register(registerRequest);
 
         // Then
         assertEquals(userDto, registeredUser);
@@ -87,7 +89,7 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findByUsername(registerRequest.username())).thenReturn(Optional.empty());
 
         // When -> then
-        assertThrows(EmailTakenException.class, () -> service.register(registerRequest));
+        assertThrows(EmailTakenException.class, () -> defaultUserService.register(registerRequest));
     }
 
     @Test
@@ -98,7 +100,7 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findByUsername(registerRequest.username())).thenReturn(Optional.of(foundUser));
 
         // When -> then
-        assertThrows(UsernameTakenException.class, () -> service.register(registerRequest));
+        assertThrows(UsernameTakenException.class, () -> defaultUserService.register(registerRequest));
     }
 
     @Test
@@ -121,7 +123,7 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // When
-        Set<UserMovie> result = service.getWatchList(userId);
+        Set<UserMovie> result = defaultUserService.getWatchList(userId);
 
         // Then
         assertEquals(expectedResult, result);
@@ -135,6 +137,6 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When -> then
-        assertThrows(UserNotFoundException.class, () -> service.getWatchList(userId));
+        assertThrows(UserNotFoundException.class, () -> defaultUserService.getWatchList(userId));
     }
 }

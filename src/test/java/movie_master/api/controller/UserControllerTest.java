@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserControllerTest {
 
     @Mock private DefaultUserService defaultUserService;
-    @InjectMocks UserController controller;
+    @InjectMocks private UserController userController;
 
     @Test
     void registerSuccessfully() throws EmailTakenException, UsernameTakenException {
@@ -45,7 +45,7 @@ class UserControllerTest {
         Mockito.when(httpServletRequest.getRequestURI()).thenReturn(uri);
 
         // When
-        ResponseEntity<Object> result = controller.register(httpServletRequest, request);
+        ResponseEntity<Object> result = userController.register(httpServletRequest, request);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.CREATED.value()));
@@ -62,7 +62,7 @@ class UserControllerTest {
         Mockito.when(defaultUserService.register(request)).thenThrow(exception);
 
         // When
-        ResponseEntity<Object> result = controller.register(httpServletRequest, request);
+        ResponseEntity<Object> result = userController.register(httpServletRequest, request);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()));
@@ -79,7 +79,7 @@ class UserControllerTest {
         Mockito.when(defaultUserService.register(request)).thenThrow(exception);
 
         // When
-        ResponseEntity<Object> result = controller.register(httpServletRequest, request);
+        ResponseEntity<Object> result = userController.register(httpServletRequest, request);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()));
@@ -103,7 +103,7 @@ class UserControllerTest {
         Mockito.when(defaultUserService.getWatchList(userId)).thenReturn(expectedBody);
 
         // When
-        ResponseEntity<Object> result = controller.getWatchList(userId);
+        ResponseEntity<Object> result = userController.getWatchList(userId);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
@@ -115,12 +115,12 @@ class UserControllerTest {
         // Given
         long userId = 1337;
         UserNotFoundException exception = new UserNotFoundException(userId);
-        String expectedMessage = String.format("User not found: %s", exception.getMessage());
+        String expectedMessage = String.format("User with id '%d' does not exist", userId);
 
         Mockito.when(defaultUserService.getWatchList(userId)).thenThrow(exception);
 
         // When
-        ResponseEntity<Object> result = controller.getWatchList(userId);
+        ResponseEntity<Object> result = userController.getWatchList(userId);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));

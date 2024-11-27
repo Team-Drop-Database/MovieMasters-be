@@ -1,10 +1,10 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
-import movie_master.api.exception.EmailHasAlreadyBeenTaken;
+import movie_master.api.exception.EmailTakenException;
 import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
+import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
@@ -24,7 +24,7 @@ import java.util.Set;
 @Service
 public class DefaultUserService implements UserService {
 
-    // Repositorites
+    // Repositories
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
 
@@ -47,7 +47,7 @@ public class DefaultUserService implements UserService {
      */
     @Override
     public UserDto register(RegisterUserRequest registerUserRequest) 
-        throws EmailHasAlreadyBeenTaken, UsernameHasAlreadyBeenTaken {
+        throws EmailTakenException, UsernameTakenException {
 
         // Check if the given email or password already exists somewhere
         Optional<User> userFoundByEmail = this.userRepository
@@ -57,24 +57,24 @@ public class DefaultUserService implements UserService {
 
         // If so, throw an exception
         if (userFoundByEmail.isPresent()) {
-            throw new EmailHasAlreadyBeenTaken(registerUserRequest.email());
+            throw new EmailTakenException(registerUserRequest.email());
         }
 
         if (userFoundByUsername.isPresent()) {
-            throw new UsernameHasAlreadyBeenTaken(registerUserRequest.username());
+            throw new UsernameTakenException(registerUserRequest.username());
         }
 
-        // Create a new user object, algorithmatically encode the password
-        User userToCreate = new User(
-                registerUserRequest.email(),
-                registerUserRequest.username(),
-                passwordEncoder.encode(registerUserRequest.password()),
-                Roles.USER.name(),
-                true);
-
         // Save the result and map the user object to a DTO before returning
-        this.userRepository.save(userToCreate);
-        return this.userDtoMapper.apply(userToCreate);
+        User createdUser = this.userRepository.save(
+                new User(
+                        registerUserRequest.email(),
+                        registerUserRequest.username(),
+                        passwordEncoder.encode(registerUserRequest.password()),
+                        Roles.USER.name(),
+                        true)
+        );
+
+        return this.userDtoMapper.apply(createdUser);
     }
 
     /**

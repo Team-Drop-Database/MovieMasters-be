@@ -1,8 +1,5 @@
 package movie_master.api.exception;
 
-/**
- * Custom exception
- */
 public class UsernameTakenException extends Exception {
 
     public UsernameTakenException(String username) {
