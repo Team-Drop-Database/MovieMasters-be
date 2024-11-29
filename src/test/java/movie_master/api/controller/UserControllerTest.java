@@ -3,6 +3,7 @@ package movie_master.api.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailTakenException;
+import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.Movie;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -124,6 +126,31 @@ class UserControllerTest {
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+        assertEquals(result.getBody(), expectedMessage);
+    }
+
+    @Test
+    void successAddMovieToWatchlist() throws UserNotFoundException, MovieNotFoundException {
+        // Given
+        long userId = 1337;
+        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+
+        UserMovie expectedBody = new UserMovie(user, movie1, false);
+        Map<String, Object> expectedMessage = Map.of(
+                "message", "Successfully added to watchlist",
+                "userId", userId,
+                "movie_id", movie1.getId(),
+                "association_object", expectedBody
+                );
+
+        Mockito.when(defaultUserService.addMovieToWatchlist(userId, movie1.getId())).thenReturn(expectedBody);
+
+        // When
+        ResponseEntity<Object> result = userController.addMovieToWatchlist(userId, movie1.getId());
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
         assertEquals(result.getBody(), expectedMessage);
     }
 }
