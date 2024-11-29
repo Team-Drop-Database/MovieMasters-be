@@ -1,4 +1,4 @@
-package movie_master.api.controller;
+package movie_master.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import movie_master.api.model.Movie;
@@ -40,16 +40,14 @@ public class MovieControllerTests {
                 "Description of movie 1",
                 releaseDate,
                 "en",
-                "/image.png",
-                10);
+                "/image.png");
         Movie movie2 = new Movie(
                 1,
                 "Star Wars",
                 "Description of movie 2",
                 releaseDate,
                 "en",
-                "/image.png",
-                10);
+                "/image.png");
 
         List<Movie> movies = Arrays.asList(movie1, movie2);
         mockMvc.perform(get("/movies")
@@ -68,16 +66,14 @@ public class MovieControllerTests {
                 "Description of movie 1",
                 releaseDate,
                 "en",
-                "/image.png",
-                10);
+                "/image.png");
         Movie movie2 = new Movie(
                 1,
                 "Star Wars",
                 "Description of movie 2",
                 releaseDate,
                 "en",
-                "/image.png",
-                10);
+                "/image.png");
 
         List<Movie> movies = Arrays.asList(movie1, movie2);
         this.mockMvc.perform(get("/movies?title=a")

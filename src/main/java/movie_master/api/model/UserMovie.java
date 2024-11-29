@@ -23,17 +23,17 @@ public class UserMovie {
     @Column(nullable = false)
     private boolean watched;
 
-    @OneToOne
-    @JoinColumn(name = "review")
-    private Review review;
+    @Column(nullable = true)
+    private double rating;
 
-    public UserMovie(User user, Movie movie, boolean watched) {
+    public UserMovie(User user, Movie movie, boolean watched, double rating) {
         this.user = user;
         this.movie = movie;
         this.watched = watched;
+        this.rating = rating;
     }
 
-    public UserMovie() {}
+    public UserMovie(){}
 
     public Long getId() {
         return id;
@@ -63,11 +63,11 @@ public class UserMovie {
         this.watched = watched;
     }
 
-    public Review getReview() {
-        return review;
+    public double getRating() {
+        return rating;
     }
 
-    public void setReview(Review review) {
-        this.review = review;
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 }

@@ -5,8 +5,8 @@ import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.UserService;
-import movie_master.api.exception.EmailTakenException;
-import movie_master.api.exception.UsernameTakenException;
+import movie_master.api.exception.EmailHasAlreadyBeenTaken;
+import movie_master.api.exception.UsernameHasAlreadyBeenTaken;
 import movie_master.api.exception.UserNotFoundException;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.util.Map;
@@ -40,29 +41,29 @@ public class UserController {
 
     /**
      * Registers a new user
-     *
+     * 
      * @param httpServletRequest
      * @param registerUserRequest
-     * @return userDto
+     * @return data providing information about the new user.
      */
     @PostMapping
-    public ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
+    private ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
         try {
             UserDto userDto = userService.register(registerUserRequest);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(userDto);
         }
-        catch (EmailTakenException | UsernameTakenException e) {
+        catch (EmailHasAlreadyBeenTaken | UsernameHasAlreadyBeenTaken e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Object> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         try {
             userService.deleteUserById(userId);
             return ResponseEntity.noContent().build();
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UserNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + exception.getMessage());
         }
     }
 
@@ -75,13 +76,14 @@ public class UserController {
      * about the movie itself.
      */
     @GetMapping("/{userId}/watchlist")
-    public ResponseEntity<Object> getWatchList(@PathVariable Long userId) {
+    public ResponseEntity<?> getWatchList(@PathVariable Long userId) {
         try {
             Set<UserMovie> watchList = userService.getWatchList(userId);
             return ResponseEntity.ok(watchList);
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException exception) {
             // Return HTTP code with 404 error message if the user could not be found
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("User not found: " + exception.getMessage());
         }
     }
 
@@ -94,7 +96,7 @@ public class UserController {
      * @return newly created watchitem (UserMovie)
      */
     @PutMapping("/{userId}/watchlist/add/{movieId}")
-    public ResponseEntity<Object> addMovieToWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
+    public ResponseEntity<?> addMovieToWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
         try {
             UserMovie watchItem = userService.addMovieToWatchlist(userId, movieId);
             return ResponseEntity.ok(Map.of(

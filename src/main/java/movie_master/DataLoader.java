@@ -54,7 +54,6 @@ public class DataLoader implements ApplicationRunner {
             JsonNode arrayNode = objectMapper.readTree(response.body().string()).get("results");
             for (JsonNode node : arrayNode) {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
-                movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
                 movieRepository.save(movie);
             }
         } catch (Exception e){

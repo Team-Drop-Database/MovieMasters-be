@@ -1,6 +1,5 @@
 package movie_master.api.service;
 
-import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.model.Movie;
 import org.springframework.stereotype.Service;
 
