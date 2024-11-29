@@ -3,6 +3,7 @@ package movie_master.api.service;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailTakenException;
 import movie_master.api.exception.MovieNotFoundException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.mapper.UserDtoMapper;
