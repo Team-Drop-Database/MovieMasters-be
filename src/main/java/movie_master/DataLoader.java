@@ -34,9 +34,9 @@ public class DataLoader implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         // Only adding movies if there are non in the database
         List<Movie> movies = movieRepository.findAll();
-//        if (!movies.isEmpty()) {
-//            return;
-//        }
+        if (!movies.isEmpty()) {
+            return;
+        }
 
         OkHttpClient client = new OkHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
