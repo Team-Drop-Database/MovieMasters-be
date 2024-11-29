@@ -23,20 +23,22 @@ public class Movie {
     private String language;
     @JsonAlias("release_date")
     private Date releaseDate;
-    private double rating;
     @JsonAlias("poster_path")
     private String posterPath;
+    @JsonAlias("vote_average")
+    private double tmdbRating;
 
     @OneToMany(mappedBy = "movie")
     private Set<UserMovie> userMovies;
 
-    public Movie(long id, String title, String description, Date releaseDate, String language, String posterPath) {
+    public Movie(long id, String title, String description, Date releaseDate, String language, String posterPath, double tmdbRating) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.releaseDate = releaseDate;
         this.language = language;
         this.posterPath = posterPath;
+        this.tmdbRating = tmdbRating;
     }
 
     public Movie() {
@@ -58,12 +60,12 @@ public class Movie {
         this.posterPath = posterPath;
     }
 
-    public double getRating() {
-        return rating;
+    public double getTmdbRating() {
+        return tmdbRating;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
+    public void setTmdbRating(double tmdbRating) {
+        this.tmdbRating = tmdbRating;
     }
 
     public Date getReleaseDate() {
