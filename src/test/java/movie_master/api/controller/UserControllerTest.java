@@ -153,4 +153,42 @@ class UserControllerTest {
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
         assertEquals(result.getBody(), expectedMessage);
     }
+
+    @Test
+    void failAddMovieToWatchlist() throws UserNotFoundException, MovieNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Long movieId = 1L;
+        Long wrongMovieId = 2L;
+        
+        MovieNotFoundException exception = new MovieNotFoundException(movieId);
+        String expectedMessage = "Could not associate user with movie. Exception message: " + exception.getMessage();
+
+        Mockito.when(defaultUserService.addMovieToWatchlist(userId, wrongMovieId)).thenThrow(exception);
+
+        // When
+        ResponseEntity<Object> result = userController.addMovieToWatchlist(userId, wrongMovieId);
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
+        assertEquals(result.getBody(), expectedMessage);
+    }
+
+    // @Test 
+    // void updateWatchlistSuccessfully() {
+    //     // Given
+    //     long userId = 1337;
+    //     User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+    //     Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+
+    //     UserMovie userMovie = new UserMovie(user, movie1, false);
+
+    //     Mockito.when(defaultUserService.updateWatchItemStatus(userId, null, true)).thenReturn(expectedBody);
+
+    // }
+
+    // @Test
+    // void failWatchlistUpdate() {
+
+    // }
 }
