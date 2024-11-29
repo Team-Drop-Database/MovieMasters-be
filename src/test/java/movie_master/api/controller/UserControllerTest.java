@@ -202,4 +202,24 @@ class UserControllerTest {
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
         assertEquals(result.getBody(), expectedMessage);
     }
+
+    @Test 
+    void failUpdateWatchList() throws UserNotFoundException, UserMovieNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Long watchlistItemId = 1L;
+
+        // Attempt to update a watchlistitem that was never added
+        UserMovieNotFoundException exception = new UserMovieNotFoundException(watchlistItemId);
+        String expectedMessage =  "Could not update 'watched' status. Exception message: " + exception.getMessage();
+
+        Mockito.when(defaultUserService.updateWatchItemStatus(userId, watchlistItemId, true)).thenThrow(exception);
+
+        // When
+        ResponseEntity<Object> result = userController.updateWatchItemStatus(userId, watchlistItemId, true);
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
+        assertEquals(result.getBody(), expectedMessage);
+    }
 }
