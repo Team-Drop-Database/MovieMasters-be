@@ -10,24 +10,31 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int reviewId;
+    private long reviewId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(nullable = false, unique = true)
-    private int movieId;
+    @OneToOne
+    @JoinColumn(name = "user_movie", nullable = false)
+    private UserMovie userMovie;
 
     @Column(nullable = false)
     private double rating;
 
+    @Column(nullable = false)
     private String comment;
 
     @Column(nullable = false)
     private LocalDateTime reviewDate = LocalDateTime.now();
 
-    public int getReviewId() {
+    public Review(UserMovie userMovie, double rating, String comment) {
+        this.userMovie = userMovie;
+        this.rating = rating;
+        this.comment = comment;
+    }
+
+    public Review() {
+    }
+
+    public long getReviewId() {
         return reviewId;
     }
 
@@ -35,20 +42,12 @@ public class Review {
         this.reviewId = reviewId;
     }
 
-    public User getUser() {
-        return user;
+    public UserMovie getUserMovie() {
+        return userMovie;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public int getMovieId() {
-        return movieId;
-    }
-
-    public void setMovieId(int movieId) {
-        this.movieId = movieId;
+    public void setUserMovie(UserMovie userMovie) {
+        this.userMovie = userMovie;
     }
 
     public double getRating() {

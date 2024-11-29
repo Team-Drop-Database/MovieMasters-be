@@ -3,9 +3,9 @@ package movie_master.api.exception;
 /**
  * Custom exception
  */
-public class EmailHasAlreadyBeenTaken extends Exception {
+public class EmailTakenException extends Exception {
 
-    public EmailHasAlreadyBeenTaken(String email) {
+    public EmailTakenException(String email) {
         super("Email: %s has already been taken".formatted(email));
     }
 }
