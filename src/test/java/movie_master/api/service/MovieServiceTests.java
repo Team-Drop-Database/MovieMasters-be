@@ -36,7 +36,8 @@ public class MovieServiceTests {
             "Description of movie 1",
             releaseDate,
             "en",
-            "/image.png");
+            "/image.png",
+            10);
 
     @BeforeEach
     public void setUp() {
