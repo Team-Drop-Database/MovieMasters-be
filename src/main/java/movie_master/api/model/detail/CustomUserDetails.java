@@ -19,12 +19,14 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private List<GrantedAuthority> authorities;
     private boolean enabled;
+    private Long userId;
 
     public CustomUserDetails(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.authorities = Arrays.stream(user.getRoles().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
         this.enabled = user.isEnabled();
+        this.userId = user.getId();
     }
 
     @Override
@@ -40,6 +42,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
+    }
+
+    public Long getUserId() {
+        return this.userId;
     }
 
     @Override

@@ -25,9 +25,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String contextPath = request.getServletContext().getContextPath();
         String path = request.getRequestURI();
+        String method = request.getMethod();
 
-        return path.startsWith(contextPath + "/auth/login");
+        return path.startsWith(contextPath + "/auth/login") ||
+                (path.startsWith(contextPath + "/users") && "POST".equalsIgnoreCase(method));
     }
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
