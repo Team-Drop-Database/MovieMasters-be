@@ -6,6 +6,7 @@ import movie_master.api.dto.UserDto;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.UserService;
 import movie_master.api.exception.EmailTakenException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.exception.UserNotFoundException;
 
@@ -133,7 +134,7 @@ public class UserController {
         catch(UserNotFoundException | UserMovieNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
             .body("Could not update 'watched' status. Exception message: "
-             + exception.getMessage());
+             + e.getMessage());
         }        
     }
 }
