@@ -48,6 +48,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("org.jeasy:easy-random-core:4.0.0")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

@@ -13,7 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
@@ -23,25 +23,15 @@ public class MovieServiceTests {
     @Autowired
     private MovieService movieService;
 
-    public MovieServiceTests() throws ParseException { }
-
     @MockBean
     private MovieRepository movieRepository;
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date releaseDate = dateFormat.parse("2000-01-01");
-    private final Movie movie1 = new Movie(
-            278,
-            "The Shawshank Redemption",
-            "Description of movie 1",
-            releaseDate,
-            "en",
-            "/image.png");
+    private final Movie movie = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
 
     @BeforeEach
     public void setUp() {
-        Mockito.when(movieRepository.findById(278L)).thenReturn(Optional.of(movie1));
-        Mockito.when(movieRepository.save(movie1)).thenReturn(movie1);
+        Mockito.when(movieRepository.findById(278L)).thenReturn(Optional.of(movie));
+        Mockito.when(movieRepository.save(movie)).thenReturn(movie);
     }
 
     @Test
@@ -63,9 +53,9 @@ public class MovieServiceTests {
 
     @Test
     public void saveReturnsMovie() throws ParseException {
-        Movie savedMovie = movieService.save(movie1);
+        Movie savedMovie = movieService.save(movie);
 
         Assertions.assertNotNull(savedMovie);
-        Assertions.assertEquals(movie1.getId(), savedMovie.getId());
+        Assertions.assertEquals(movie.getId(), savedMovie.getId());
     }
 }
