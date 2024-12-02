@@ -130,7 +130,7 @@ public class UserController {
                 "association_object", watchItem
                 ));
         }
-        catch(Exception exception) {
+        catch(UserNotFoundException | UserMovieNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
             .body("Could not update 'watched' status. Exception message: "
              + exception.getMessage());
