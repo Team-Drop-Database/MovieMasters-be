@@ -142,4 +142,24 @@ public class DefaultUserService implements UserService {
         userRepository.save(user);
         return movieAssociation;
     }
+
+    @Override
+    public UserDto getUserByName(String username) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(username);
+        }
+        return this.userDtoMapper.apply(user.get());
+    }
+
+    @Override
+    public UserDto getUserByEmail(String email) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(email);
+        }
+        return this.userDtoMapper.apply(user.get());
+    }
 }

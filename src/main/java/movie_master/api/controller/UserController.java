@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import movie_master.api.model.UserMovie;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -36,6 +35,33 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    /**
+     * Getting a user specified by the username or email
+     *
+     * @param username
+     * @param email
+     * @return UserDto
+     */
+    @GetMapping
+    public ResponseEntity<UserDto> getAllUsers(@RequestParam(required = false) String username,
+                                               @RequestParam(required = false) String email) {
+        if (username.isEmpty() && email.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        UserDto user;
+
+        try {
+            if (!username.isEmpty()) {
+                user = userService.getUserByName(username);
+            } else {
+                user = userService.getUserByEmail(email);
+            }
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok().body(user);
     }
 
     /**

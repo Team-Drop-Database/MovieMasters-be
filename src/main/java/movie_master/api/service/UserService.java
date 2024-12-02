@@ -16,6 +16,8 @@ import java.util.Set;
  */
 public interface UserService {
     UserDto register(RegisterUserRequest registerUserRequest) throws EmailTakenException, UsernameTakenException;
+    UserDto getUserByName(String username) throws UserNotFoundException;
+    UserDto getUserByEmail(String email) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;

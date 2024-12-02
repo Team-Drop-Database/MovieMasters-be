@@ -126,4 +126,63 @@ class UserControllerTest {
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
         assertEquals(result.getBody(), expectedMessage);
     }
+
+    @Test
+    void userCanBeFoundByUserName() throws UserNotFoundException {
+        // Given
+        String username = "User McNameface";
+        UserDto user = new UserDto(1L, "test@mail.com", username, "ugly", LocalDate.now(), "QA");
+
+        Mockito.when(defaultUserService.getUserByName(username)).thenReturn(user);
+
+        // When
+        ResponseEntity<UserDto> result = userController.getAllUsers(username, null);
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
+    }
+
+    @Test
+    void failUserCanBeFoundByUserName() throws UserNotFoundException {
+        // Given
+        String username = "User McNameface";
+
+        Mockito.when(defaultUserService.getUserByName(username)).thenThrow(UserNotFoundException.class);
+
+        // When
+        ResponseEntity<UserDto> result = userController.getAllUsers(username, "");
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    void userCanBeFoundByEmail() throws UserNotFoundException {
+        // Given
+        String email = "test@user.com";
+        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), "QA");
+
+        Mockito.when(defaultUserService.getUserByEmail(email)).thenReturn(user);
+
+        // When
+        ResponseEntity<UserDto> result = userController.getAllUsers("", email);
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
+    }
+
+    @Test
+    void failUserCanBeFoundByEmail() throws UserNotFoundException {
+        // Given
+        String email = "test@user.com";
+        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), "QA");
+
+        Mockito.when(defaultUserService.getUserByEmail(email)).thenThrow(UserNotFoundException.class);
+
+        // When
+        ResponseEntity<UserDto> result = userController.getAllUsers("", email);
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+    }
 }
