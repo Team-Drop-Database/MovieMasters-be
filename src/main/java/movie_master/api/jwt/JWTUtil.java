@@ -1,4 +1,4 @@
-package movie_master.api.security;
+package movie_master.api.jwt;
 
 import io.jsonwebtoken.Claims;
 

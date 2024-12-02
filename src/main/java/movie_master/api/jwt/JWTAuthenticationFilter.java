@@ -1,4 +1,4 @@
-package movie_master.api.security;
+package movie_master.api.jwt;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -25,7 +25,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         return (servletPath.equals("/users") && request.getMethod().equals("POST")) || (servletPath.startsWith("/auth"));
     }
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
