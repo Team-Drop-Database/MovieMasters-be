@@ -20,6 +20,7 @@ public class DefaultJWTUtil implements JWTUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Override
     public String generateToken(Map<String, Object> claims, String subject) {
         Key key = getSigningKey();
 
@@ -32,7 +33,7 @@ public class DefaultJWTUtil implements JWTUtil {
                 .compact();
     }
 
-    public Claims extractClaims(String token) {
+    private Claims extractClaims(String token) {
         Key key = getSigningKey();
 
         return Jwts.parserBuilder()
@@ -44,28 +45,26 @@ public class DefaultJWTUtil implements JWTUtil {
 
     // Helper method to get the signing key from the base64-encoded secret
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(this.secret);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     @Override
-    public Long extractUserId(String token) {
-        return extractClaims(token).get("userId", Long.class);
+    public Long getUserId(String jwt) {
+        return extractClaims(jwt).get("userId", Long.class);
     }
 
     @Override
-    public String extractSubject(String token) {
-        return extractClaims(token).getSubject();
+    public String getSubject(String jwt) {
+        return extractClaims(jwt).getSubject();
     }
 
     @Override
-    public boolean isJWTokenValid(String token, String username) {
-        final String subject = extractSubject(token);
-        return (subject.equals(username) && !isJWTokenExpired(token));
+    public boolean isJWTokenValid(String jwt, Long userId, String username) {
+        return (getUserId(jwt).equals(userId) && getSubject(jwt).equals(username) && !isJWTokenExpired(jwt));
     }
 
-    @Override
-    public boolean isJWTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
+    private boolean isJWTokenExpired(String jwt) {
+        return extractClaims(jwt).getExpiration().before(new Date());
     }
 }

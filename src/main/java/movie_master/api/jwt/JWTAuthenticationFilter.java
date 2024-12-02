@@ -1,6 +1,5 @@
 package movie_master.api.jwt;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import movie_master.api.service.CustomUserDetailsService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -39,36 +39,43 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws ServletException, IOException {
-        String token = request.getHeader("Authorization");
+        String jwt = request.getHeader("Authorization");
 
-        if (token == null || !token.startsWith("Bearer ")) {
+        // There is no authorization header
+        if (jwt == null || !jwt.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Authentication is required to access this resource.\"}");
+            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Authentication is required to access this resource\"}");
             return;
         }
 
-        token = token.substring(7); // Remove "Bearer " prefix
+        // Remove "Bearer " prefix
+        jwt = jwt.substring(7);
 
         try {
-            Claims claims = jwtUtil.extractClaims(token);
-            String username = claims.getSubject();
+            Long userId = jwtUtil.getUserId(jwt);
+            String username = jwtUtil.getSubject(jwt);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (userId != null && username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (this.jwtUtil.isJWTokenValid(token, username)) {
+                // check if the jwt is valid
+                if (jwtUtil.isJWTokenValid(jwt, userId, username)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                     );
 
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    // Store the details of the user who is currently authenticated
+                    SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(usernamePasswordAuthenticationToken);
+                    SecurityContextHolder.setContext(context);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Invalid or expired token.\"}");
+            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Invalid or expired jwt\"}");
             return;
         }
 
