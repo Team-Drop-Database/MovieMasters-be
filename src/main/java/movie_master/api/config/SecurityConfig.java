@@ -1,7 +1,7 @@
 package movie_master.api.config;
 
 import movie_master.api.security.JWTAuthenticationFilter;
-import movie_master.api.security.JWTService;
+import movie_master.api.security.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,13 +18,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * The class that configures the security filter chain and other security related beans
@@ -35,12 +33,10 @@ public class SecurityConfig {
     @Value("${client.host}")
     private String CLIENT_HOST;
 
-    private final JWTService jwtService;
-    private final JWTConfig jwtConfig;
+    private final JWTUtil jwtUtil;
 
-    public SecurityConfig(JWTService jwtService, JWTConfig jwtConfig) {
-        this.jwtService = jwtService;
-        this.jwtConfig = jwtConfig;
+    public SecurityConfig(JWTUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
     }
 
     @Bean
@@ -53,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/users").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JWTAuthenticationFilter(jwtService, jwtConfig), UsernamePasswordAuthenticationFilter.class)  // Add the JWT filter
+                .addFilterBefore(new JWTAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)  // Add the JWT filter
                 .build();
     }
 

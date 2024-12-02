@@ -5,7 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import movie_master.api.config.JWTConfig;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -13,22 +12,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
-    private final JWTService jwtService;
-    private final JWTConfig jwtConfig;
+    private final JWTUtil jwtUtil;
 
-    public JWTAuthenticationFilter(JWTService jwtService, JWTConfig jwtConfig) {
-        this.jwtService = jwtService;
-        this.jwtConfig = jwtConfig;
+    public JWTAuthenticationFilter(JWTUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String contextPath = request.getServletContext().getContextPath();
-        String path = request.getRequestURI();
-        String method = request.getMethod();
+        String servletPath = request.getServletPath();
 
-        return path.startsWith(contextPath + "/auth/login") ||
-                (path.startsWith(contextPath + "/users") && "POST".equalsIgnoreCase(method));
+        return (servletPath.equals("/users") && request.getMethod().equals("POST")) || (servletPath.startsWith("/auth"));
     }
 
 
@@ -46,7 +40,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         token = token.substring(7); // Remove "Bearer " prefix
 
         try {
-            Claims claims = jwtService.extractClaims(token);
+            Claims claims = jwtUtil.extractClaims(token);
             String username = claims.getSubject();
 
             if (username != null) {
