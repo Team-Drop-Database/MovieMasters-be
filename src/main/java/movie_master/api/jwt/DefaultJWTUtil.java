@@ -1,4 +1,4 @@
-package movie_master.api.security;
+package movie_master.api.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * The default JWT Util implementation
+ */
 @Component
 public class DefaultJWTUtil implements JWTUtil {
     @Value("${jwt.secret}")

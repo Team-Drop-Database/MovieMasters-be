@@ -1,8 +1,8 @@
 package movie_master.api.config;
 
-import movie_master.api.security.JWTAuthenticationFilter;
-import movie_master.api.security.DefaultJWTUtil;
-import movie_master.api.security.JWTUtil;
+import movie_master.api.jwt.JWTAuthenticationFilter;
+import movie_master.api.jwt.DefaultJWTUtil;
+import movie_master.api.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
