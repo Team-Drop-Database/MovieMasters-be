@@ -100,7 +100,7 @@ public class UserController {
             return ResponseEntity.ok(Map.of(
                 "message", "Successfully added to watchlist",
                 "userId", userId,
-                "movie_id", movieId,
+                "movieId", movieId,
                 "association_object", watchItem
                 ));
         } catch(Exception exception) {
@@ -129,7 +129,8 @@ public class UserController {
                 "movie_id", itemId,
                 "association_object", watchItem
                 ));
-        } catch(Exception exception) {
+        }
+        catch(Exception exception) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
             .body("Could not update 'watched' status. Exception message: "
              + exception.getMessage());

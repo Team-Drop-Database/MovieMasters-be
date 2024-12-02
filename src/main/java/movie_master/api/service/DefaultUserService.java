@@ -157,15 +157,16 @@ public class DefaultUserService implements UserService {
 
         // Retrieve the user
         Optional<User> userOpt = userRepository.findById(userId);
-        if(userOpt.isEmpty()){
+        if (userOpt.isEmpty()) {
             throw new UserNotFoundException(userId);
         }
         User user = userOpt.get();
 
         // Retrieve the watchlistitem using its ID (not the movie id!)
         Optional<UserMovie> watchlistItemOpt = user.getWatchList()
-            .stream().filter(a -> a.getId().equals(itemId)).findFirst();
-        if(watchlistItemOpt.isEmpty()){
+            .stream().filter(userMovieOpt -> userMovieOpt.getId()
+            .equals(itemId)).findFirst();
+        if (watchlistItemOpt.isEmpty()) {
             throw new UserMovieNotFoundException(itemId);
         }
         

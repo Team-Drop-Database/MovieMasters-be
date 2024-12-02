@@ -9,6 +9,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,8 @@ public class DataLoader implements ApplicationRunner {
             for (JsonNode node : arrayNode) {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
+                movie.setTmdbRating(
+                        BigDecimal.valueOf(movie.getTmdbRating()).setScale(1, RoundingMode.UP).doubleValue());
                 movieRepository.save(movie);
             }
         } catch (Exception e){
