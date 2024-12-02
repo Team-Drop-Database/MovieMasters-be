@@ -1,6 +1,7 @@
 package movie_master.api.config;
 
 import movie_master.api.security.JWTAuthenticationFilter;
+import movie_master.api.security.DefaultJWTUtil;
 import movie_master.api.security.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +36,7 @@ public class SecurityConfig {
 
     private final JWTUtil jwtUtil;
 
-    public SecurityConfig(JWTUtil jwtUtil) {
+    public SecurityConfig(DefaultJWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 

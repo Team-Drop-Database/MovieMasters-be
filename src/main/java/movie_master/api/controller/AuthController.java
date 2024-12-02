@@ -3,7 +3,7 @@ package movie_master.api.controller;
 import jakarta.validation.Valid;
 import movie_master.api.model.detail.CustomUserDetails;
 import movie_master.api.request.LoginRequest;
-import movie_master.api.security.JWTUtil;
+import movie_master.api.security.DefaultJWTUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
-    private final JWTUtil jwtUtil;
+    private final DefaultJWTUtil jwtUtil;
 
-    public AuthController(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public AuthController(AuthenticationManager authenticationManager, DefaultJWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
     }
