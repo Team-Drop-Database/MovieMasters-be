@@ -141,7 +141,7 @@ class UserControllerTest {
         Map<String, Object> expectedMessage = Map.of(
                 "message", "Successfully added to watchlist",
                 "userId", userId,
-                "movie_id", movie1.getId(),
+                "movieId", movie1.getId(),
                 "association_object", expectedBody
                 );
 
