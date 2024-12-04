@@ -28,12 +28,25 @@ public class DefaultJWTUtil implements JWTUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 5))  // 5 hours
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))  // 1 day
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private Claims extractClaims(String token) {
+    @Override
+    public String generateRefreshToken(Map<String, Object> claims, String subject) {
+        Key key = getSigningKey();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))  // 3 days
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public Claims extractClaims(String token) {
         Key key = getSigningKey();
 
         return Jwts.parserBuilder()
