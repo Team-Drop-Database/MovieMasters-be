@@ -3,21 +3,19 @@ package movie_master.api.service;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailTakenException;
 import movie_master.api.exception.MovieNotFoundException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
-import movie_master.api.model.role.Role;
+import movie_master.api.model.role.Roles;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -73,7 +71,7 @@ public class DefaultUserService implements UserService {
                         registerUserRequest.email(),
                         registerUserRequest.username(),
                         passwordEncoder.encode(registerUserRequest.password()),
-                        Role.USER,
+                        Roles.USER.name(),
                         true
                         )
         );
@@ -96,6 +94,13 @@ public class DefaultUserService implements UserService {
         userRepository.deleteById(userId);
     }
 
+    /**
+     * Retrieves the watchlist of a given user.
+     * 
+     * @param userId id of the user
+     * @return A set of UserMovie objects representing the
+     *  watchlist of this user.
+     */
     @Override
     public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
 
@@ -147,57 +152,28 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserDto getUserByName(String username) throws UserNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
+    public UserMovie updateWatchItemStatus(Long userId, Long itemId, boolean watched) 
+            throws UserNotFoundException, UserMovieNotFoundException {
 
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(username);
-        }
-        return this.userDtoMapper.apply(user.get());
-    }
-
-    @Override
-    public UserDto getUserByEmail(String email) throws UserNotFoundException {
-        Optional<User> user = userRepository.findByEmail(email);
-
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(email);
-        }
-        return this.userDtoMapper.apply(user.get());
-    }
-
-    @Override
-    public List<UserDto> getAllUsers() throws UserNotFoundException {
-        List<User> foundUsers = this.userRepository.findAll();
-        List<UserDto> users = new ArrayList<>();
-
-        for (User user : foundUsers ){
-            users.add(this.userDtoMapper.apply(user));
-        }
-        return users;
-    }
-
-    @Override
-    public User getUserById(Long userId) throws UserNotFoundException {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
+        // Retrieve the user
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
             throw new UserNotFoundException(userId);
         }
-        return user.get();
-    }
+        User user = userOpt.get();
 
-    @Override
-    public User updateUser(User updatedUser) throws UserNotFoundException {
-        userRepository.findById(updatedUser.getId()).map(user -> {
-            user.setUsername(updatedUser.getUsername());
-            user.setEmail(updatedUser.getEmail());
-            user.setProfilePicture(updatedUser.getProfilePicture());
-            if (updatedUser.getRole() != null) {
-                user.setRole(updatedUser.getRole());
-            }
-            return userRepository.save(user);
-        }).orElseThrow(UserNotFoundException::new);
-
-        return this.userRepository.findById(updatedUser.getId()).get();
+        // Retrieve the watchlistitem using its ID (not the movie id!)
+        Optional<UserMovie> watchlistItemOpt = user.getWatchList()
+            .stream().filter(userMovieOpt -> userMovieOpt.getId()
+            .equals(itemId)).findFirst();
+        if (watchlistItemOpt.isEmpty()) {
+            throw new UserMovieNotFoundException(itemId);
+        }
+        
+        // Set the new 'watched' value and return the updated UserMovie
+        UserMovie watchlistItem = watchlistItemOpt.get();
+        watchlistItem.setWatched(watched);
+        userRepository.save(user);
+        return watchlistItem;
     }
 }

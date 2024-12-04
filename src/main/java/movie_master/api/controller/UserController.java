@@ -9,6 +9,7 @@ import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.UserService;
 import movie_master.api.exception.EmailTakenException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.exception.UserNotFoundException;
 
@@ -199,7 +200,7 @@ public class UserController {
             return ResponseEntity.ok(Map.of(
                 "message", "Successfully added to watchlist",
                 "userId", userId,
-                "movie_id", movieId,
+                "movieId", movieId,
                 "association_object", watchItem
                 ));
         } catch(Exception exception) {
@@ -207,5 +208,32 @@ public class UserController {
             .body("Could not associate user with movie. Exception message: "
              + exception.getMessage());
         }
+    }
+
+    /**
+     * Updates the 'watched' status of an item on the watchlist.
+     * 
+     * @param userId id of the user
+     * @param itemId id of the watchlist item (UserMovie)
+     * @param watched whether the user has watched this movie or not
+     * @return updated watchitem
+     */
+    @PutMapping("{userId}/watchlist/update/{itemId}")
+    public ResponseEntity<Object> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long itemId,
+     @RequestParam boolean watched) {
+        try {
+            UserMovie watchItem = userService.updateWatchItemStatus(userId, itemId, watched);
+            return ResponseEntity.ok(Map.of(
+                "message", "Successfully updated watchlist item",
+                "userId", userId,
+                "movie_id", itemId,
+                "association_object", watchItem
+                ));
+        }
+        catch(UserNotFoundException | UserMovieNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+            .body("Could not update 'watched' status. Exception message: "
+             + e.getMessage());
+        }        
     }
 }

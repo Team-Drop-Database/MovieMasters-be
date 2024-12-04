@@ -5,10 +5,10 @@ import movie_master.api.model.User;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.exception.EmailTakenException;
 import movie_master.api.exception.MovieNotFoundException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.UserMovie;
-import movie_master.api.request.RegisterUserRequest;
 
 import java.util.List;
 import java.util.Set;
@@ -26,4 +26,5 @@ public interface UserService {
     List<UserDto> getAllUsers() throws UserNotFoundException;
     User updateUser(User user) throws UserNotFoundException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
+    UserMovie updateWatchItemStatus(Long userId, Long itemId, boolean watched) throws UserNotFoundException, UserMovieNotFoundException;
 }
