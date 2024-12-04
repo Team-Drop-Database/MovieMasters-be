@@ -1,7 +1,7 @@
 package movie_master.api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import movie_master.api.dto.ReviewDTO;
+import movie_master.api.dto.ReviewDto;
 import movie_master.api.exception.MovieNotInWatchlistException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.request.PostReviewRequest;
@@ -23,14 +23,14 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReviewDTO>> getAllReviews() {
-        List<ReviewDTO> allReviews = service.findAll();
+    public ResponseEntity<List<ReviewDto>> getAllReviews() {
+        List<ReviewDto> allReviews = service.findAll();
         return ResponseEntity.ok(allReviews);
     }
 
     @GetMapping("/{amount}")
-    public ResponseEntity<List<ReviewDTO>> getReviewsByAmount(@PathVariable int amount) {
-        List<ReviewDTO> foundReviews = service.findByAmount(amount);
+    public ResponseEntity<List<ReviewDto>> getReviewsByAmount(@PathVariable int amount) {
+        List<ReviewDto> foundReviews = service.findByAmount(amount);
         return ResponseEntity.ok(foundReviews);
     }
 
@@ -40,7 +40,7 @@ public class ReviewController {
         @RequestBody PostReviewRequest request
     ) {
         try {
-            ReviewDTO postedReview = service.postReview(request);
+            ReviewDto postedReview = service.postReview(request);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(postedReview);
         } catch (UserNotFoundException | MovieNotInWatchlistException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());

@@ -48,18 +48,18 @@ public class DefaultUserServiceTest {
             registerRequest.email(),
             registerRequest.username(),
             encodedPassword,
-            Roles.USER.name(),
+            Roles.ROLE_USER.name(),
             true
         );
         User createdUser = new User(
             "ervin.@gmail.com",
             "dedede",
             encodedPassword,
-            Roles.USER.name(),
+            Roles.ROLE_USER.name(),
             true
         );
         UserDto userDto = new UserDto(
-            userToCreate.getId(),
+            userToCreate.getUserId(),
             userToCreate.getEmail(),
             userToCreate.getUsername(),
             userToCreate.getProfilePicture(),

@@ -5,6 +5,7 @@ import movie_master.api.model.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -24,6 +25,8 @@ public class MovieControllerTests {
     @Autowired
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+    @Value("${jwt.testing}")
+    private String jwtTesting;
 
     @BeforeEach
     void setup() {
@@ -53,6 +56,7 @@ public class MovieControllerTests {
 
         List<Movie> movies = Arrays.asList(movie1, movie2);
         mockMvc.perform(get("/movies")
+                .header("Authorization", "Bearer %s".formatted(jwtTesting))
                 .content(objectMapper.writeValueAsString(movies))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -81,6 +85,7 @@ public class MovieControllerTests {
 
         List<Movie> movies = Arrays.asList(movie1, movie2);
         this.mockMvc.perform(get("/movies?title=a")
+                        .header("Authorization", "Bearer %s".formatted(jwtTesting))
                         .content(objectMapper.writeValueAsString(movies))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

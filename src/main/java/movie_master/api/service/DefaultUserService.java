@@ -70,7 +70,7 @@ public class DefaultUserService implements UserService {
                         registerUserRequest.email(),
                         registerUserRequest.username(),
                         passwordEncoder.encode(registerUserRequest.password()),
-                        Roles.USER.name(),
+                        Roles.ROLE_USER.name(),
                         true
                         )
         );

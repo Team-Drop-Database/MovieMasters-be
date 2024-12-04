@@ -22,7 +22,7 @@ public class CustomUserDetails implements UserDetails {
     private final boolean enabled;
 
     public CustomUserDetails(User user) {
-        this.userId = user.getId();
+        this.userId = user.getUserId();
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.authorities = Arrays.stream(user.getRoles().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
