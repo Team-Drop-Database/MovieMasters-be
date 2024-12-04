@@ -87,7 +87,7 @@ public class UserController {
     }
 
     /**
-     * Updates the watchlist of a movie by adding a movie to it. Essentially an association
+     * Updates the watchlist of a user by adding a movie to it. Essentially an association
      *  ('MovieUser') is created between a user and a movie.
      * 
      * @param userId id of the user
@@ -115,19 +115,19 @@ public class UserController {
      * Updates the 'watched' status of an item on the watchlist.
      * 
      * @param userId id of the user
-     * @param itemId id of the watchlist item (UserMovie)
+     * @param movieId id of the movie
      * @param watched whether the user has watched this movie or not
      * @return updated watchitem
      */
-    @PutMapping("{userId}/watchlist/update/{itemId}")
-    public ResponseEntity<Object> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long itemId,
+    @PutMapping("{userId}/watchlist/update/{movieId}")
+    public ResponseEntity<Object> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long movieId,
      @RequestParam boolean watched) {
         try {
-            UserMovie watchItem = userService.updateWatchItemStatus(userId, itemId, watched);
+            UserMovie watchItem = userService.updateWatchItemStatus(userId, movieId, watched);
             return ResponseEntity.ok(Map.of(
                 "message", "Successfully updated watchlist item",
                 "userId", userId,
-                "movie_id", itemId,
+                "movie_id", movieId,
                 "association_object", watchItem
                 ));
         }

@@ -12,12 +12,14 @@ import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Roles;
 import movie_master.api.repository.MovieRepository;
+import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The default implementation for the user service.
@@ -151,8 +153,17 @@ public class DefaultUserService implements UserService {
         return movieAssociation;
     }
 
+    /**
+     * For a given user, updates a specific movies' 'watched'
+     *  status to either watched or unwatched.
+     * 
+     * @param id of the user
+     * @param id of the movie
+     * @returns UserMovie object containing the updated
+     * state of the users' relationship with the movie.
+     */
     @Override
-    public UserMovie updateWatchItemStatus(Long userId, Long itemId, boolean watched) 
+    public UserMovie updateWatchItemStatus(Long userId, Long movieId, boolean watched) 
             throws UserNotFoundException, UserMovieNotFoundException {
 
         // Retrieve the user
@@ -164,10 +175,10 @@ public class DefaultUserService implements UserService {
 
         // Retrieve the watchlistitem using its ID (not the movie id!)
         Optional<UserMovie> watchlistItemOpt = user.getWatchList()
-            .stream().filter(userMovieOpt -> userMovieOpt.getId()
-            .equals(itemId)).findFirst();
+            .stream().filter(userMovieOpt -> userMovieOpt.getMovie().getId()
+            == movieId).findFirst();
         if (watchlistItemOpt.isEmpty()) {
-            throw new UserMovieNotFoundException(itemId);
+            throw new UserMovieNotFoundException(movieId);
         }
         
         // Set the new 'watched' value and return the updated UserMovie
