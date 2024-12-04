@@ -1,7 +1,7 @@
 package movie_master.api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import movie_master.api.dto.ReviewDTO;
+import movie_master.api.dto.ReviewDto;
 import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.exception.MovieNotInWatchlistException;
 import movie_master.api.exception.UserNotFoundException;
@@ -34,12 +34,12 @@ class ReviewControllerTest {
     void getAllReviewsTest() {
         // Given
         int elementAmount = 10;
-        List<ReviewDTO> expectedResult = createMultipleRandomRecords(ReviewDTO.class, easyRandom, elementAmount);
+        List<ReviewDto> expectedResult = createMultipleRandomRecords(ReviewDto.class, easyRandom, elementAmount);
 
         Mockito.when(service.findAll()).thenReturn(expectedResult);
 
         // When
-        ResponseEntity<List<ReviewDTO>> result = controller.getAllReviews();
+        ResponseEntity<List<ReviewDto>> result = controller.getAllReviews();
 
         // Then
         assertEquals(result.getBody(), expectedResult);
@@ -49,12 +49,12 @@ class ReviewControllerTest {
     void getReviewsByAmountTest() {
         // Given
         int desiredAmount = 10;
-        List<ReviewDTO> expectedResult = createMultipleRandomRecords(ReviewDTO.class, easyRandom, desiredAmount);
+        List<ReviewDto> expectedResult = createMultipleRandomRecords(ReviewDto.class, easyRandom, desiredAmount);
 
         Mockito.when(service.findByAmount(desiredAmount)).thenReturn(expectedResult);
 
         // When
-        ResponseEntity<List<ReviewDTO>> result = controller.getReviewsByAmount(desiredAmount);
+        ResponseEntity<List<ReviewDto>> result = controller.getReviewsByAmount(desiredAmount);
 
         // Then
         assertEquals(result.getBody(), expectedResult);
@@ -66,7 +66,7 @@ class ReviewControllerTest {
         HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
         String uri = easyRandom.nextObject(String.class);
         PostReviewRequest request = createRandomRecord(PostReviewRequest.class, easyRandom);
-        ReviewDTO expectedResult = createRandomRecord(ReviewDTO.class, easyRandom);
+        ReviewDto expectedResult = createRandomRecord(ReviewDto.class, easyRandom);
 
         Mockito.when(service.postReview(request)).thenReturn(expectedResult);
         Mockito.when(httpServletRequest.getRequestURI()).thenReturn(uri);

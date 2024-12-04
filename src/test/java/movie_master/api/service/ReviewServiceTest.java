@@ -1,9 +1,9 @@
 package movie_master.api.service;
 
-import movie_master.api.dto.ReviewDTO;
+import movie_master.api.dto.ReviewDto;
 import movie_master.api.exception.MovieNotInWatchlistException;
 import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.mapper.ReviewDTOMapper;
+import movie_master.api.mapper.ReviewDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.Review;
 import movie_master.api.model.User;
@@ -32,7 +32,7 @@ class ReviewServiceTest {
 
     @Mock private ReviewRepository reviewRepository;
     @Mock private UserRepository userRepository;
-    @Mock private ReviewDTOMapper mapper;
+    @Mock private ReviewDtoMapper mapper;
     @InjectMocks private ReviewService reviewService;
 
     EasyRandom easyRandom = new EasyRandom();
@@ -42,8 +42,8 @@ class ReviewServiceTest {
         // Given
         int expectedAmount = 100;
         List<Review> storedReviews = easyRandom.objects(Review.class, expectedAmount).toList();
-        ReviewDTO mapped = createRandomRecord(ReviewDTO.class, easyRandom);
-        ArrayList<ReviewDTO> expectedResult = new ArrayList<>();
+        ReviewDto mapped = createRandomRecord(ReviewDto.class, easyRandom);
+        ArrayList<ReviewDto> expectedResult = new ArrayList<>();
         for (int i = 0; i < expectedAmount; i++) {
             expectedResult.add(mapped);
         }
@@ -52,7 +52,7 @@ class ReviewServiceTest {
         Mockito.when(mapper.mapToDTO(Mockito.any())).thenReturn(mapped);
 
         // When
-        List<ReviewDTO> result = reviewService.findAll();
+        List<ReviewDto> result = reviewService.findAll();
 
         // Then
         assertEquals(result, expectedResult.stream().toList());
@@ -64,8 +64,8 @@ class ReviewServiceTest {
         int desiredAmount = 5;
         int actualAmount = 10;
         List<Review> storedReviews = easyRandom.objects(Review.class, actualAmount).toList();
-        ReviewDTO mapped = createRandomRecord(ReviewDTO.class, easyRandom);
-        ArrayList<ReviewDTO> expectedResult = new ArrayList<>();
+        ReviewDto mapped = createRandomRecord(ReviewDto.class, easyRandom);
+        ArrayList<ReviewDto> expectedResult = new ArrayList<>();
         for (int i = 0; i < desiredAmount; i++) {
             expectedResult.add(mapped);
         }
@@ -74,7 +74,7 @@ class ReviewServiceTest {
         Mockito.when(mapper.mapToDTO(Mockito.any())).thenReturn(mapped);
 
         // When
-        List<ReviewDTO> result = reviewService.findByAmount(desiredAmount);
+        List<ReviewDto> result = reviewService.findByAmount(desiredAmount);
 
         // Then
         assertEquals(result, expectedResult.stream().toList());
@@ -86,7 +86,7 @@ class ReviewServiceTest {
         User user = easyRandom.nextObject(User.class);
         Movie movie = easyRandom.nextObject(Movie.class);
         PostReviewRequest request = new PostReviewRequest(
-            user.getId(),
+            user.getUserId(),
             movie.getId(),
             easyRandom.nextDouble(),
             easyRandom.nextObject(String.class)
@@ -94,14 +94,14 @@ class ReviewServiceTest {
         UserMovie userMovie = new UserMovie(user, movie, easyRandom.nextBoolean());
         user.addMovieToWatchlist(userMovie);
         Review storedReview = easyRandom.nextObject(Review.class);
-        ReviewDTO expectedResult = createRandomRecord(ReviewDTO.class, easyRandom);
+        ReviewDto expectedResult = createRandomRecord(ReviewDto.class, easyRandom);
 
         Mockito.when(userRepository.findById(request.userId())).thenReturn(Optional.of(user));
         Mockito.when(reviewRepository.save(Mockito.any())).thenReturn(storedReview); // any() because mocking LocalDate sucks
         Mockito.when(mapper.mapToDTO(storedReview)).thenReturn(expectedResult);
 
         // When
-        ReviewDTO result = reviewService.postReview(request);
+        ReviewDto result = reviewService.postReview(request);
 
         // Then
         assertEquals(expectedResult, result);

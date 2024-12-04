@@ -16,12 +16,12 @@ import java.util.Map;
  * The default JWT Util implementation
  */
 @Component
-public class DefaultJWTUtil implements JWTUtil {
+public class DefaultJwtUtil implements JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
     @Override
-    public String generateToken(Map<String, Object> claims, String subject) {
+    public String generateJwt(Map<String, Object> claims, String subject) {
         Key key = getSigningKey();
 
         return Jwts.builder()
@@ -73,11 +73,11 @@ public class DefaultJWTUtil implements JWTUtil {
     }
 
     @Override
-    public boolean isJWTokenValid(String jwt, Long userId, String username) {
-        return (getUserId(jwt).equals(userId) && getSubject(jwt).equals(username) && !isJWTokenExpired(jwt));
+    public boolean isJwtValid(String jwt, Long userId, String username) {
+        return (getUserId(jwt).equals(userId) && getSubject(jwt).equals(username) && !isJwtExpired(jwt));
     }
 
-    private boolean isJWTokenExpired(String jwt) {
+    private boolean isJwtExpired(String jwt) {
         return extractClaims(jwt).getExpiration().before(new Date());
     }
 }

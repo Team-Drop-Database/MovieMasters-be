@@ -48,18 +48,18 @@ public class DefaultUserServiceTest {
             registerRequest.email(),
             registerRequest.username(),
             encodedPassword,
-            Roles.USER.name(),
+            Roles.ROLE_USER.name(),
             true
         );
         User createdUser = new User(
             "ervin.@gmail.com",
             "dedede",
             encodedPassword,
-            Roles.USER.name(),
+            Roles.ROLE_USER.name(),
             true
         );
         UserDto userDto = new UserDto(
-            userToCreate.getId(),
+            userToCreate.getUserId(),
             userToCreate.getEmail(),
             userToCreate.getUsername(),
             userToCreate.getProfilePicture(),
@@ -106,7 +106,7 @@ public class DefaultUserServiceTest {
     @Test
     void retrieveWatchlistSuccessfully() throws UserNotFoundException {
         // Given
-        long userId = 69;
+        Long userId = 69L;
         User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
@@ -132,7 +132,7 @@ public class DefaultUserServiceTest {
     @Test
     void failRetrievingWatchlist() {
         // Given
-        long userId = 69;
+        Long userId = 69L;
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 

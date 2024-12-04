@@ -1,9 +1,9 @@
 package movie_master.api.service;
 
-import movie_master.api.dto.ReviewDTO;
+import movie_master.api.dto.ReviewDto;
 import movie_master.api.exception.MovieNotInWatchlistException;
 import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.mapper.ReviewDTOMapper;
+import movie_master.api.mapper.ReviewDtoMapper;
 import movie_master.api.model.Review;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
@@ -21,26 +21,26 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
-    private final ReviewDTOMapper mapper;
+    private final ReviewDtoMapper mapper;
 
     public ReviewService(
         ReviewRepository reviewRepository,
         UserRepository userRepository,
-        ReviewDTOMapper mapper
+        ReviewDtoMapper mapper
     ) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
     }
 
-    public List<ReviewDTO> findAll() {
+    public List<ReviewDto> findAll() {
         return reviewRepository.findAll()
             .stream()
             .map(mapper::mapToDTO)
             .toList();
     }
 
-    public List<ReviewDTO> findByAmount(int maxAmount) {
+    public List<ReviewDto> findByAmount(int maxAmount) {
         return reviewRepository.findAll()
             .stream()
             .limit(maxAmount)
@@ -48,7 +48,7 @@ public class ReviewService {
             .toList();
     }
 
-    public ReviewDTO postReview(PostReviewRequest reviewRequest)
+    public ReviewDto postReview(PostReviewRequest reviewRequest)
             throws UserNotFoundException, MovieNotInWatchlistException {
 
         Optional<User> foundUser = userRepository.findById(reviewRequest.userId());

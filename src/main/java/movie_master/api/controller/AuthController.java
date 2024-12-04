@@ -1,7 +1,7 @@
 package movie_master.api.controller;
 
 import jakarta.validation.Valid;
-import movie_master.api.jwt.JWTUtil;
+import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.detail.CustomUserDetails;
 import movie_master.api.request.LoginRequest;
 import org.springframework.http.HttpStatus;
@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Authentication controller
@@ -28,9 +26,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
     }
@@ -50,11 +48,9 @@ public class AuthController {
                     .getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
+                    .toList();
 
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("userId", userId);
-            claims.put("roles", roles);
+            Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
 
             String jwt = jwtUtil.generateToken(claims, username);
             String refreshToken = jwtUtil.generateRefreshToken(claims, username);
