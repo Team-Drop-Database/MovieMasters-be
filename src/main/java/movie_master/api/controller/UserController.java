@@ -3,6 +3,9 @@ package movie_master.api.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
+import movie_master.api.mapper.UserDtoMapper;
+import movie_master.api.model.User;
+import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.UserService;
 import movie_master.api.exception.EmailTakenException;
@@ -32,36 +35,84 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserDtoMapper userDtoMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserDtoMapper userDtoMapper) {
         this.userService = userService;
+        this.userDtoMapper = userDtoMapper;
     }
 
     /**
-     * Getting a user specified by the username or email
+     * Getting all users
      *
-     * @param username
-     * @param email
      * @return UserDto
      */
     @GetMapping
-    public ResponseEntity<UserDto> getAllUsers(@RequestParam(required = false) String username,
-                                               @RequestParam(required = false) String email) {
-        if (username.isEmpty() && email.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        UserDto user;
-
+    public ResponseEntity<List<UserDto>> getAllUsers() {
         try {
-            if (!username.isEmpty()) {
-                user = userService.getUserByName(username);
-            } else {
-                user = userService.getUserByEmail(email);
-            }
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            List<UserDto> users = userService.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.ok().body(user);
+    }
+
+    /**
+     * Getting a user by their username
+     *
+     * @param username
+     * @return UserDto
+     */
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Object> getuserByUserName(@PathVariable String username) {
+        try {
+            return ResponseEntity.ok().body(userService.getUserByName(username));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Getting a user by their email
+     *
+     * @param email
+     * @return UserDto
+     */
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Object> getuserByEmail(@PathVariable String email) {
+        try {
+            return ResponseEntity.ok().body(userService.getUserByEmail(email));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Change the role of the given user
+     *
+     * @param role
+     * @param userId
+     * @return updated user
+     */
+    @PutMapping("/{userId}/role")
+    public ResponseEntity<Object> setUserRole(@RequestBody String role, @PathVariable Long userId) {
+        User user;
+        try {
+            user = userService.getUserById(userId);
+
+            if (role.equalsIgnoreCase("mod")) {
+                user.setRole(Role.MOD);
+            } else {
+                user.setRole(Role.USER);
+            }
+
+            User updatedUser = userService.updateUser(user);
+            return ResponseEntity.ok().body(userDtoMapper.apply(updatedUser));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     /**
@@ -79,6 +130,28 @@ public class UserController {
         }
         catch (EmailTakenException | UsernameTakenException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * Update a user
+     *
+     * @param userId
+     * @param userDto
+     * @return the updated user
+     */
+    @PutMapping("/{userId}")
+    public ResponseEntity<Object> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        // TODO: validate if the user got the right permissions
+        if (!Objects.equals(userId, userDto.id())){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            User user = this.userService.updateUser(new User(userDto));
+            return ResponseEntity.ok(userDtoMapper.apply(user));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

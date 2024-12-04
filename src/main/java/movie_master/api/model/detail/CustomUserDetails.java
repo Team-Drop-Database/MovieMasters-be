@@ -23,7 +23,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.authorities = Arrays.stream(user.getRoles().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        this.authorities = Arrays.stream(user.getRole().toString().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
         this.enabled = user.isEnabled();
     }
 

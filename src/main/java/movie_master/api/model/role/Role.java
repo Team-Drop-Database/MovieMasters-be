@@ -1,6 +1,6 @@
 package movie_master.api.model.role;
 
-public enum Roles {
+public enum Role {
     USER,
-    ADMIN
+    MOD
 }
