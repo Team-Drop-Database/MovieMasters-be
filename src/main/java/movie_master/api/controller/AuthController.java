@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class AuthController {
 
             Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
 
-            String jwt = jwtUtil.generateToken(claims, username);
+            String jwt = jwtUtil.generateJwt(claims, username);
             String refreshToken = jwtUtil.generateRefreshToken(claims, username);
 
             return ResponseEntity.ok().body(Map.of("accessToken", jwt, "refreshToken", refreshToken));
@@ -74,7 +75,7 @@ public class AuthController {
             String username = jwtUtil.getSubject(refreshToken);
             Long userId = jwtUtil.getUserId(refreshToken);
 
-            if (!jwtUtil.isJWTokenValid(refreshToken, userId, username)) {
+            if (!jwtUtil.isJwtValid(refreshToken, userId, username)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
             }
 
@@ -83,7 +84,7 @@ public class AuthController {
             claims.put("userId", userId);
             claims.put("roles", jwtUtil.extractClaims(refreshToken).get("roles"));
 
-            String newAccessToken = jwtUtil.generateToken(claims, username);
+            String newAccessToken = jwtUtil.generateJwt(claims, username);
 
             return ResponseEntity.ok().body(Map.of("accessToken", newAccessToken));
         } catch (Exception e) {
