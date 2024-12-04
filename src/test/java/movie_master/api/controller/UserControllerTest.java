@@ -8,6 +8,7 @@ import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
+import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.DefaultUserService;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class UserControllerTest {
         HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
         String uri = "uri";
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
-        UserDto expectedBody = new UserDto(1L, "email", "username", "ugly", LocalDate.now(), "some");
+        UserDto expectedBody = new UserDto(1L, "email", "username", "ugly", LocalDate.now(), Role.USER);
 
         Mockito.when(defaultUserService.register(request)).thenReturn(expectedBody);
         Mockito.when(httpServletRequest.getRequestURI()).thenReturn(uri);
@@ -90,7 +91,7 @@ class UserControllerTest {
     void retrieveWatchlistSuccessfully() throws UserNotFoundException {
         // Given
         long userId = 1337;
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
         Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
@@ -131,12 +132,12 @@ class UserControllerTest {
     void userCanBeFoundByUserName() throws UserNotFoundException {
         // Given
         String username = "User McNameface";
-        UserDto user = new UserDto(1L, "test@mail.com", username, "ugly", LocalDate.now(), "QA");
+        UserDto user = new UserDto(1L, "test@mail.com", username, "ugly", LocalDate.now(), Role.USER);
 
         Mockito.when(defaultUserService.getUserByName(username)).thenReturn(user);
 
         // When
-        ResponseEntity<UserDto> result = userController.getAllUsers(username, null);
+        ResponseEntity<Object> result = userController.getuserByUserName(username);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
@@ -150,7 +151,7 @@ class UserControllerTest {
         Mockito.when(defaultUserService.getUserByName(username)).thenThrow(UserNotFoundException.class);
 
         // When
-        ResponseEntity<UserDto> result = userController.getAllUsers(username, "");
+        ResponseEntity<Object> result = userController.getuserByUserName(username);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
@@ -160,12 +161,12 @@ class UserControllerTest {
     void userCanBeFoundByEmail() throws UserNotFoundException {
         // Given
         String email = "test@user.com";
-        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), "QA");
+        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.USER);
 
         Mockito.when(defaultUserService.getUserByEmail(email)).thenReturn(user);
 
         // When
-        ResponseEntity<UserDto> result = userController.getAllUsers("", email);
+        ResponseEntity<Object> result = userController.getuserByEmail(email);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
@@ -175,12 +176,12 @@ class UserControllerTest {
     void failUserCanBeFoundByEmail() throws UserNotFoundException {
         // Given
         String email = "test@user.com";
-        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), "QA");
+        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.USER);
 
         Mockito.when(defaultUserService.getUserByEmail(email)).thenThrow(UserNotFoundException.class);
 
         // When
-        ResponseEntity<UserDto> result = userController.getAllUsers("", email);
+        ResponseEntity<Object> result = userController.getuserByEmail(email);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
