@@ -10,12 +10,15 @@ import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
-import movie_master.api.model.role.Roles;
+import movie_master.api.model.role.Role;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -71,7 +74,7 @@ public class DefaultUserService implements UserService {
                         registerUserRequest.email(),
                         registerUserRequest.username(),
                         passwordEncoder.encode(registerUserRequest.password()),
-                        Roles.USER.name(),
+                        Role.USER,
                         true
                         )
         );
@@ -175,5 +178,60 @@ public class DefaultUserService implements UserService {
         watchlistItem.setWatched(watched);
         userRepository.save(user);
         return watchlistItem;
+    }
+
+    @Override
+    public UserDto getUserByName(String username) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(username);
+        }
+        return this.userDtoMapper.apply(user.get());
+    }
+
+    @Override
+    public UserDto getUserByEmail(String email) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(email);
+        }
+        return this.userDtoMapper.apply(user.get());
+    }
+
+    @Override
+    public List<UserDto> getAllUsers() throws UserNotFoundException {
+        List<User> foundUsers = this.userRepository.findAll();
+        List<UserDto> users = new ArrayList<>();
+
+        for (User user : foundUsers ){
+            users.add(this.userDtoMapper.apply(user));
+        }
+        return users;
+    }
+
+    @Override
+    public User getUserById(Long userId) throws UserNotFoundException {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+        return user.get();
+    }
+
+    @Override
+    public User updateUser(User updatedUser) throws UserNotFoundException {
+        userRepository.findById(updatedUser.getId()).map(user -> {
+            user.setUsername(updatedUser.getUsername());
+            user.setEmail(updatedUser.getEmail());
+            user.setProfilePicture(updatedUser.getProfilePicture());
+            if (updatedUser.getRole() != null) {
+                user.setRole(updatedUser.getRole());
+            }
+            return userRepository.save(user);
+        }).orElseThrow(UserNotFoundException::new);
+
+        return this.userRepository.findById(updatedUser.getId()).get();
     }
 }

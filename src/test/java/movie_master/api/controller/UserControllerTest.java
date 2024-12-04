@@ -195,7 +195,7 @@ class UserControllerTest {
     void successAddMovieToWatchlist() throws UserNotFoundException, MovieNotFoundException {
         // Given
         long userId = 1337;
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
 
         UserMovie expectedBody = new UserMovie(user, movie1, false);
@@ -243,7 +243,7 @@ class UserControllerTest {
         Long userId = 1337L;
         Long watchlistItemId = 1L;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
 
         UserMovie expectedBody = new UserMovie(user, movie1, false);
