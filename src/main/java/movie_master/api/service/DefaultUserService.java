@@ -30,16 +30,19 @@ public class DefaultUserService implements UserService {
     // Repositories
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
+    private final UserMovieRepository userMovieRepository;
 
     // Utilities
     private final PasswordEncoder passwordEncoder;
     private final UserDtoMapper userDtoMapper;
 
     public DefaultUserService(
-        UserRepository userRepository, MovieRepository movieRepository,
-         PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper) {
+        UserRepository userRepository, MovieRepository movieRepository, 
+        UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
+         UserDtoMapper userDtoMapper) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
+        this.userMovieRepository = userMovieRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
     }
@@ -151,6 +154,38 @@ public class DefaultUserService implements UserService {
         // Save the newly updated association and return it
         userRepository.save(user);
         return movieAssociation;
+    }
+
+    /**
+     * Removes a movie from a users watchlist.
+     * 
+     * @param userid id of the user
+     * @param movieId id of the movie
+    */
+    @Override
+    public void removeMovieFromWatchlist(Long userId, Long movieId) 
+        throws UserNotFoundException, UserMovieNotFoundException {
+
+        // Retrieve movie objects
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        // Check whether both entities exist
+        if(userOpt.isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+
+        User user = userOpt.get();
+
+        boolean hasWatchlisted = user.getWatchList()
+        .stream().anyMatch(e -> e.getMovie().getId() == movieId);
+
+        if(!hasWatchlisted){
+            throw new UserMovieNotFoundException(movieId);
+        }
+
+        UserMovie userMovie = user.getWatchList().stream().filter(e -> e.getMovie().getId() == movieId).collect(Collectors.toList()).get(0);
+        user.getWatchList().remove(userMovie);
+        userMovieRepository.delete(userMovie);
     }
 
     /**
