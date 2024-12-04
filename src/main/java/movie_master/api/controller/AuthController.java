@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.detail.CustomUserDetails;
 import movie_master.api.request.LoginRequest;
+import movie_master.api.request.RefreshJwtRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,7 +55,7 @@ public class AuthController {
             Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
 
             String jwt = jwtUtil.generateJwt(claims, username);
-            String refreshToken = jwtUtil.generateRefreshToken(claims, username);
+            String refreshToken = jwtUtil.generateRefreshJwt(claims, username);
 
             return ResponseEntity.ok().body(Map.of("accessToken", jwt, "refreshToken", refreshToken));
         } catch (BadCredentialsException e) {
@@ -63,33 +64,28 @@ public class AuthController {
     }
 
 
-    @PostMapping("/refresh")
-    public ResponseEntity<Object> refresh(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
-
-        if (refreshToken == null || refreshToken.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Refresh token is required");
-        }
-
-        try {
-            String username = jwtUtil.getSubject(refreshToken);
-            Long userId = jwtUtil.getUserId(refreshToken);
-
-            if (!jwtUtil.isJwtValid(refreshToken, userId, username)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
-            }
-
-            // Generate new JWT
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("userId", userId);
-            claims.put("roles", jwtUtil.extractClaims(refreshToken).get("roles"));
-
-            String newAccessToken = jwtUtil.generateJwt(claims, username);
-
-            return ResponseEntity.ok().body(Map.of("accessToken", newAccessToken));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired or invalid");
-        }
-    }
+    //TODO APARTE pull request aanmaken
+//    @PostMapping("/refresh")
+//    public ResponseEntity<Object> refresh(@Valid @RequestBody RefreshJwtRequest refreshJwtRequest) {
+//        try {
+//            String username = jwtUtil.getSubject(refreshJwtRequest.jwt());
+//            Long userId = jwtUtil.getUserId(refreshJwtRequest.jwt());
+//
+//            if (!jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username)) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+//            }
+//
+//            // Generate new JWT
+//            Map<String, Object> claims = new HashMap<>();
+//            claims.put("userId", userId);
+//            claims.put("roles", jwtUtil.extractClaims(refreshJwtRequest.jwt()).get("roles"));
+//
+//            String newAccessToken = jwtUtil.generateJwt(claims, username);
+//
+//            return ResponseEntity.ok().body(Map.of("accessToken", newAccessToken));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired or invalid");
+//        }
+//    }
 
 }

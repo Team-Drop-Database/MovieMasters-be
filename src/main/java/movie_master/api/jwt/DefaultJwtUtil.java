@@ -33,8 +33,9 @@ public class DefaultJwtUtil implements JwtUtil {
                 .compact();
     }
 
+    //TODO aparte pull request voor aanmaken
     @Override
-    public String generateRefreshToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshJwt(Map<String, Object> claims, String subject) {
         Key key = getSigningKey();
 
         return Jwts.builder()

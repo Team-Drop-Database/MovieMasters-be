@@ -54,16 +54,18 @@ public class AuthControllerTests {
         Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
 
         String jwt = "this_is_a_jwt_mock";
+        String refreshJwt = "this_is_the_refresh_jwt";
 
         Mockito.when(authenticationManager.authenticate(UsernamePasswordAuthenticationToken
                 .unauthenticated(loginRequest.username(), loginRequest.password()))).thenReturn(authentication);
         Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
         Mockito.when(jwtUtil.generateJwt(claims, username)).thenReturn(jwt);
+        Mockito.when(jwtUtil.generateRefreshJwt(claims, username)).thenReturn(refreshJwt);
 
         ResponseEntity<Object> result = authController.login(loginRequest);
 
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
-        assertEquals(result.getBody(), jwt);
+        assertEquals(result.getBody(), Map.of("accessToken", jwt, "refreshToken", refreshJwt));
     }
 
     @Test

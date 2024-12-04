@@ -1,5 +1,6 @@
 package movie_master.api.jwt;
 
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -74,7 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }
-        catch (Exception e) {
+        catch (SignatureException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Invalid or expired jwt\"}");
             return;

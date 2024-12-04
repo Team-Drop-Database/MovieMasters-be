@@ -79,4 +79,64 @@ public class DefaultJwtUtilTests {
         assertEquals(username, defaultJWTUtil.getSubject(jwt));
         assertFalse(defaultJWTUtil.isJwtValid(jwt, userId, username));
     }
+
+    @Test
+    void canGenerateRefreshJwt() {
+        User user = new User("mock@gmail.com", "mock","mocked", "USER", true);
+        user.setUserId(1L);
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        Long userId = userDetails.getUserId();
+        String username = userDetails.getUsername();
+        List<String> roles = userDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
+
+        Mockito.when(defaultJWTUtil.generateRefreshJwt(claims, username)).thenReturn("this_is_the_refresh_jwt");
+
+        String refreshJwt = defaultJWTUtil.generateRefreshJwt(claims, username);
+
+        Mockito.when(defaultJWTUtil.getUserId(refreshJwt)).thenReturn(userId);
+        Mockito.when(defaultJWTUtil.getSubject(refreshJwt)).thenReturn(username);
+        Mockito.when(defaultJWTUtil.isJwtValid(refreshJwt, userId, username)).thenReturn(true);
+
+        assertNotNull(refreshJwt);
+        assertEquals(userId, defaultJWTUtil.getUserId(refreshJwt));
+        assertEquals(username, defaultJWTUtil.getSubject(refreshJwt));
+        assertTrue(defaultJWTUtil.isJwtValid(refreshJwt, userId, username));
+    }
+
+    @Test
+    void generatedRefreshJwtCanBeInvalid() {
+        User user = new User("mock@gmail.com", "mock","mocked", "USER", true);
+        user.setUserId(1L);
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        Long userId = userDetails.getUserId();
+        String username = userDetails.getUsername();
+        List<String> roles = userDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
+
+        Mockito.when(defaultJWTUtil.generateRefreshJwt(claims, username)).thenReturn("this_is_the_refresh_jwt");
+
+        String jwt = defaultJWTUtil.generateRefreshJwt(claims, username);
+
+        Mockito.when(defaultJWTUtil.getUserId(jwt)).thenReturn(userId);
+        Mockito.when(defaultJWTUtil.getSubject(jwt)).thenReturn(username);
+        Mockito.when(defaultJWTUtil.isJwtValid(jwt, userId, username)).thenReturn(false);
+
+        assertNotNull(jwt);
+        assertEquals(userId, defaultJWTUtil.getUserId(jwt));
+        assertEquals(username, defaultJWTUtil.getSubject(jwt));
+        assertFalse(defaultJWTUtil.isJwtValid(jwt, userId, username));
+    }
 }

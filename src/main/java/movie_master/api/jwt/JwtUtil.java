@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface JwtUtil {
     String generateJwt(Map<String, Object> claims, String subject);
-    String generateRefreshToken(Map<String, Object> claims, String subject);
+    String generateRefreshJwt(Map<String, Object> claims, String subject);
     Claims extractClaims(String token);
     Long getUserId(String jwt);
     String getSubject(String jwt);
