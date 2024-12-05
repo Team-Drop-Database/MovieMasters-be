@@ -8,6 +8,8 @@ DB_PASSWORD=example_password
 DB_NAME=example_name
 SHOW_SQL=true
 CLIENT_HOST=http://localhost:YOUR_PORT_NUMBER
+JWT_SECRET=example_jwt_secret
+JWT_TESTING=example_jwt_testing
 ```
 
 ## Getting started
