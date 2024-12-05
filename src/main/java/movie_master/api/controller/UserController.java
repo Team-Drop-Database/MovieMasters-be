@@ -82,7 +82,7 @@ public class UserController {
      * @return UserDto
      */
     @GetMapping("/email/{email}")
-    public ResponseEntity<Object> getuserByEmail(@PathVariable String email) {
+    public ResponseEntity<Object> getUserByEmail(@PathVariable String email) {
         try {
             return ResponseEntity.ok().body(userService.getUserByEmail(email));
         } catch (UserNotFoundException e) {
@@ -105,7 +105,8 @@ public class UserController {
 
             if (role.equalsIgnoreCase("mod")) {
                 user.setRole(Role.MOD);
-            } else {
+            } 
+            else {
                 user.setRole(Role.USER);
             }
 
