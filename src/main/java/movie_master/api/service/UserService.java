@@ -9,6 +9,7 @@ import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.UserMovie;
+import movie_master.api.request.UpdateUserRequest;
 
 import java.util.List;
 import java.util.Set;
@@ -24,7 +25,8 @@ public interface UserService {
     void deleteUserById(Long userId) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     List<UserDto> getAllUsers();
-    User updateUser(User user) throws UserNotFoundException;
+    User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException;
+    UserDto updateUserRole(Long  userId, String role) throws UserNotFoundException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
     UserMovie updateWatchItemStatus(Long userId, Long itemId, boolean watched) throws UserNotFoundException, UserMovieNotFoundException;
 }

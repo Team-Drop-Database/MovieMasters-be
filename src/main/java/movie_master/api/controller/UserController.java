@@ -7,6 +7,7 @@ import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.User;
 import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
+import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
 import movie_master.api.exception.EmailTakenException;
 import movie_master.api.exception.UserMovieNotFoundException;
@@ -53,11 +54,7 @@ public class UserController {
         try {
             List<UserDto> users = userService.getAllUsers();
             return ResponseEntity.ok(users);
-        } 
-        catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -103,19 +100,10 @@ public class UserController {
      */
     @PutMapping("/{userId}/role")
     public ResponseEntity<Object> setUserRole(@RequestBody String role, @PathVariable Long userId) {
-        User user;
         try {
-            user = userService.getUserById(userId);
+            UserDto user = userService.updateUserRole(userId, role);
 
-            if (role.equalsIgnoreCase("mod")) {
-                user.setRole(Role.MOD);
-            } 
-            else {
-                user.setRole(Role.USER);
-            }
-
-            User updatedUser = userService.updateUser(user);
-            return ResponseEntity.ok().body(userDtoMapper.apply(updatedUser));
+            return ResponseEntity.ok().body(user);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -147,7 +135,7 @@ public class UserController {
      * @return the updated user
      */
     @PutMapping("/{userId}")
-    public ResponseEntity<Object> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> updateUser(@PathVariable Long userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
         // TODO: validate if the user got the right permissions
         if (!Objects.equals(userId, userDto.id())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -14,6 +14,7 @@ import movie_master.api.model.role.Role;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
+import movie_master.api.request.UpdateUserRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -221,7 +222,10 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public User updateUser(User updatedUser) throws UserNotFoundException {
+    public User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException {
+        User user = this.getUserById(userId);
+        if (!user.getUsername().equals(updateUserRequest.userName())) {}
+
         userRepository.findById(updatedUser.getId()).map(user -> {
             user.setUsername(updatedUser.getUsername());
             user.setEmail(updatedUser.getEmail());
@@ -233,5 +237,22 @@ public class DefaultUserService implements UserService {
         }).orElseThrow(UserNotFoundException::new);
 
         return this.userRepository.findById(updatedUser.getId()).get();
+    }
+
+    @Override
+    public UserDto updateUserRole(Long userId, String role) throws UserNotFoundException {
+        try {
+            User user = getUserById(userId);
+            if (role.equalsIgnoreCase("mod")) {
+                user.setRole(Role.MOD);
+            } else {
+                user.setRole(Role.USER);
+            }
+            User updatedUser = updateUser(user);
+            return this.userDtoMapper.apply(updatedUser);
+        }
+        catch (UserNotFoundException e) {
+            throw new UserNotFoundException();
+        }
     }
 }
