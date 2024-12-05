@@ -53,9 +53,11 @@ public class UserController {
         try {
             List<UserDto> users = userService.getAllUsers();
             return ResponseEntity.ok(users);
-        } catch (UserNotFoundException e){
+        } 
+        catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -70,7 +72,8 @@ public class UserController {
     public ResponseEntity<Object> getuserByUserName(@PathVariable String username) {
         try {
             return ResponseEntity.ok().body(userService.getUserByName(username));
-        } catch (UserNotFoundException e) {
+        } 
+        catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -85,7 +88,8 @@ public class UserController {
     public ResponseEntity<Object> getUserByEmail(@PathVariable String email) {
         try {
             return ResponseEntity.ok().body(userService.getUserByEmail(email));
-        } catch (UserNotFoundException e) {
+        } 
+        catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -145,14 +149,15 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<Object> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
         // TODO: validate if the user got the right permissions
-        if (!Objects.equals(userId, userDto.id())){
+        if (!Objects.equals(userId, userDto.id())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
             User user = this.userService.updateUser(new User(userDto));
             return ResponseEntity.ok(userDtoMapper.apply(user));
-        } catch (UserNotFoundException e) {
+        } 
+        catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

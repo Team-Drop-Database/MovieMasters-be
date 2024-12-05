@@ -201,7 +201,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() throws UserNotFoundException {
+    public List<UserDto> getAllUsers() {
         List<User> foundUsers = this.userRepository.findAll();
         List<UserDto> users = new ArrayList<>();
 
