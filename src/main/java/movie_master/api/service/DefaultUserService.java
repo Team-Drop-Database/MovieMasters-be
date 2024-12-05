@@ -221,32 +221,34 @@ public class DefaultUserService implements UserService {
         return user.get();
     }
 
-    private Boolean validateExistingEmail(String email) {
+    private Boolean emailIsTakenByDifferentUser(String email, Long userId) {
         Optional<User> userFoundByEmail = this.userRepository
                 .findByEmail(email);
-        return userFoundByEmail.isPresent();
+        return userFoundByEmail.filter(user -> !user.getId().equals(userId)).isPresent();
     }
 
-    private Boolean validateExistingUsername(String username) {
+    private Boolean usernameIsTakenByDifferentUser(String username, Long userId) {
         Optional<User> userFoundByUsername = this.userRepository
                 .findByUsername(username);
-        return userFoundByUsername.isPresent();
+        return userFoundByUsername.filter(user -> !user.getId().equals(userId)).isPresent();
     }
 
     @Override
     public UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException, EmailTakenException, UsernameTakenException {
-        if (validateExistingEmail(updateUserRequest.email())) {
+        if (emailIsTakenByDifferentUser(updateUserRequest.email(), userId)) {
             throw new EmailTakenException(updateUserRequest.email());
         }
 
-        if (validateExistingUsername(updateUserRequest.username())) {
+        if (usernameIsTakenByDifferentUser(updateUserRequest.username(), userId)) {
             throw new UsernameTakenException(updateUserRequest.username());
         }
 
         User updatedUser = userRepository.findById(userId).map(user -> {
             user.setUsername(updateUserRequest.username());
             user.setEmail(updateUserRequest.email());
-            user.setProfilePicture(updateUserRequest.profilePicture());
+            if (updateUserRequest.profilePicture() != null) {
+                user.setProfilePicture(updateUserRequest.profilePicture());
+            }
             if (updateUserRequest.role() != null) {
                 user.setRole(updateUserRequest.role());
             }
@@ -259,7 +261,7 @@ public class DefaultUserService implements UserService {
     @Override
     public UserDto updateUserRole(Long userId, String role) throws UserNotFoundException {
         User updatedUser = userRepository.findById(userId).map(user -> {
-            if (role.equalsIgnoreCase("mod")) {
+            if (role.equalsIgnoreCase(Role.MOD.toString())) {
                 user.setRole(Role.MOD);
             } else {
                 user.setRole(Role.USER);
