@@ -170,7 +170,7 @@ class UserControllerTest {
         Mockito.when(defaultUserService.getUserByEmail(email)).thenReturn(user);
 
         // When
-        ResponseEntity<Object> result = userController.getuserByEmail(email);
+        ResponseEntity<Object> result = userController.getUserByEmail(email);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
@@ -185,7 +185,7 @@ class UserControllerTest {
         Mockito.when(defaultUserService.getUserByEmail(email)).thenThrow(UserNotFoundException.class);
 
         // When
-        ResponseEntity<Object> result = userController.getuserByEmail(email);
+        ResponseEntity<Object> result = userController.getUserByEmail(email);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));

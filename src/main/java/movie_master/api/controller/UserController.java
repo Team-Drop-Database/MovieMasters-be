@@ -131,22 +131,20 @@ public class UserController {
      * Update a user
      *
      * @param userId
-     * @param userDto
+     * @param updateUserRequest
      * @return the updated user
      */
     @PutMapping("/{userId}")
     public ResponseEntity<Object> updateUser(@PathVariable Long userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
         // TODO: validate if the user got the right permissions
-        if (!Objects.equals(userId, userDto.id())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         try {
-            User user = this.userService.updateUser(new User(userDto));
-            return ResponseEntity.ok(userDtoMapper.apply(user));
+            UserDto user = this.userService.updateUser(userId, updateUserRequest);
+            return ResponseEntity.ok(user);
         } 
         catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (EmailTakenException | UsernameTakenException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

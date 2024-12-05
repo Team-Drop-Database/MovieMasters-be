@@ -221,38 +221,52 @@ public class DefaultUserService implements UserService {
         return user.get();
     }
 
-    @Override
-    public User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException {
-        User user = this.getUserById(userId);
-        if (!user.getUsername().equals(updateUserRequest.userName())) {}
+    private Boolean validateExistingEmail(String email) {
+        Optional<User> userFoundByEmail = this.userRepository
+                .findByEmail(email);
+        return userFoundByEmail.isPresent();
+    }
 
-        userRepository.findById(updatedUser.getId()).map(user -> {
-            user.setUsername(updatedUser.getUsername());
-            user.setEmail(updatedUser.getEmail());
-            user.setProfilePicture(updatedUser.getProfilePicture());
-            if (updatedUser.getRole() != null) {
-                user.setRole(updatedUser.getRole());
+    private Boolean validateExistingUsername(String username) {
+        Optional<User> userFoundByUsername = this.userRepository
+                .findByUsername(username);
+        return userFoundByUsername.isPresent();
+    }
+
+    @Override
+    public UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException, EmailTakenException, UsernameTakenException {
+        if (validateExistingEmail(updateUserRequest.email())) {
+            throw new EmailTakenException(updateUserRequest.email());
+        }
+
+        if (validateExistingUsername(updateUserRequest.username())) {
+            throw new UsernameTakenException(updateUserRequest.username());
+        }
+
+        User updatedUser = userRepository.findById(userId).map(user -> {
+            user.setUsername(updateUserRequest.username());
+            user.setEmail(updateUserRequest.email());
+            user.setProfilePicture(updateUserRequest.profilePicture());
+            if (updateUserRequest.role() != null) {
+                user.setRole(updateUserRequest.role());
             }
             return userRepository.save(user);
         }).orElseThrow(UserNotFoundException::new);
 
-        return this.userRepository.findById(updatedUser.getId()).get();
+        return this.userDtoMapper.apply(updatedUser);
     }
 
     @Override
     public UserDto updateUserRole(Long userId, String role) throws UserNotFoundException {
-        try {
-            User user = getUserById(userId);
+        User updatedUser = userRepository.findById(userId).map(user -> {
             if (role.equalsIgnoreCase("mod")) {
                 user.setRole(Role.MOD);
             } else {
                 user.setRole(Role.USER);
             }
-            User updatedUser = updateUser(user);
-            return this.userDtoMapper.apply(updatedUser);
-        }
-        catch (UserNotFoundException e) {
-            throw new UserNotFoundException();
-        }
+            return userRepository.save(user);
+        }).orElseThrow(UserNotFoundException::new);
+
+        return this.userDtoMapper.apply(updatedUser);
     }
 }

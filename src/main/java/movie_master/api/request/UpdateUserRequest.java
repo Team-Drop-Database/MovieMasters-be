@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import movie_master.api.model.role.Role;
 
 public record UpdateUserRequest (
-        @NotNull String userName,
+        @NotNull String username,
         @NotNull String email,
         String profilePicture,
         Role role

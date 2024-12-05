@@ -25,7 +25,7 @@ public interface UserService {
     void deleteUserById(Long userId) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     List<UserDto> getAllUsers();
-    User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException;
+    UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException, EmailTakenException, UsernameTakenException;
     UserDto updateUserRole(Long  userId, String role) throws UserNotFoundException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
     UserMovie updateWatchItemStatus(Long userId, Long itemId, boolean watched) throws UserNotFoundException, UserMovieNotFoundException;
