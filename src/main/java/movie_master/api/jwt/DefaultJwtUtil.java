@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +34,6 @@ public class DefaultJwtUtil implements JwtUtil {
                 .compact();
     }
 
-    //TODO aparte pull request voor aanmaken
     @Override
     public String generateRefreshJwt(Map<String, Object> claims, String subject) {
         Key key = getSigningKey();
@@ -47,6 +47,7 @@ public class DefaultJwtUtil implements JwtUtil {
                 .compact();
     }
 
+    @Override
     public Claims extractClaims(String token) {
         Key key = getSigningKey();
 
@@ -74,8 +75,14 @@ public class DefaultJwtUtil implements JwtUtil {
     }
 
     @Override
-    public boolean isJwtValid(String jwt, Long userId, String username) {
-        return (getUserId(jwt).equals(userId) && getSubject(jwt).equals(username) && !isJwtExpired(jwt));
+    public List<String> getRoles(String jwt) {
+        return extractClaims(jwt).get("roles", List.class);
+    }
+
+    @Override
+    public boolean isJwtValid(String jwt, Long userId, String username, List<String> roles) {
+        return (getUserId(jwt).equals(userId) && getSubject(jwt).equals(username)
+                && getRoles(jwt).equals(roles) && !isJwtExpired(jwt));
     }
 
     private boolean isJwtExpired(String jwt) {

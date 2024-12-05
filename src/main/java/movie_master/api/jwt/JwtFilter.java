@@ -1,21 +1,25 @@
 package movie_master.api.jwt;
 
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import movie_master.api.model.detail.CustomUserDetails;
-import movie_master.api.service.CustomUserDetailsService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Custom filter for JWT
@@ -23,9 +27,9 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    public JwtFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+    public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
@@ -54,14 +58,21 @@ public class JwtFilter extends OncePerRequestFilter {
         jwt = jwt.substring(7);
 
         try {
-            Long userId = jwtUtil.getUserId(jwt);
-            String username = jwtUtil.getSubject(jwt);
+            Long jwtUserId = jwtUtil.getUserId(jwt);
+            String jwtUsername = jwtUtil.getSubject(jwt);
 
-            if (userId != null && username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+            if (jwtUserId != null && jwtUsername != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(jwtUsername);
+                Long userId = userDetails.getUserId();
+                String username = userDetails.getUsername();
+                List<String> roles = userDetails
+                        .getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList();
 
                 // check if the jwt is valid
-                if (jwtUtil.isJwtValid(jwt, userDetails.getUserId(), userDetails.getUsername())) {
+                if (jwtUtil.isJwtValid(jwt, userId, username, roles)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                     );
@@ -75,7 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }
-        catch (SignatureException e) {
+        catch (SignatureException | MalformedJwtException | UnsupportedJwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Invalid or expired jwt\"}");
             return;

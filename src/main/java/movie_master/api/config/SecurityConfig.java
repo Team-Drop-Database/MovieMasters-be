@@ -54,7 +54,6 @@ public class SecurityConfig {
             
     /**
      * Cors configuration
-     * @return
      */
     @Bean
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
@@ -70,9 +69,6 @@ public class SecurityConfig {
 
     /**
      * Sets up the authentication provider to be used
-     * @param userDetailsService
-     * @param passwordEncoder
-     * @return
      */
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {

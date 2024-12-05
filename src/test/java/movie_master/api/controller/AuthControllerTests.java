@@ -3,7 +3,10 @@ package movie_master.api.controller;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.User;
 import movie_master.api.model.detail.CustomUserDetails;
+import movie_master.api.model.role.Roles;
 import movie_master.api.request.LoginRequest;
+import movie_master.api.request.RefreshJwtRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,8 +21,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.security.SignatureException;
 import java.util.List;
 import java.util.Map;
 
@@ -27,21 +31,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTests {
+    private CustomUserDetails userDetails;
+    private RefreshJwtRequest refreshJwtRequest;
     @Mock private AuthenticationManager authenticationManager;
     @Mock private JwtUtil jwtUtil;
+    @Mock private UserDetailsService userDetailsService;
     @Mock private Authentication authentication;
     @Mock private BadCredentialsException badCredentialsException;
-    @Mock private MethodArgumentNotValidException methodArgumentNotValidException;
+    @Mock private SignatureException signatureException;
     @InjectMocks private AuthController authController;
+
+    @BeforeEach
+    void setup() {
+        User user = new User("mock@gmail.com", "mock", "mocked", Roles.ROLE_USER.name(), true);
+        user.setUserId(1L);
+        userDetails = new CustomUserDetails(user);
+        refreshJwtRequest = new RefreshJwtRequest("refreshJwt");
+    }
 
     @Test
     void userCanLogin() {
-        User user = new User("mock@gmail.com", "mock","mocked", "USER", true);
-        user.setUserId(1L);
-
         LoginRequest loginRequest = new LoginRequest("mock", "mocked");
-
-        CustomUserDetails userDetails = new CustomUserDetails(user);
 
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
@@ -53,8 +63,8 @@ public class AuthControllerTests {
 
         Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
 
-        String jwt = "this_is_a_jwt_mock";
-        String refreshJwt = "this_is_the_refresh_jwt";
+        String jwt = "jwt";
+        String refreshJwt = "refreshJwt";
 
         Mockito.when(authenticationManager.authenticate(UsernamePasswordAuthenticationToken
                 .unauthenticated(loginRequest.username(), loginRequest.password()))).thenReturn(authentication);
@@ -79,5 +89,51 @@ public class AuthControllerTests {
 
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()));
         assertEquals(result.getBody(), badCredentialsException.getMessage());
+    }
+
+    @Test
+    void userCanRetrieveRefreshToken() {
+        Mockito.when(jwtUtil.getSubject(refreshJwtRequest.jwt())).thenReturn(userDetails.getUsername());
+        Mockito.when(userDetailsService.loadUserByUsername(jwtUtil.getSubject(refreshJwtRequest.jwt())))
+                .thenReturn(userDetails);
+
+        Long userId = userDetails.getUserId();
+        String username = userDetails.getUsername();
+        List<String> roles = userDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
+        String jwt = "jwt";
+
+        Mockito.when(jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, roles)).thenReturn(true);
+        Mockito.when(jwtUtil.generateJwt(claims, username)).thenReturn(jwt);
+
+        ResponseEntity<Object> result = authController.refresh(refreshJwtRequest);
+
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
+        assertEquals(result.getBody(), Map.of("accessToken", jwt));
+    }
+
+    @Test
+    void userCanHaveInvalidRefreshToken() {
+        Mockito.when(jwtUtil.getSubject(refreshJwtRequest.jwt())).thenReturn(userDetails.getUsername());
+        Mockito.when(userDetailsService.loadUserByUsername(jwtUtil.getSubject(refreshJwtRequest.jwt()))).thenReturn(userDetails);
+
+        Long userId = userDetails.getUserId();
+        String username = userDetails.getUsername();
+        List<String> roles = userDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        Mockito.when(jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, roles)).thenReturn(false);
+
+        ResponseEntity<Object> result = authController.refresh(refreshJwtRequest);
+
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()));
+        assertEquals(result.getBody(), "Invalid refresh token");
     }
 }
