@@ -205,7 +205,7 @@ public class DefaultUserService implements UserService {
         List<User> foundUsers = this.userRepository.findAll();
         List<UserDto> users = new ArrayList<>();
 
-        for (User user : foundUsers ){
+        for (User user : foundUsers ) {
             users.add(this.userDtoMapper.apply(user));
         }
         return users;
