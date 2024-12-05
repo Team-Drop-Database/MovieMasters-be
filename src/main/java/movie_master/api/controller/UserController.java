@@ -4,8 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
 import movie_master.api.mapper.UserDtoMapper;
-import movie_master.api.model.User;
-import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
@@ -37,11 +35,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final UserDtoMapper userDtoMapper;
 
     public UserController(UserService userService, UserDtoMapper userDtoMapper) {
         this.userService = userService;
-        this.userDtoMapper = userDtoMapper;
     }
 
     /**
@@ -102,7 +98,6 @@ public class UserController {
     public ResponseEntity<Object> setUserRole(@RequestBody String role, @PathVariable Long userId) {
         try {
             UserDto user = userService.updateUserRole(userId, role);
-
             return ResponseEntity.ok().body(user);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

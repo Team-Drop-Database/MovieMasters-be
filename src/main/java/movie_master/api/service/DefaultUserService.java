@@ -249,9 +249,6 @@ public class DefaultUserService implements UserService {
             if (updateUserRequest.profilePicture() != null) {
                 user.setProfilePicture(updateUserRequest.profilePicture());
             }
-            if (updateUserRequest.role() != null) {
-                user.setRole(updateUserRequest.role());
-            }
             return userRepository.save(user);
         }).orElseThrow(UserNotFoundException::new);
 
