@@ -75,7 +75,7 @@ public class DefaultUserService implements UserService {
                         registerUserRequest.email(),
                         registerUserRequest.username(),
                         passwordEncoder.encode(registerUserRequest.password()),
-                        Role.USER,
+                        Role.ROLE_USER,
                         true
                         )
         );
@@ -258,10 +258,10 @@ public class DefaultUserService implements UserService {
     @Override
     public UserDto updateUserRole(Long userId, String role) throws UserNotFoundException {
         User updatedUser = userRepository.findById(userId).map(user -> {
-            if (role.equalsIgnoreCase(Role.MOD.toString())) {
-                user.setRole(Role.MOD);
+            if (role.equalsIgnoreCase(Role.ROLE_MOD.toString())) {
+                user.setRole(Role.ROLE_MOD);
             } else {
-                user.setRole(Role.USER);
+                user.setRole(Role.ROLE_USER);
             }
             return userRepository.save(user);
         }).orElseThrow(UserNotFoundException::new);

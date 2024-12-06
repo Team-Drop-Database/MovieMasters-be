@@ -44,7 +44,7 @@ class UserControllerTest {
         HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
         String uri = "uri";
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
-        UserDto expectedBody = new UserDto(1L, "email", "username", "ugly", LocalDate.now(), Role.USER);
+        UserDto expectedBody = new UserDto(1L, "email", "username", "ugly", LocalDate.now(), Role.ROLE_USER);
 
         Mockito.when(defaultUserService.register(request)).thenReturn(expectedBody);
         Mockito.when(httpServletRequest.getRequestURI()).thenReturn(uri);
@@ -95,7 +95,7 @@ class UserControllerTest {
     void retrieveWatchlistSuccessfully() throws UserNotFoundException {
         // Given
         long userId = 1337;
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
         Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
@@ -136,7 +136,7 @@ class UserControllerTest {
     void userCanBeFoundByUserName() throws UserNotFoundException {
         // Given
         String username = "User McNameface";
-        UserDto user = new UserDto(1L, "test@mail.com", username, "ugly", LocalDate.now(), Role.USER);
+        UserDto user = new UserDto(1L, "test@mail.com", username, "ugly", LocalDate.now(), Role.ROLE_USER);
 
         Mockito.when(defaultUserService.getUserByName(username)).thenReturn(user);
 
@@ -165,7 +165,7 @@ class UserControllerTest {
     void userCanBeFoundByEmail() throws UserNotFoundException {
         // Given
         String email = "test@user.com";
-        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.USER);
+        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.ROLE_USER);
 
         Mockito.when(defaultUserService.getUserByEmail(email)).thenReturn(user);
 
@@ -180,7 +180,7 @@ class UserControllerTest {
     void failUserCanBeFoundByEmail() throws UserNotFoundException {
         // Given
         String email = "test@user.com";
-        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.USER);
+        UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.ROLE_USER);
 
         Mockito.when(defaultUserService.getUserByEmail(email)).thenThrow(UserNotFoundException.class);
 
@@ -195,7 +195,7 @@ class UserControllerTest {
     void successAddMovieToWatchlist() throws UserNotFoundException, MovieNotFoundException {
         // Given
         long userId = 1337;
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
 
         UserMovie expectedBody = new UserMovie(user, movie1, false);
@@ -243,7 +243,7 @@ class UserControllerTest {
         Long userId = 1337L;
         Long watchlistItemId = 1L;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
 
         UserMovie expectedBody = new UserMovie(user, movie1, false);
