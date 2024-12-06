@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=jdbc:mysql://mysql_db:3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=movie_master
+      - SHOW_SQL=false
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - CLIENT_HOST=${CLIENT_HOST}
+    networks:
+      - movie_master_network
+
+  mysql_db:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=movie_master
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - movie_master_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 10
+      interval: 3s
+
+volumes:
+  mysql-data:
+
+networks:
+  movie_master_network:
+    name: movie_master_network
