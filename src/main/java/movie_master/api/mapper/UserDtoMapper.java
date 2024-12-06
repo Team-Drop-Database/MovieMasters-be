@@ -7,6 +7,8 @@ import java.util.function.Function;
 
 /**
  * Class that contains a function that maps a user object to a user dto object
+ * A data transfer object is being used to control which data of a model
+ * will be exposed to the client.
  */
 @Service
 public class UserDtoMapper implements Function<User, UserDto> {

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,12 +58,14 @@ public class AuthController {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("userId", userId);
+            claims.put("roles", roles);
 
             String jwt = jwtUtil.generateJwt(claims, username);
-            String refreshToken = jwtUtil.generateRefreshJwt(claims, username);
+            String refreshJwt = jwtUtil.generateRefreshJwt(claims, username);
 
-            return ResponseEntity.ok().body(Map.of("accessToken", jwt, "refreshToken", refreshToken));
+            return ResponseEntity.ok().body(Map.of("accessToken", jwt, "refreshToken", refreshJwt));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
@@ -94,7 +97,9 @@ public class AuthController {
             }
 
             // Generate new JWT
-            Map<String, Object> claims =  Map.of("userId", userId, "roles", roles);
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("userId", userId);
+            claims.put("roles", roles);
 
             String jwt = jwtUtil.generateJwt(claims, username);
 
