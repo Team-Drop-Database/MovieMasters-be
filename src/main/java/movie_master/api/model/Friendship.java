@@ -1,35 +1,77 @@
 package movie_master.api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import movie_master.api.model.helper.FriendshipId;
+import movie_master.api.model.friendship.FriendshipStatus;
 
 import java.time.LocalDateTime;
 
+/**
+ * Friendship table for the database
+ */
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "friendship")
 public class Friendship {
 
-    @EmbeddedId
-    private FriendshipId friendshipId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String status;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "friend_id", nullable = false)
+    @JsonBackReference
+    private User friend;
+
+    @Enumerated(EnumType.STRING)
+    private FriendshipStatus status;
 
     @Column(name = "friendship_date", nullable = false)
     private LocalDateTime friendshipDate = LocalDateTime.now();
 
-    public FriendshipId getFriendshipId() {
-        return friendshipId;
+    public Friendship() {}
+
+    public Friendship(User user, User friend, FriendshipStatus status) {
+        this.user = user;
+        this.friend = friend;
+        this.status = status;
     }
 
-    public void setFriendshipId(FriendshipId friendshipId) {
-        this.friendshipId = friendshipId;
+    public Long getId() {
+        return id;
     }
 
-    public String getStatus() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getFriend() {
+        return friend;
+    }
+
+    public void setFriend(User friend) {
+        this.friend = friend;
+    }
+
+    public FriendshipStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(FriendshipStatus status) {
         this.status = status;
     }
 

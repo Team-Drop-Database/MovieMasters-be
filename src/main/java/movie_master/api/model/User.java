@@ -30,6 +30,10 @@ public class User {
     @JsonManagedReference      
     private Set<UserMovie> watchlist;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Set<Friendship> friendships = new HashSet<>();
+
     public User() {}
 
     public User(String email, String username, String password, String roles, boolean enabled) {
