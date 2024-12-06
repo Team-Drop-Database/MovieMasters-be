@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public interface UserService {
     UserDto register(RegisterUserRequest registerUserRequest) throws EmailTakenException, UsernameTakenException;
-    UserDto getUserByName(String username) throws UserNotFoundException;
+    UserDto getUserByUsername(String username) throws UserNotFoundException;
     UserDto getUserByEmail(String email) throws UserNotFoundException;
     User getUserById(Long id) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;

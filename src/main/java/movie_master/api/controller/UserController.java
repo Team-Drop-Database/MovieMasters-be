@@ -3,7 +3,6 @@ package movie_master.api.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
-import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
@@ -36,7 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class UserController {
     private final UserService userService;
 
-    public UserController(UserService userService, UserDtoMapper userDtoMapper) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -50,7 +49,8 @@ public class UserController {
         try {
             List<UserDto> users = userService.getAllUsers();
             return ResponseEntity.ok(users);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -62,9 +62,9 @@ public class UserController {
      * @return UserDto
      */
     @GetMapping("/username/{username}")
-    public ResponseEntity<Object> getuserByUserName(@PathVariable String username) {
+    public ResponseEntity<Object> getUserByUsername(@PathVariable String username) {
         try {
-            return ResponseEntity.ok().body(userService.getUserByName(username));
+            return ResponseEntity.ok().body(userService.getUserByUsername(username));
         } 
         catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -95,11 +95,12 @@ public class UserController {
      * @return updated user
      */
     @PutMapping("/{userId}/role")
-    public ResponseEntity<Object> setUserRole(@RequestBody String role, @PathVariable Long userId) {
+    public ResponseEntity<Object> updateUserRole(@RequestBody String role, @PathVariable Long userId) {
         try {
             UserDto user = userService.updateUserRole(userId, role);
             return ResponseEntity.ok().body(user);
-        } catch (UserNotFoundException e) {
+        }
+        catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -133,12 +134,13 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@PathVariable Long userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
         // TODO: validate if the user got the right permissions
         try {
-            UserDto user = this.userService.updateUser(userId, updateUserRequest);
+            UserDto user = userService.updateUser(userId, updateUserRequest);
             return ResponseEntity.ok(user);
         } 
         catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (EmailTakenException | UsernameTakenException e) {
+        }
+        catch (EmailTakenException | UsernameTakenException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -148,7 +150,8 @@ public class UserController {
         try {
             userService.deleteUserById(userId);
             return ResponseEntity.noContent().build();
-        } catch (UserNotFoundException e) {
+        }
+        catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -166,7 +169,8 @@ public class UserController {
         try {
             Set<UserMovie> watchList = userService.getWatchList(userId);
             return ResponseEntity.ok(watchList);
-        } catch (UserNotFoundException e) {
+        }
+        catch (UserNotFoundException e) {
             // Return HTTP code with 404 error message if the user could not be found
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -190,7 +194,8 @@ public class UserController {
                 "movieId", movieId,
                 "association_object", watchItem
                 ));
-        } catch(Exception exception) {
+        }
+        catch(Exception exception) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
             .body("Could not associate user with movie. Exception message: "
              + exception.getMessage());
