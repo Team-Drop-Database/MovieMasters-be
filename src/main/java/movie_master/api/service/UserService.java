@@ -2,6 +2,7 @@ package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.*;
+import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.model.UserMovie;
 import movie_master.api.request.UpdateUserRequest;
@@ -19,8 +20,8 @@ public interface UserService {
     void deleteUserById(Long userId) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     List<UserDto> getAllUsers();
-    UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException, EmailTakenException, UsernameTakenException;
-    UserDto updateUserRole(Long  userId, String role) throws UserNotFoundException;
+    UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest, Long jwtUserId, Role jwtUserRole) throws UserNotFoundException, EmailTakenException, UsernameTakenException, UnauthorizedException;
+    UserDto updateUserRole(Long  userId, String role, Role jwtUserRole) throws UserNotFoundException, UnauthorizedException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
     void removeMovieFromWatchlist(Long userId, Long movieId) throws UserNotFoundException, UserMovieNotFoundException;
     UserMovie updateWatchItemStatus(Long userId, Long movieId, boolean watched) throws UserNotFoundException, UserMovieNotFoundException;

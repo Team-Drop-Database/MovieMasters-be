@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.*;
+import movie_master.api.jwt.JwtUtil;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
@@ -32,9 +33,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -93,13 +96,19 @@ public class UserController {
      * @return updated user
      */
     @PutMapping("/{userId}/role")
-    public ResponseEntity<Object> updateUserRole(@RequestBody String role, @PathVariable Long userId) {
+    public ResponseEntity<Object> updateUserRole(@RequestBody String role,
+                                                 @PathVariable Long userId,
+                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) {
         try {
-            UserDto user = userService.updateUserRole(userId, role);
+            UserDto user = userService.updateUserRole(userId,
+                    role,
+                    jwtUtil.getRole(jwtToken.replace("Bearer ", "")));
             return ResponseEntity.ok().body(user);
         }
         catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 
@@ -134,11 +143,18 @@ public class UserController {
                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) {
         // TODO: validate if the user got the right permissions
         try {
-            UserDto user = userService.updateUser(userId, updateUserRequest);
+            jwtToken = jwtToken.replace("Bearer ", "");
+            UserDto user = userService.updateUser(userId,
+                    updateUserRequest,
+                    jwtUtil.getUserId(jwtToken),
+                    jwtUtil.getRole(jwtToken));
             return ResponseEntity.ok(user);
         } 
         catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
         catch (EmailTakenException | UsernameTakenException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

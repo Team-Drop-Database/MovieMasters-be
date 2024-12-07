@@ -2,6 +2,7 @@ package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.*;
+import movie_master.api.jwt.JwtUtil;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
@@ -15,10 +16,7 @@ import movie_master.api.request.UpdateUserRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,16 +33,19 @@ public class DefaultUserService implements UserService {
     // Utilities
     private final PasswordEncoder passwordEncoder;
     private final UserDtoMapper userDtoMapper;
+    private final JwtUtil jwtUtil;
 
     public DefaultUserService(
             UserRepository userRepository, MovieRepository movieRepository,
             UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
-            UserDtoMapper userDtoMapper) {
+            UserDtoMapper userDtoMapper,
+            JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
         this.userMovieRepository = userMovieRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -267,7 +268,18 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserNotFoundException, EmailTakenException, UsernameTakenException {
+    public UserDto updateUser(Long userId,
+                              UpdateUserRequest updateUserRequest,
+                              Long jwtUserId,
+                              Role jwtUserRole)
+            throws UserNotFoundException,
+            EmailTakenException,
+            UsernameTakenException,
+            UnauthorizedException {
+        // Only allowing the user itself or a mod to update the user
+        if (!Objects.equals(userId, jwtUserId) && Objects.equals(Role.ROLE_USER, jwtUserRole)) {
+            throw new UnauthorizedException();
+        }
         if (emailIsTakenByDifferentUser(updateUserRequest.email(), userId)) {
             throw new EmailTakenException(updateUserRequest.email());
         }
@@ -296,7 +308,13 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserDto updateUserRole(Long userId, String role) throws UserNotFoundException {
+    public UserDto updateUserRole(Long userId, String role, Role jwtUserRole)
+            throws UserNotFoundException, UnauthorizedException {
+        // Only mods can change the role of a user
+        if (!Objects.equals(Role.ROLE_MOD, jwtUserRole)) {
+            throw new UnauthorizedException();
+        }
+
         User updatedUser = userRepository
                 .findById(userId)
                 .map(user -> {

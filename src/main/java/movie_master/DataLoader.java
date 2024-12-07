@@ -9,6 +9,7 @@ import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
+import movie_master.api.model.role.Role;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
@@ -103,7 +104,8 @@ public class DataLoader implements ApplicationRunner {
                 username,
                 password);
         try {
-            userService.register(user);
+            UserDto createdUser = userService.register(user);
+            userService.updateUserRole(createdUser.id(), Role.ROLE_MOD.toString(), Role.ROLE_MOD);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
