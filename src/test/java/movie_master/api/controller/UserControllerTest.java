@@ -2,12 +2,8 @@ package movie_master.api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import movie_master.api.dto.UserDto;
-import movie_master.api.exception.EmailTakenException;
+import movie_master.api.exception.*;
 import movie_master.api.exception.MovieNotFoundException;
-import movie_master.api.exception.UserMovieNotFoundException;
-import movie_master.api.exception.MovieNotFoundException;
-import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
@@ -162,7 +158,7 @@ class UserControllerTest {
     }
 
     @Test
-    void userCanBeFoundByEmail() throws UserNotFoundException {
+    void userCanBeFoundByEmail() throws EmailNotFoundException {
         // Given
         String email = "test@user.com";
         UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.ROLE_USER);
@@ -177,12 +173,12 @@ class UserControllerTest {
     }
 
     @Test
-    void failUserCanBeFoundByEmail() throws UserNotFoundException {
+    void failUserCanBeFoundByEmail() throws EmailNotFoundException {
         // Given
         String email = "test@user.com";
         UserDto user = new UserDto(1L, email, "User McNameface", "ugly", LocalDate.now(), Role.ROLE_USER);
 
-        Mockito.when(defaultUserService.getUserByEmail(email)).thenThrow(UserNotFoundException.class);
+        Mockito.when(defaultUserService.getUserByEmail(email)).thenThrow(EmailNotFoundException.class);
 
         // When
         ResponseEntity<Object> result = userController.getUserByEmail(email);

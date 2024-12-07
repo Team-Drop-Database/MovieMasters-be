@@ -1,11 +1,7 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
-import movie_master.api.exception.EmailTakenException;
-import movie_master.api.exception.MovieNotFoundException;
-import movie_master.api.exception.UserMovieNotFoundException;
-import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.exception.UsernameTakenException;
+import movie_master.api.exception.*;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
@@ -192,11 +188,11 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserDto getUserByEmail(String email) throws UserNotFoundException {
+    public UserDto getUserByEmail(String email) throws EmailNotFoundException {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
-            throw new UserNotFoundException(email);
+            throw new EmailNotFoundException(email);
         }
         return this.userDtoMapper.apply(user.get());
     }

@@ -10,6 +10,6 @@ public class UserNotFoundException extends Exception {
     }
 
     public UserNotFoundException(String user) {
-        super("User with name or email '%s' does not exist".formatted(user));
+        super("User with name '%s' does not exist".formatted(user));
     }
 }

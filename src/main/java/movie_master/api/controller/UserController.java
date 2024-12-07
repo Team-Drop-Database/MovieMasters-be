@@ -3,14 +3,11 @@ package movie_master.api.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
+import movie_master.api.exception.*;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
-import movie_master.api.exception.EmailTakenException;
-import movie_master.api.exception.UserMovieNotFoundException;
-import movie_master.api.exception.UsernameTakenException;
-import movie_master.api.exception.UserNotFoundException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -82,7 +79,7 @@ public class UserController {
         try {
             return ResponseEntity.ok().body(userService.getUserByEmail(email));
         } 
-        catch (UserNotFoundException e) {
+        catch (EmailNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
