@@ -33,14 +33,17 @@ public class Friendship {
     private FriendshipStatus status;
 
     @Column(name = "friendship_date", nullable = false)
-    private LocalDateTime friendshipDate = LocalDateTime.now();
+    private LocalDateTime friendshipDate;
 
-    public Friendship() {}
+    public Friendship() {
+        this.friendshipDate = LocalDateTime.now();
+    }
 
     public Friendship(User user, User friend, FriendshipStatus status) {
         this.user = user;
         this.friend = friend;
         this.status = status;
+        this.friendshipDate = LocalDateTime.now();
     }
 
     public Long getId() {

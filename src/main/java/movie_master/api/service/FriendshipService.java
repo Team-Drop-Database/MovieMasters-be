@@ -1,9 +1,9 @@
 package movie_master.api.service;
 
 import movie_master.api.model.Friendship;
+import movie_master.api.model.User;
 import movie_master.api.model.friendship.FriendshipStatus;
 import movie_master.api.repository.FriendshipRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,32 +11,37 @@ import java.util.List;
 @Service
 public class FriendshipService {
 
-    @Autowired
-    private FriendshipRepository friendshipRepository;
+    private final FriendshipRepository friendshipRepository;
 
-    public Friendship addFriend(Long userId, Long friendId) {
-        FriendshipId friendshipId = new FriendshipId(userId.intValue(), friendId.intValue());
-        Friendship friendship = new Friendship(friendshipId, FriendshipStatus.PENDING);
+    public FriendshipService(FriendshipRepository friendshipRepository) {
+        this.friendshipRepository = friendshipRepository;
+    }
+
+    public Friendship addFriend(User user, User friend) {
+        if (friendshipRepository.existsByUserAndFriend(user, friend)) {
+            throw new IllegalArgumentException("Friendship already exists.");
+        }
+        Friendship friendship = new Friendship(user, friend, FriendshipStatus.PENDING);
         return friendshipRepository.save(friendship);
     }
 
-    // Get list of accepted friends for a user
-    public List<Friendship> getFriends(Long userId) {
-        return friendshipRepository.findByFriendshipIdUserIdAndStatus(userId.intValue(), FriendshipStatus.ACCEPTED);
-    }
-
-    // Remove a friend by deleting the friendship record
-    public void removeFriend(Long userId, Long friendId) {
-        FriendshipId friendshipId = new FriendshipId(userId.intValue(), friendId.intValue());
-        friendshipRepository.deleteById(friendshipId);
-    }
-
-    // Update the friendship status (e.g., accept or reject a request)
-    public Friendship updateFriendshipStatus(Long userId, Long friendId, FriendshipStatus status) {
-        FriendshipId friendshipId = new FriendshipId(userId.intValue(), friendId.intValue());
-        Friendship friendship = friendshipRepository.findById(friendshipId)
-                .orElseThrow(() -> new RuntimeException("Friendship not found"));
+    public Friendship updateFriendshipStatus(User user, User friend, FriendshipStatus status) {
+        Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
+        if (friendship == null) {
+            throw new IllegalArgumentException("Friendship does not exist.");
+        }
         friendship.setStatus(status);
         return friendshipRepository.save(friendship);
+    }
+
+    public List<Friendship> getFriendsByStatus(User user, FriendshipStatus status) {
+        return friendshipRepository.findByUserAndStatus(user, status);
+    }
+
+    public void deleteFriend(User user, User friend) {
+        Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
+        if (friendship != null) {
+            friendshipRepository.delete(friendship);
+        }
     }
 }
