@@ -103,7 +103,7 @@ public class DataLoader implements ApplicationRunner {
                 username,
                 password);
         try {
-            this.userService.register(user);
+            userService.register(user);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

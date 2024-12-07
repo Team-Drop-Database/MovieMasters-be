@@ -233,8 +233,12 @@ public class DefaultUserService implements UserService {
         User updatedUser = userRepository
                 .findById(userId)
                 .map(user -> {
-                    user.setUsername(updateUserRequest.username());
-                    user.setEmail(updateUserRequest.email());
+                    if (updateUserRequest.username() != null) {
+                        user.setUsername(updateUserRequest.username());
+                    }
+                    if (updateUserRequest.email() != null){
+                        user.setEmail(updateUserRequest.email());
+                    }
                     if (updateUserRequest.profilePicture() != null) {
                         user.setProfilePicture(updateUserRequest.profilePicture());
                     }
