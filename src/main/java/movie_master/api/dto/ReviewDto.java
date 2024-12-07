@@ -1,6 +1,6 @@
 package movie_master.api.dto;
 
-public record ReviewDTO(
+public record ReviewDto(
     long id,
     String username,
     String userProfilePicture,
