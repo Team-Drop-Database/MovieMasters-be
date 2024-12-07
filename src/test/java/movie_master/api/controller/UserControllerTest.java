@@ -137,10 +137,10 @@ class UserControllerTest {
         String username = "User McNameface";
         UserDto user = new UserDto(1L, "test@mail.com", username, "ugly", LocalDate.now(), Role.ROLE_USER);
 
-        Mockito.when(defaultUserService.getUserByName(username)).thenReturn(user);
+        Mockito.when(defaultUserService.getUserByUsername(username)).thenReturn(user);
 
         // When
-        ResponseEntity<Object> result = userController.getuserByUserName(username);
+        ResponseEntity<Object> result = userController.getUserByUsername(username);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
@@ -151,10 +151,10 @@ class UserControllerTest {
         // Given
         String username = "User McNameface";
 
-        Mockito.when(defaultUserService.getUserByName(username)).thenThrow(UserNotFoundException.class);
+        Mockito.when(defaultUserService.getUserByUsername(username)).thenThrow(UserNotFoundException.class);
 
         // When
-        ResponseEntity<Object> result = userController.getuserByUserName(username);
+        ResponseEntity<Object> result = userController.getUserByUsername(username);
 
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
