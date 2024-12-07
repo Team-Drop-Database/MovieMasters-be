@@ -3,8 +3,6 @@ package movie_master.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import movie_master.api.dto.UserDto;
-import movie_master.api.model.role.Role;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -34,11 +32,11 @@ public class User {
 
     public User() {}
 
-    public User(String email, String username, String password, Role role, boolean enabled) {
+    public User(String email, String username, String password, String roles, boolean enabled) {
         this.email = email;
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.roles = roles;
         this.enabled = enabled;
         watchlist = new HashSet<>();
     }
@@ -52,8 +50,12 @@ public class User {
         this.dateJoined = userDto.date_joined();
     }
 
-    public Long getId() {
+    public Long getUserId() {
         return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
@@ -70,6 +72,10 @@ public class User {
 
     public String getProfilePicture() {
         return profilePicture;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public LocalDate getDateJoined() {

@@ -174,7 +174,7 @@ public class UserController {
     }
 
     /**
-     * Updates the watchlist of a movie by adding a movie to it. Essentially an association
+     * Updates the watchlist of a user by adding a movie to it. Essentially an association
      *  ('MovieUser') is created between a user and a movie.
      * 
      * @param userId id of the user
@@ -200,22 +200,47 @@ public class UserController {
     }
 
     /**
+     * Updates the watchlist of a user by removing a movie from it. This 
+     * cuts the association ('MovieUser') between a User and a Movie.
+     * 
+     * @param userId id of a user
+     * @param movieId id of a movie
+     * @return message confirming the removal of the
+     * movie from the users' watchlist
+     */
+    @PutMapping("/{userId}/watchlist/remove/{movieId}")
+    public ResponseEntity<Object> removeMovieFromWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
+        try {
+            userService.removeMovieFromWatchlist(userId, movieId);
+            return ResponseEntity.ok(Map.of(
+                "message", "Successfully removed item from watchlist",
+                "userId", userId,
+                "movieId", movieId
+                ));
+        } catch(Exception exception) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+            .body("Could not remove movie from watchlist. Exception message: "
+             + exception.getMessage());
+        }
+    }
+
+    /**
      * Updates the 'watched' status of an item on the watchlist.
      * 
      * @param userId id of the user
-     * @param itemId id of the watchlist item (UserMovie)
+     * @param movieId id of the movie
      * @param watched whether the user has watched this movie or not
      * @return updated watchitem
      */
-    @PutMapping("{userId}/watchlist/update/{itemId}")
-    public ResponseEntity<Object> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long itemId,
+    @PutMapping("{userId}/watchlist/update/{movieId}")
+    public ResponseEntity<Object> updateWatchItemStatus(@PathVariable Long userId, @PathVariable Long movieId,
      @RequestParam boolean watched) {
         try {
-            UserMovie watchItem = userService.updateWatchItemStatus(userId, itemId, watched);
+            UserMovie watchItem = userService.updateWatchItemStatus(userId, movieId, watched);
             return ResponseEntity.ok(Map.of(
                 "message", "Successfully updated watchlist item",
                 "userId", userId,
-                "movie_id", itemId,
+                "movie_id", movieId,
                 "association_object", watchItem
                 ));
         }

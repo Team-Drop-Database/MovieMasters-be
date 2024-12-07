@@ -20,18 +20,20 @@ public class CorsTests {
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final RegisterUserRequest registerUserRequest = new RegisterUserRequest("cors@gmail.com", "cors1234", "cors12233");;
+    private final RegisterUserRequest registerUserRequest = new RegisterUserRequest("cors@gmail.com", "cors1234", "cors12233");
     @Value("${client.host}")
-    private String CLIENT_HOST;
+    private String clientHost;
+    @Value("${jwt.testing}")
+    private String jwtTesting;
 
     @Test
     public void cant_register_user_with_disallowed_origin() throws Exception {
         String json = objectMapper.writeValueAsString(registerUserRequest);
 
         mockMvc.perform(options("/users")
+                        .header("Origin", "http://localhost:2003")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
-                        .header("Origin", "http://localhost:2003")
                 )
                 .andExpect(status().isForbidden());
     }
@@ -41,9 +43,10 @@ public class CorsTests {
         String json = objectMapper.writeValueAsString(registerUserRequest);
 
         mockMvc.perform(options("/users")
+                        .header("Authorization", "Bearer %s".formatted(jwtTesting))
+                        .header("Origin", clientHost)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
-                        .header("Origin", CLIENT_HOST)
                 )
                 .andExpect(status().isOk());
     }

@@ -8,6 +8,7 @@ import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
 import movie_master.api.repository.MovieRepository;
+import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The default implementation for the user service.
@@ -28,6 +30,7 @@ public class DefaultUserService implements UserService {
     // Repositories
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
+    private final UserMovieRepository userMovieRepository;
 
     // Utilities
     private final PasswordEncoder passwordEncoder;
@@ -35,9 +38,11 @@ public class DefaultUserService implements UserService {
 
     public DefaultUserService(
         UserRepository userRepository, MovieRepository movieRepository,
-         PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper) {
+        UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
+         UserDtoMapper userDtoMapper) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
+        this.userMovieRepository = userMovieRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
     }
@@ -151,8 +156,49 @@ public class DefaultUserService implements UserService {
         return movieAssociation;
     }
 
+    /**
+     * Removes a movie from a users watchlist.
+     *
+     * @param userid id of the user
+     * @param movieId id of the movie
+    */
     @Override
-    public UserMovie updateWatchItemStatus(Long userId, Long itemId, boolean watched) 
+    public void removeMovieFromWatchlist(Long userId, Long movieId)
+        throws UserNotFoundException, UserMovieNotFoundException {
+
+        // Retrieve movie objects
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        // Check whether both entities exist
+        if(userOpt.isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+
+        User user = userOpt.get();
+
+        boolean hasWatchlisted = user.getWatchList()
+        .stream().anyMatch(e -> e.getMovie().getId() == movieId);
+
+        if(!hasWatchlisted){
+            throw new UserMovieNotFoundException(movieId);
+        }
+
+        UserMovie userMovie = user.getWatchList().stream().filter(e -> e.getMovie().getId() == movieId).collect(Collectors.toList()).get(0);
+        user.getWatchList().remove(userMovie);
+        userMovieRepository.delete(userMovie);
+    }
+
+    /**
+     * For a given user, updates a specific movies' 'watched'
+     *  status to either watched or unwatched.
+     *
+     * @param id of the user
+     * @param id of the movie
+     * @returns UserMovie object containing the updated
+     * state of the users' relationship with the movie.
+     */
+    @Override
+    public UserMovie updateWatchItemStatus(Long userId, Long movieId, boolean watched)
             throws UserNotFoundException, UserMovieNotFoundException {
 
         // Retrieve the user
@@ -164,10 +210,10 @@ public class DefaultUserService implements UserService {
 
         // Retrieve the watchlistitem using its ID (not the movie id!)
         Optional<UserMovie> watchlistItemOpt = user.getWatchList()
-            .stream().filter(userMovieOpt -> userMovieOpt.getId()
-            .equals(itemId)).findFirst();
+            .stream().filter(userMovieOpt -> userMovieOpt.getMovie().getId()
+            == movieId).findFirst();
         if (watchlistItemOpt.isEmpty()) {
-            throw new UserMovieNotFoundException(itemId);
+            throw new UserMovieNotFoundException(movieId);
         }
         
         // Set the new 'watched' value and return the updated UserMovie

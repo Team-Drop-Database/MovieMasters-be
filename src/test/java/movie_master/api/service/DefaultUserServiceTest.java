@@ -106,7 +106,7 @@ public class DefaultUserServiceTest {
     @Test
     void retrieveWatchlistSuccessfully() throws UserNotFoundException {
         // Given
-       Long userId = 69L;
+        Long userId = 69L;
         User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
