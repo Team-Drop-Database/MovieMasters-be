@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Review service
+ */
 @Service
 public class ReviewService {
 
@@ -33,6 +36,7 @@ public class ReviewService {
         this.mapper = mapper;
     }
 
+    // Retrieve all reviews
     public List<ReviewDto> findAll() {
         return reviewRepository.findAll()
             .stream()
@@ -40,6 +44,7 @@ public class ReviewService {
             .toList();
     }
 
+    // Retrieve a certain amount of reviews
     public List<ReviewDto> findByAmount(int maxAmount) {
         return reviewRepository.findAll()
             .stream()
@@ -48,20 +53,27 @@ public class ReviewService {
             .toList();
     }
 
+    // Create a review
     public ReviewDto postReview(PostReviewRequest reviewRequest)
             throws UserNotFoundException, MovieNotInWatchlistException {
 
         Optional<User> foundUser = userRepository.findById(reviewRequest.userId());
+
+        // Throw an exception if the user has not been found
         if (foundUser.isEmpty()) {
             throw new UserNotFoundException(reviewRequest.userId());
         }
 
         User user = foundUser.get();
+        // Get the watchlist of the found user
         Set<UserMovie> watchlist = user.getWatchList();
+
+        // Get the movie from your watchlist that you want to place a review on
         Optional<UserMovie> userMovie = watchlist.stream()
             .filter(item -> item.getMovie().getId() == reviewRequest.movieId())
             .findFirst();
 
+        // Throw an exception if the movie that you want to place a review on has not been found
         if (userMovie.isEmpty()) {
             throw new MovieNotInWatchlistException(reviewRequest.movieId(), reviewRequest.userId());
         }

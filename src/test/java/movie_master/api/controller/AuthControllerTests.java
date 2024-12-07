@@ -24,6 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.security.SignatureException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,6 @@ public class AuthControllerTests {
     @BeforeEach
     void setup() {
         User user = new User("mock@gmail.com", "mock", "mocked", Roles.ROLE_USER.name(), true);
-        user.setUserId(1L);
         userDetails = new CustomUserDetails(user);
         refreshJwtRequest = new RefreshJwtRequest("refreshJwt");
     }
@@ -61,7 +61,9 @@ public class AuthControllerTests {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("roles", roles);
 
         String jwt = "jwt";
         String refreshJwt = "refreshJwt";
@@ -104,7 +106,11 @@ public class AuthControllerTests {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-        Map<String, Object> claims = Map.of("userId", userId, "roles", roles);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("roles", roles);
+
         String jwt = "jwt";
 
         Mockito.when(jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, roles)).thenReturn(true);
