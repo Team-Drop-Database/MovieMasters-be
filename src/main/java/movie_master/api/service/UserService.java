@@ -2,7 +2,6 @@ package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.*;
-import movie_master.api.model.User;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.model.UserMovie;
 import movie_master.api.request.UpdateUserRequest;
@@ -17,7 +16,7 @@ public interface UserService {
     UserDto register(RegisterUserRequest registerUserRequest) throws EmailTakenException, UsernameTakenException;
     UserDto getUserByName(String username) throws UserNotFoundException;
     UserDto getUserByEmail(String email) throws EmailNotFoundException;
-    User getUserById(Long id) throws UserNotFoundException;
+    UserDto getUserByUsername(String username) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     List<UserDto> getAllUsers();

@@ -178,7 +178,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserDto getUserByName(String username) throws UserNotFoundException {
+    public UserDto getUserByUsername(String username) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
 
         if (user.isEmpty()) {
@@ -217,13 +217,13 @@ public class DefaultUserService implements UserService {
         return user.get();
     }
 
-    private Boolean emailIsTakenByDifferentUser(String email, Long userId) {
+    private boolean emailIsTakenByDifferentUser(String email, Long userId) {
         Optional<User> userFoundByEmail = this.userRepository
                 .findByEmail(email);
         return userFoundByEmail.filter(user -> !user.getId().equals(userId)).isPresent();
     }
 
-    private Boolean usernameIsTakenByDifferentUser(String username, Long userId) {
+    private boolean usernameIsTakenByDifferentUser(String username, Long userId) {
         Optional<User> userFoundByUsername = this.userRepository
                 .findByUsername(username);
         return userFoundByUsername.filter(user -> !user.getId().equals(userId)).isPresent();
@@ -239,28 +239,35 @@ public class DefaultUserService implements UserService {
             throw new UsernameTakenException(updateUserRequest.username());
         }
 
-        User updatedUser = userRepository.findById(userId).map(user -> {
-            user.setUsername(updateUserRequest.username());
-            user.setEmail(updateUserRequest.email());
-            if (updateUserRequest.profilePicture() != null) {
-                user.setProfilePicture(updateUserRequest.profilePicture());
-            }
-            return userRepository.save(user);
-        }).orElseThrow(UserNotFoundException::new);
+        User updatedUser = userRepository
+                .findById(userId)
+                .map(user -> {
+                    user.setUsername(updateUserRequest.username());
+                    user.setEmail(updateUserRequest.email());
+                    if (updateUserRequest.profilePicture() != null) {
+                        user.setProfilePicture(updateUserRequest.profilePicture());
+                    }
+                    return userRepository.save(user);
+                })
+                .orElseThrow(UserNotFoundException::new);
 
         return this.userDtoMapper.apply(updatedUser);
     }
 
     @Override
     public UserDto updateUserRole(Long userId, String role) throws UserNotFoundException {
-        User updatedUser = userRepository.findById(userId).map(user -> {
-            if (role.equalsIgnoreCase(Role.ROLE_MOD.toString())) {
-                user.setRole(Role.ROLE_MOD);
-            } else {
-                user.setRole(Role.ROLE_USER);
-            }
-            return userRepository.save(user);
-        }).orElseThrow(UserNotFoundException::new);
+        User updatedUser = userRepository
+                .findById(userId)
+                .map(user -> {
+                    if (role.equalsIgnoreCase(Role.ROLE_MOD.toString())) {
+                        user.setRole(Role.ROLE_MOD);
+                    }
+                    else {
+                        user.setRole(Role.ROLE_USER);
+                    }
+                    return userRepository.save(user);
+                })
+                .orElseThrow(UserNotFoundException::new);
 
         return this.userDtoMapper.apply(updatedUser);
     }
