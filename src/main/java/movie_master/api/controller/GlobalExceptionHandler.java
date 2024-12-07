@@ -5,6 +5,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Objects;
+
 /**
  * Controller for handling global exceptions
  */
@@ -13,6 +15,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     private ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        return ResponseEntity.badRequest().body(ex.getDetailMessageArguments());
+        return ResponseEntity.badRequest().body(Objects.requireNonNull(ex.getDetailMessageArguments())[1]);
     }
 }

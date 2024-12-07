@@ -15,21 +15,27 @@ import java.util.stream.Collectors;
  * See docs: <a href="https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/user-details.html">...</a>
  */
 public class CustomUserDetails implements UserDetails {
-    private String username;
-    private String password;
-    private List<GrantedAuthority> authorities;
-    private boolean enabled;
+    private final Long userId;
+    private final String username;
+    private final String password;
+    private final List<GrantedAuthority> authorities;
+    private final boolean enabled;
 
     public CustomUserDetails(User user) {
+        this.userId = user.getUserId();
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.authorities = Arrays.stream(user.getRoles().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
         this.enabled = user.isEnabled();
     }
 
+    public Long getUserId() {
+        return this.userId;
+    }
+
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
+    public String getUsername() {
+        return this.username;
     }
 
     @Override
@@ -38,8 +44,13 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
-        return this.username;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.authorities;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
     }
 
     @Override
@@ -55,10 +66,5 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
     }
 }

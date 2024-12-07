@@ -1,6 +1,6 @@
 package movie_master.api.mapper;
 
-import movie_master.api.dto.ReviewDTO;
+import movie_master.api.dto.ReviewDto;
 import movie_master.api.model.Review;
 import movie_master.api.model.User;
 import org.jeasy.random.EasyRandom;
@@ -12,9 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ReviewDTOMapperTest {
+class ReviewDtoMapperTest {
 
-    @InjectMocks ReviewDTOMapper mapper;
+    @InjectMocks
+    ReviewDtoMapper mapper;
 
     EasyRandom easyRandom = new EasyRandom();
 
@@ -23,7 +24,7 @@ class ReviewDTOMapperTest {
         // Given
         Review review = easyRandom.nextObject(Review.class);
         User user = review.getUserMovie().getUser();
-        ReviewDTO expectedResult = new ReviewDTO(
+        ReviewDto expectedResult = new ReviewDto(
             review.getReviewId(),
             user.getUsername(),
             user.getProfilePicture(),
@@ -33,7 +34,7 @@ class ReviewDTOMapperTest {
         );
 
         // When
-        ReviewDTO result = mapper.mapToDTO(review);
+        ReviewDto result = mapper.mapToDTO(review);
 
         // Then
         assertEquals(expectedResult, result);
