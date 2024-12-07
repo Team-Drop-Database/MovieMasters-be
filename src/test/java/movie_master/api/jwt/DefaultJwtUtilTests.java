@@ -2,15 +2,14 @@ package movie_master.api.jwt;
 
 import movie_master.api.model.User;
 import movie_master.api.model.detail.CustomUserDetails;
+import movie_master.api.model.role.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DefaultJwtUtilTests {
     private Long userId;
     private String username;
-    private List<String> roles;
+    private Role role;
     private Map<String, Object> claims;
     private String jwt;
     private String refreshJwt;
@@ -28,17 +27,13 @@ public class DefaultJwtUtilTests {
 
     @BeforeEach
     void setup() {
-        User user = new User("mock@gmail.com", "mock", "mocked", "USER", true);
+        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true);
         user.setUserId(1L);
         CustomUserDetails userDetails = new CustomUserDetails(user);
         userId = userDetails.getUserId();
         username = userDetails.getUsername();
-        roles = userDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-        claims = Map.of("userId", userId, "roles", roles);
+        role = userDetails.getRole();
+        claims = Map.of("userId", userId, "roles", role);
         jwt = "jwt";
         refreshJwt = "refreshJwt";
     }
@@ -51,12 +46,12 @@ public class DefaultJwtUtilTests {
 
         Mockito.when(defaultJWTUtil.getUserId(jwt)).thenReturn(userId);
         Mockito.when(defaultJWTUtil.getSubject(jwt)).thenReturn(username);
-        Mockito.when(defaultJWTUtil.isJwtValid(jwt, userId, username, roles)).thenReturn(true);
+        Mockito.when(defaultJWTUtil.isJwtValid(jwt, userId, username, role)).thenReturn(true);
 
         assertNotNull(jwt);
         assertEquals(userId, defaultJWTUtil.getUserId(jwt));
         assertEquals(username, defaultJWTUtil.getSubject(jwt));
-        assertTrue(defaultJWTUtil.isJwtValid(jwt, userId, username, roles));
+        assertTrue(defaultJWTUtil.isJwtValid(jwt, userId, username, role));
     }
 
     @Test
@@ -67,12 +62,12 @@ public class DefaultJwtUtilTests {
 
         Mockito.when(defaultJWTUtil.getUserId(jwt)).thenReturn(userId);
         Mockito.when(defaultJWTUtil.getSubject(jwt)).thenReturn(username);
-        Mockito.when(defaultJWTUtil.isJwtValid(jwt, userId, username, roles)).thenReturn(false);
+        Mockito.when(defaultJWTUtil.isJwtValid(jwt, userId, username, role)).thenReturn(false);
 
         assertNotNull(jwt);
         assertEquals(userId, defaultJWTUtil.getUserId(jwt));
         assertEquals(username, defaultJWTUtil.getSubject(jwt));
-        assertFalse(defaultJWTUtil.isJwtValid(jwt, userId, username, roles));
+        assertFalse(defaultJWTUtil.isJwtValid(jwt, userId, username, role));
     }
 
     @Test
@@ -83,12 +78,12 @@ public class DefaultJwtUtilTests {
 
         Mockito.when(defaultJWTUtil.getUserId(refreshJwt)).thenReturn(userId);
         Mockito.when(defaultJWTUtil.getSubject(refreshJwt)).thenReturn(username);
-        Mockito.when(defaultJWTUtil.isJwtValid(refreshJwt, userId, username, roles)).thenReturn(true);
+        Mockito.when(defaultJWTUtil.isJwtValid(refreshJwt, userId, username, role)).thenReturn(true);
 
         assertNotNull(refreshJwt);
         assertEquals(userId, defaultJWTUtil.getUserId(refreshJwt));
         assertEquals(username, defaultJWTUtil.getSubject(refreshJwt));
-        assertTrue(defaultJWTUtil.isJwtValid(refreshJwt, userId, username, roles));
+        assertTrue(defaultJWTUtil.isJwtValid(refreshJwt, userId, username, role));
     }
 
     @Test
@@ -99,11 +94,11 @@ public class DefaultJwtUtilTests {
 
         Mockito.when(defaultJWTUtil.getUserId(jwt)).thenReturn(userId);
         Mockito.when(defaultJWTUtil.getSubject(jwt)).thenReturn(username);
-        Mockito.when(defaultJWTUtil.isJwtValid(jwt, userId, username, roles)).thenReturn(false);
+        Mockito.when(defaultJWTUtil.isJwtValid(jwt, userId, username, role)).thenReturn(false);
 
         assertNotNull(jwt);
         assertEquals(userId, defaultJWTUtil.getUserId(jwt));
         assertEquals(username, defaultJWTUtil.getSubject(jwt));
-        assertFalse(defaultJWTUtil.isJwtValid(jwt, userId, username, roles));
+        assertFalse(defaultJWTUtil.isJwtValid(jwt, userId, username, role));
     }
 }

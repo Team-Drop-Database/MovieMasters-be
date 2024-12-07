@@ -1,13 +1,13 @@
 package movie_master.api.model.detail;
 
 import movie_master.api.model.User;
+import movie_master.api.model.role.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.Arrays;
+
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A custom class for user details
@@ -25,12 +25,16 @@ public class CustomUserDetails implements UserDetails {
         this.userId = user.getUserId();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.authorities = Arrays.stream(user.getRole().toString().split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().toString()));
         this.enabled = user.isEnabled();
     }
 
     public Long getUserId() {
         return this.userId;
+    }
+
+    public Role getRole() {
+        return Role.valueOf(this.authorities.getFirst().toString());
     }
 
     @Override

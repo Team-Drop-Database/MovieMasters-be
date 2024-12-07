@@ -8,6 +8,7 @@ import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -128,7 +129,9 @@ public class UserController {
      * @return the updated user
      */
     @PutMapping("/{userId}")
-    public ResponseEntity<Object> updateUser(@PathVariable Long userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<Object> updateUser(@PathVariable Long userId,
+                                             @Valid @RequestBody UpdateUserRequest updateUserRequest,
+                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) {
         // TODO: validate if the user got the right permissions
         try {
             UserDto user = userService.updateUser(userId, updateUserRequest);

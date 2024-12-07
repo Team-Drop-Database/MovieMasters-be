@@ -59,7 +59,7 @@ public class DefaultUserServiceTest {
             true
         );
         UserDto userDto = new UserDto(
-            userToCreate.getId(),
+            userToCreate.getUserId(),
             userToCreate.getEmail(),
             userToCreate.getUsername(),
             userToCreate.getProfilePicture(),

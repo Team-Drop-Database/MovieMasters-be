@@ -37,9 +37,9 @@ public class DefaultUserService implements UserService {
     private final UserDtoMapper userDtoMapper;
 
     public DefaultUserService(
-        UserRepository userRepository, MovieRepository movieRepository,
-        UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
-         UserDtoMapper userDtoMapper) {
+            UserRepository userRepository, MovieRepository movieRepository,
+            UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
+            UserDtoMapper userDtoMapper) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
         this.userMovieRepository = userMovieRepository;
@@ -48,18 +48,18 @@ public class DefaultUserService implements UserService {
     }
 
     /**
-     * Registers a new user using a given 
+     * Registers a new user using a given
      * RegisterUserRequest object.
      */
     @Override
-    public UserDto register(RegisterUserRequest registerUserRequest) 
-        throws EmailTakenException, UsernameTakenException {
+    public UserDto register(RegisterUserRequest registerUserRequest)
+            throws EmailTakenException, UsernameTakenException {
 
         // Check if the given email or password already exists somewhere
         Optional<User> userFoundByEmail = this.userRepository
-            .findByEmail(registerUserRequest.email());
+                .findByEmail(registerUserRequest.email());
         Optional<User> userFoundByUsername = this.userRepository
-            .findByUsername(registerUserRequest.username());
+                .findByUsername(registerUserRequest.username());
 
         // If so, throw an exception
         if (userFoundByEmail.isPresent()) {
@@ -78,7 +78,7 @@ public class DefaultUserService implements UserService {
                         passwordEncoder.encode(registerUserRequest.password()),
                         Role.ROLE_USER,
                         true
-                        )
+                )
         );
 
         return this.userDtoMapper.apply(createdUser);
@@ -86,10 +86,10 @@ public class DefaultUserService implements UserService {
 
     /**
      * Retrieves the watchlist of a given user.
-     * 
+     *
      * @param userId id of the user
      * @return A set of UserMovie objects representing the
-     *  watchlist of this user.
+     * watchlist of this user.
      */
     @Override
     public void deleteUserById(Long userId) throws UserNotFoundException {
@@ -101,10 +101,10 @@ public class DefaultUserService implements UserService {
 
     /**
      * Retrieves the watchlist of a given user.
-     * 
+     *
      * @param userId id of the user
      * @return A set of UserMovie objects representing the
-     *  watchlist of this user.
+     * watchlist of this user.
      */
     @Override
     public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
@@ -112,9 +112,9 @@ public class DefaultUserService implements UserService {
         // Retrieve the user in Optional form
         Optional<User> user = userRepository.findById(userId);
 
-        // If it does not exist, throw an exception. Otherwise, 
+        // If it does not exist, throw an exception. Otherwise,
         // return the watchlist.
-        if(user.isPresent()){
+        if (user.isPresent()) {
             return user.get().getWatchList();
         } else {
             throw new UserNotFoundException(userId);
@@ -123,23 +123,23 @@ public class DefaultUserService implements UserService {
 
     /**
      * Adds a movie to the watchlist of a user.
-     * 
-     * @param userId id of the user
+     *
+     * @param userId  id of the user
      * @param movieId id of the movie
      * @return new UserMovie object representing the association
      */
     @Override
     public UserMovie addMovieToWatchlist(Long userId, Long movieId)
             throws UserNotFoundException, MovieNotFoundException {
-        
+
         // Retrieve movie objects
         Optional<User> userOpt = userRepository.findById(userId);
         Optional<Movie> movieOpt = movieRepository.findById(movieId);
 
         // Check whether both entities exist
-        if(userOpt.isEmpty()) {
+        if (userOpt.isEmpty()) {
             throw new UserNotFoundException(userId);
-        } else if(movieOpt.isEmpty()) {
+        } else if (movieOpt.isEmpty()) {
             throw new MovieNotFoundException(movieId);
         }
 
@@ -159,27 +159,27 @@ public class DefaultUserService implements UserService {
     /**
      * Removes a movie from a users watchlist.
      *
-     * @param userid id of the user
+     * @param userId  id of the user
      * @param movieId id of the movie
-    */
+     */
     @Override
     public void removeMovieFromWatchlist(Long userId, Long movieId)
-        throws UserNotFoundException, UserMovieNotFoundException {
+            throws UserNotFoundException, UserMovieNotFoundException {
 
         // Retrieve movie objects
         Optional<User> userOpt = userRepository.findById(userId);
 
         // Check whether both entities exist
-        if(userOpt.isEmpty()) {
+        if (userOpt.isEmpty()) {
             throw new UserNotFoundException(userId);
         }
 
         User user = userOpt.get();
 
         boolean hasWatchlisted = user.getWatchList()
-        .stream().anyMatch(e -> e.getMovie().getId() == movieId);
+                .stream().anyMatch(e -> e.getMovie().getId() == movieId);
 
-        if(!hasWatchlisted){
+        if (!hasWatchlisted) {
             throw new UserMovieNotFoundException(movieId);
         }
 
@@ -190,10 +190,10 @@ public class DefaultUserService implements UserService {
 
     /**
      * For a given user, updates a specific movies' 'watched'
-     *  status to either watched or unwatched.
+     * status to either watched or unwatched.
      *
-     * @param id of the user
-     * @param id of the movie
+     * @param userId of the user
+     * @param userId of the movie
      * @returns UserMovie object containing the updated
      * state of the users' relationship with the movie.
      */
@@ -210,12 +210,12 @@ public class DefaultUserService implements UserService {
 
         // Retrieve the watchlistitem using its ID (not the movie id!)
         Optional<UserMovie> watchlistItemOpt = user.getWatchList()
-            .stream().filter(userMovieOpt -> userMovieOpt.getMovie().getId()
-            == movieId).findFirst();
+                .stream().filter(userMovieOpt -> userMovieOpt.getMovie().getId()
+                        == movieId).findFirst();
         if (watchlistItemOpt.isEmpty()) {
             throw new UserMovieNotFoundException(movieId);
         }
-        
+
         // Set the new 'watched' value and return the updated UserMovie
         UserMovie watchlistItem = watchlistItemOpt.get();
         watchlistItem.setWatched(watched);
@@ -248,7 +248,7 @@ public class DefaultUserService implements UserService {
         List<User> foundUsers = this.userRepository.findAll();
         List<UserDto> users = new ArrayList<>();
 
-        for (User user : foundUsers ) {
+        for (User user : foundUsers) {
             users.add(this.userDtoMapper.apply(user));
         }
         return users;
@@ -257,13 +257,13 @@ public class DefaultUserService implements UserService {
     private boolean emailIsTakenByDifferentUser(String email, Long userId) {
         Optional<User> userFoundByEmail = this.userRepository
                 .findByEmail(email);
-        return userFoundByEmail.filter(user -> !user.getId().equals(userId)).isPresent();
+        return userFoundByEmail.filter(user -> !user.getUserId().equals(userId)).isPresent();
     }
 
     private boolean usernameIsTakenByDifferentUser(String username, Long userId) {
         Optional<User> userFoundByUsername = this.userRepository
                 .findByUsername(username);
-        return userFoundByUsername.filter(user -> !user.getId().equals(userId)).isPresent();
+        return userFoundByUsername.filter(user -> !user.getUserId().equals(userId)).isPresent();
     }
 
     @Override
@@ -282,7 +282,7 @@ public class DefaultUserService implements UserService {
                     if (updateUserRequest.username() != null) {
                         user.setUsername(updateUserRequest.username());
                     }
-                    if (updateUserRequest.email() != null){
+                    if (updateUserRequest.email() != null) {
                         user.setEmail(updateUserRequest.email());
                     }
                     if (updateUserRequest.profilePicture() != null) {
@@ -302,8 +302,7 @@ public class DefaultUserService implements UserService {
                 .map(user -> {
                     if (role.equalsIgnoreCase(Role.ROLE_MOD.toString())) {
                         user.setRole(Role.ROLE_MOD);
-                    }
-                    else {
+                    } else {
                         user.setRole(Role.ROLE_USER);
                     }
                     return userRepository.save(user);
