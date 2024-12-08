@@ -3,24 +3,15 @@ package movie_master.api.request;
 import movie_master.api.model.friendship.FriendshipStatus;
 
 public class FriendshipRequest {
-    private Long userId;
-    private Long friendId;
+    private String username;
     private FriendshipStatus status;
 
-    public Long getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getFriendId() {
-        return friendId;
-    }
-
-    public void setFriendId(Long friendId) {
-        this.friendId = friendId;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public FriendshipStatus getStatus() {

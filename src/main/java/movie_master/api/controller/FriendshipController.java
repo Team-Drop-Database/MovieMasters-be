@@ -1,5 +1,7 @@
 package movie_master.api.controller;
 
+import movie_master.api.exception.FriendshipNotFoundException;
+import movie_master.api.exception.UnauthorizedFriendshipActionException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.Friendship;
@@ -30,10 +32,10 @@ public class FriendshipController {
 
     @PostMapping("/add")
     public ResponseEntity<Friendship> addFriend(@RequestBody FriendshipRequest request,
-                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
+                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         User user = userService.findUserById(userId);
-        User friend = userService.findUserById(request.getFriendId());
+        User friend = userService.findUserByUsername(request.getUsername());
 
         Friendship friendship = friendshipService.addFriend(user, friend);
         return ResponseEntity.ok(friendship);
@@ -41,10 +43,15 @@ public class FriendshipController {
 
     @PutMapping("/update")
     public ResponseEntity<Friendship> updateFriendshipStatus(@RequestBody FriendshipRequest request,
-                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
+                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, UnauthorizedFriendshipActionException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         User user = userService.findUserById(userId);
-        User friend = userService.findUserById(request.getFriendId());
+        User friend = userService.findUserByUsername(request.getUsername());
+        Friendship existingFriendship = friendshipService.getFriendship(friend, user);
+
+        if (!existingFriendship.getFriend().getUserId().equals(userId)) {
+            throw new UnauthorizedFriendshipActionException(userId, existingFriendship.getFriend().getUserId());
+        }
 
         Friendship friendship = friendshipService.updateFriendshipStatus(user, friend, request.getStatus());
         return ResponseEntity.ok(friendship);
@@ -66,19 +73,8 @@ public class FriendshipController {
                              @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         User user = userService.findUserById(userId);
-        User friend = userService.findUserById(request.getFriendId());
+        User friend = userService.findUserByUsername(request.getUsername());
 
         friendshipService.deleteFriend(user, friend);
-    }
-
-    @PostMapping("/add-by-username")
-    public ResponseEntity<Friendship> addFriendByUsername(@RequestParam String username,
-                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
-        Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
-        User user = userService.findUserById(userId);
-        User friend = userService.findUserByUsername(username);
-
-        Friendship friendship = friendshipService.addFriend(user, friend);
-        return ResponseEntity.ok(friendship);
     }
 }

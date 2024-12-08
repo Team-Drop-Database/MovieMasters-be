@@ -1,10 +1,10 @@
 package movie_master.api.service;
 
+import movie_master.api.exception.FriendshipNotFoundException;
 import movie_master.api.model.Friendship;
 import movie_master.api.model.User;
 import movie_master.api.model.friendship.FriendshipStatus;
 import movie_master.api.repository.FriendshipRepository;
-import movie_master.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,25 +13,23 @@ import java.util.List;
 public class FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
-    private final UserRepository userRepository;
 
-    public FriendshipService(FriendshipRepository friendshipRepository, UserRepository userRepository) {
+    public FriendshipService(FriendshipRepository friendshipRepository) {
         this.friendshipRepository = friendshipRepository;
-        this.userRepository = userRepository;
     }
 
-    public Friendship addFriend(User user, User friend) {
+    public Friendship addFriend(User user, User friend) throws FriendshipNotFoundException {
         if (friendshipRepository.existsByUserAndFriend(user, friend)) {
-            throw new IllegalArgumentException("Friendship already exists.");
+            throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
         }
         Friendship friendship = new Friendship(user, friend, FriendshipStatus.PENDING);
         return friendshipRepository.save(friendship);
     }
 
-    public Friendship updateFriendshipStatus(User user, User friend, FriendshipStatus status) {
+    public Friendship updateFriendshipStatus(User user, User friend, FriendshipStatus status) throws FriendshipNotFoundException {
         Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
         if (friendship == null) {
-            throw new IllegalArgumentException("Friendship does not exist.");
+            throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
         }
         friendship.setStatus(status);
         return friendshipRepository.save(friendship);
@@ -47,14 +45,12 @@ public class FriendshipService {
             friendshipRepository.delete(friendship);
         }
     }
-    public Friendship addFriendByUsername(User user, String friendUsername) {
-        User friend = userRepository.findByUsername(friendUsername)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + friendUsername));
 
-        if (friendshipRepository.existsByUserAndFriend(user, friend)) {
-            throw new IllegalArgumentException("Friendship already exists.");
+    public Friendship getFriendship(User user, User friend) throws FriendshipNotFoundException {
+        Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
+        if (friendship == null) {
+            throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
         }
-        Friendship friendship = new Friendship(user, friend, FriendshipStatus.PENDING);
-        return friendshipRepository.save(friendship);
+        return friendship;
     }
 }
