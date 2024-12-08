@@ -1,6 +1,7 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
+import movie_master.api.model.User;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.exception.EmailTakenException;
 import movie_master.api.exception.MovieNotFoundException;
@@ -17,6 +18,8 @@ import java.util.Set;
 public interface UserService {
     UserDto register(RegisterUserRequest registerUserRequest) throws EmailTakenException, UsernameTakenException;
     void deleteUserById(Long userId) throws UserNotFoundException;
+    User findUserById(Long userId) throws UserNotFoundException;
+    User findUserByUsername(String username) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
     void removeMovieFromWatchlist(Long userId, Long movieId) throws UserNotFoundException, UserMovieNotFoundException;

@@ -100,6 +100,32 @@ public class DefaultUserService implements UserService {
     }
 
     /**
+     * Retrieves a user by their ID.
+     *
+     * @param userId the ID of the user to retrieve
+     * @return The User object representing the user with the given ID.
+     * @throws UserNotFoundException if the user does not exist
+     */
+    @Override
+    public User findUserById(Long userId) throws UserNotFoundException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    /**
+     * Retrieves a user by their username.
+     *
+     * @param username the username of the user to retrieve
+     * @return The User object representing the user with the given username.
+     * @throws UserNotFoundException if the user does not exist
+     */
+    @Override
+    public User findUserByUsername(String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User with username: " + username + " not found."));
+    }
+
+    /**
      * Retrieves the watchlist of a given user.
      * 
      * @param userId id of the user
