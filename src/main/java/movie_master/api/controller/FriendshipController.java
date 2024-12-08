@@ -24,10 +24,10 @@ public class FriendshipController {
     @PostMapping("/add")
     public Friendship addFriend(@RequestBody FriendshipRequest request) {
         User user = new User();
-        user.setId(request.getUserId());
+        user.setUserId(request.getUserId());
 
         User friend = new User();
-        friend.setId(request.getFriendId());
+        friend.setUserId(request.getFriendId());
 
         return friendshipService.addFriend(user, friend);
     }
@@ -35,10 +35,10 @@ public class FriendshipController {
     @PutMapping("/update")
     public Friendship updateFriendshipStatus(@RequestBody FriendshipRequest request) {
         User user = new User();
-        user.setId(request.getUserId());
+        user.setUserId(request.getUserId());
 
         User friend = new User();
-        friend.setId(request.getFriendId());
+        friend.setUserId(request.getFriendId());
 
         return friendshipService.updateFriendshipStatus(user, friend, request.getStatus());
     }
@@ -46,7 +46,7 @@ public class FriendshipController {
     @GetMapping("/{userId}/friends")
     public List<Friendship> getFriendsByStatus(@PathVariable Long userId, @RequestParam FriendshipStatus status) {
         User user = new User();
-        user.setId(userId);
+        user.setUserId(userId);
 
         return friendshipService.getFriendsByStatus(user, status);
     }
@@ -54,10 +54,10 @@ public class FriendshipController {
     @DeleteMapping("/remove")
     public void deleteFriend(@RequestBody FriendshipRequest request) {
         User user = new User();
-        user.setId(request.getUserId());
+        user.setUserId(request.getUserId());
 
         User friend = new User();
-        friend.setId(request.getFriendId());
+        friend.setUserId(request.getFriendId());
 
         friendshipService.deleteFriend(user, friend);
     }
