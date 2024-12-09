@@ -35,7 +35,7 @@ public class FriendshipController {
                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         User user = userService.findUserById(userId);
-        User friend = userService.findUserByUsername(request.getUsername());
+        User friend = userService.findUserByUsername(request.username());
 
         Friendship friendship = friendshipService.addFriend(user, friend);
         return ResponseEntity.ok(friendship);
@@ -46,14 +46,14 @@ public class FriendshipController {
                                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, UnauthorizedFriendshipActionException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         User user = userService.findUserById(userId);
-        User friend = userService.findUserByUsername(request.getUsername());
+        User friend = userService.findUserByUsername(request.username());
         Friendship existingFriendship = friendshipService.getFriendship(friend, user);
 
-        if (!existingFriendship.getFriend().getUserId().equals(userId)) {
+        if (request.status() == FriendshipStatus.ACCEPTED && !existingFriendship.getFriend().getUserId().equals(userId)) {
             throw new UnauthorizedFriendshipActionException(userId, existingFriendship.getFriend().getUserId());
         }
 
-        Friendship friendship = friendshipService.updateFriendshipStatus(user, friend, request.getStatus());
+        Friendship friendship = friendshipService.updateFriendshipStatus(user, friend, request.status());
         return ResponseEntity.ok(friendship);
     }
 
@@ -70,10 +70,10 @@ public class FriendshipController {
     @DeleteMapping("/remove")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFriend(@RequestBody FriendshipRequest request,
-                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
+                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         User user = userService.findUserById(userId);
-        User friend = userService.findUserByUsername(request.getUsername());
+        User friend = userService.findUserByUsername(request.username());
 
         friendshipService.deleteFriend(user, friend);
     }

@@ -27,10 +27,7 @@ public class FriendshipService {
     }
 
     public Friendship updateFriendshipStatus(User user, User friend, FriendshipStatus status) throws FriendshipNotFoundException {
-        Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
-        if (friendship == null) {
-            throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
-        }
+        Friendship friendship = findFriendshipInBothDirections(user, friend);
         friendship.setStatus(status);
         return friendshipRepository.save(friendship);
     }
@@ -39,15 +36,22 @@ public class FriendshipService {
         return friendshipRepository.findByUserAndStatus(user, status);
     }
 
-    public void deleteFriend(User user, User friend) {
-        Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
-        if (friendship != null) {
-            friendshipRepository.delete(friendship);
-        }
+    public void deleteFriend(User user, User friend) throws FriendshipNotFoundException{
+        Friendship friendship = findFriendshipInBothDirections(user, friend);
+        friendshipRepository.delete(friendship);
+
     }
 
     public Friendship getFriendship(User user, User friend) throws FriendshipNotFoundException {
+        return findFriendshipInBothDirections(user, friend);
+    }
+
+    //Helper function for getting a friendship in both directions
+    private Friendship findFriendshipInBothDirections(User user, User friend) throws FriendshipNotFoundException {
         Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
+        if (friendship == null) {
+            friendship = friendshipRepository.findByUserAndFriend(friend, user);
+        }
         if (friendship == null) {
             throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
         }
