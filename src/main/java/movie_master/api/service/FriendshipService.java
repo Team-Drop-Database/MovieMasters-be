@@ -43,7 +43,11 @@ public class FriendshipService {
     }
 
     public Friendship getFriendship(User user, User friend) throws FriendshipNotFoundException {
-        return findFriendshipInBothDirections(user, friend);
+        Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
+        if (friendship == null) {
+            throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
+        }
+        return friendship;
     }
 
     //Helper function for getting a friendship in both directions

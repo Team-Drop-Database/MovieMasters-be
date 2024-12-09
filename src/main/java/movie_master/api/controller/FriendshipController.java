@@ -49,7 +49,7 @@ public class FriendshipController {
         User friend = userService.findUserByUsername(request.username());
         Friendship existingFriendship = friendshipService.getFriendship(friend, user);
 
-        if (request.status() == FriendshipStatus.ACCEPTED && !existingFriendship.getFriend().getUserId().equals(userId)) {
+        if (!existingFriendship.getFriend().getUserId().equals(userId)) {
             throw new UnauthorizedFriendshipActionException(userId, existingFriendship.getFriend().getUserId());
         }
 
