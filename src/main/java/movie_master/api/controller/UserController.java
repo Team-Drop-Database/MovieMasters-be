@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.*;
 import movie_master.api.jwt.JwtUtil;
+import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
@@ -103,7 +104,7 @@ public class UserController {
             UserDto user = userService.updateUserRole(userId,
                     newRole,
                     jwtUtil.getRole(jwt.replace("Bearer ", "")));
-            return ResponseEntity.ok().body(user);
+            return ResponseEntity.ok().body(generateTokens(user.id(), user.username(), user.role()));
         }
         catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -141,14 +142,13 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@PathVariable Long userId,
                                              @RequestBody UpdateUserRequest updateUserRequest,
                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
-        // TODO: validate if the user got the right permissions
         try {
             jwt = jwt.replace("Bearer ", "");
             UserDto user = userService.updateUser(userId,
                     updateUserRequest,
                     jwtUtil.getUserId(jwt),
                     jwtUtil.getRole(jwt));
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(generateTokens(user.id(), user.username(), user.role()));
         } 
         catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -268,5 +268,23 @@ public class UserController {
             .body("Could not update 'watched' status. Exception message: "
              + e.getMessage());
         }        
+    }
+
+    /**
+     * Generate jwt and refresh token
+     * @param userId ID of the user
+     * @param username username of the user
+     * @param role role of the user
+     * @return JWT token and JWT refresh token
+     */
+    private Map<String, String> generateTokens(Long userId, String username, Role role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("role", role);
+
+        String jwt = jwtUtil.generateJwt(claims, username);
+        String refreshJwt = jwtUtil.generateRefreshJwt(claims, username);
+
+        return Map.of("accessToken", jwt, "refreshToken", refreshJwt);
     }
 }
