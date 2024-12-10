@@ -59,7 +59,7 @@ public class UserController {
     /**
      * Getting a user by their username
      *
-     * @param username
+     * @param username username of the user to find
      * @return UserDto
      */
     @GetMapping("/username/{username}")
@@ -75,7 +75,7 @@ public class UserController {
     /**
      * Getting a user by their email
      *
-     * @param email
+     * @param email email of the user to find
      * @return UserDto
      */
     @GetMapping("/email/{email}")
@@ -91,8 +91,8 @@ public class UserController {
     /**
      * Change the role of the given user
      *
-     * @param role
-     * @param userId
+     * @param newRole role to give the user
+     * @param userId ID of the user to give the role to
      * @return updated user
      */
     @PutMapping("/{userId}/role")
@@ -102,12 +102,12 @@ public class UserController {
         try {
             UserDto user = userService.updateUserRole(userId,
                     newRole,
-                    jwtUtil.getRole(jwtToken.replace("Bearer ", "")));
+                    jwtUtil.getRole(jwt.replace("Bearer ", "")));
             return ResponseEntity.ok().body(user);
         }
-        catch (UserNotFoundException e) {
+        catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (UnauthorizedException e) {
+        } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
@@ -133,8 +133,8 @@ public class UserController {
     /**
      * Update a user
      *
-     * @param userId
-     * @param updateUserRequest
+     * @param userId ID of the user to update
+     * @param updateUserRequest object with the values to update
      * @return the updated user
      */
     @PutMapping("/{userId}")
@@ -146,8 +146,8 @@ public class UserController {
             jwt = jwt.replace("Bearer ", "");
             UserDto user = userService.updateUser(userId,
                     updateUserRequest,
-                    jwtUtil.getUserId(jwtToken),
-                    jwtUtil.getRole(jwtToken));
+                    jwtUtil.getUserId(jwt),
+                    jwtUtil.getRole(jwt));
             return ResponseEntity.ok(user);
         } 
         catch (UserNotFoundException e) {

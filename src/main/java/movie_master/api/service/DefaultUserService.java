@@ -272,10 +272,10 @@ public class DefaultUserService implements UserService {
                               UpdateUserRequest updateUserRequest,
                               Long jwtUserId,
                               Role jwtUserRole)
-            throws UserNotFoundException,
+            throws UnauthorizedException,
             EmailTakenException,
             UsernameTakenException,
-            UnauthorizedException {
+            UserNotFoundException {
         // Only allowing the user itself or a mod to update the user
         if (!Objects.equals(userId, jwtUserId) && Objects.equals(Role.ROLE_USER, jwtUserRole)) {
             throw new UnauthorizedException();
@@ -321,8 +321,7 @@ public class DefaultUserService implements UserService {
                 .map(user -> {
                     if (role.equalsIgnoreCase(Role.ROLE_MOD.toString())) {
                         user.setRole(Role.ROLE_MOD);
-                    } 
-                    else {
+                    } else {
                         user.setRole(Role.ROLE_USER);
                     }
                     return userRepository.save(user);
