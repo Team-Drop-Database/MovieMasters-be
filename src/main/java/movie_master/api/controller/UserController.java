@@ -96,12 +96,12 @@ public class UserController {
      * @return updated user
      */
     @PutMapping("/{userId}/role")
-    public ResponseEntity<Object> updateUserRole(@RequestBody String role,
+    public ResponseEntity<Object> updateUserRole(@RequestBody String newRole,
                                                  @PathVariable Long userId,
-                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) {
+                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
         try {
             UserDto user = userService.updateUserRole(userId,
-                    role,
+                    newRole,
                     jwtUtil.getRole(jwtToken.replace("Bearer ", "")));
             return ResponseEntity.ok().body(user);
         }
@@ -139,11 +139,11 @@ public class UserController {
      */
     @PutMapping("/{userId}")
     public ResponseEntity<Object> updateUser(@PathVariable Long userId,
-                                             @Valid @RequestBody UpdateUserRequest updateUserRequest,
-                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) {
+                                             @RequestBody UpdateUserRequest updateUserRequest,
+                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
         // TODO: validate if the user got the right permissions
         try {
-            jwtToken = jwtToken.replace("Bearer ", "");
+            jwt = jwt.replace("Bearer ", "");
             UserDto user = userService.updateUser(userId,
                     updateUserRequest,
                     jwtUtil.getUserId(jwtToken),
