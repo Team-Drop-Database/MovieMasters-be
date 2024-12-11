@@ -65,15 +65,15 @@ public class FriendshipServiceTest {
     @Test
     void updateFriendshipStatusSuccessfully() throws FriendshipNotFoundException {
         // Arrange
-        mockFriendship.setStatus(FriendshipStatus.ACCEPTED);
+        mockFriendship.setStatus(FriendshipStatus.REJECTED);
         when(friendshipRepository.findByUserAndFriend(mockUser2, mockUser1)).thenReturn(mockFriendship);
         when(friendshipRepository.save(mockFriendship)).thenReturn(mockFriendship);
 
         // Act
-        Friendship result = friendshipService.updateFriendshipStatus(mockUser2, mockUser1, FriendshipStatus.ACCEPTED);
+        Friendship result = friendshipService.updateFriendshipStatus(mockUser2, mockUser1, FriendshipStatus.REJECTED);
 
         // Assert
-        assertEquals(FriendshipStatus.ACCEPTED, result.getStatus());
+        assertEquals(FriendshipStatus.REJECTED, result.getStatus());
         verify(friendshipRepository, times(1)).save(mockFriendship);
     }
 
