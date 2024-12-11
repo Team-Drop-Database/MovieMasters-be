@@ -29,6 +29,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -218,6 +221,26 @@ class UserControllerTest {
         // When
         ResponseEntity<Object> result = userController.updateWatchItemStatus(userId, watchlistItemId, true);
 
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
+        assertEquals(result.getBody(), expectedMessage);
+    }
+
+    @Test
+    void failRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException{
+        // Given
+        Long userId = 1337L;
+        Long movieId = 1L;
+
+        UserMovieNotFoundException expectedError = new UserMovieNotFoundException(movieId);
+        String expectedMessage = "Could not remove movie from watchlist. Exception message: "
+         + expectedError.getMessage();
+
+        doThrow(expectedError).when(defaultUserService).removeMovieFromWatchlist(userId, movieId);
+        
+        // When
+        ResponseEntity<Object> result = userController.removeMovieFromWatchlist(userId, movieId);
+        
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
         assertEquals(result.getBody(), expectedMessage);

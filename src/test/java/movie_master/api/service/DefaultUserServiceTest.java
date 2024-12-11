@@ -2,6 +2,7 @@ package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.EmailTakenException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.mapper.UserDtoMapper;
@@ -9,6 +10,7 @@ import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Roles;
+import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import org.junit.jupiter.api.Test;
@@ -25,13 +27,17 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultUserServiceTest {
 
     //TODO mock movie repository
     @Mock private UserRepository userRepository;
+    @Mock private UserMovieRepository userMovieRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private UserDtoMapper userDtoMapper;
     @InjectMocks private DefaultUserService defaultUserService;
