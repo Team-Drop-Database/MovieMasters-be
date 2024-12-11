@@ -192,5 +192,37 @@ public class DefaultUserServiceTest {
         assertFalse(userMovie.isWatched());
     }
     
+    @Test
+    void succesRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException{
+
+        // Given
+        Long userId = 1337L;
+        Long removedMovieId = 1L;
+
+        final int CORRECT_MOVIES_AMOUNT = 2;
+
+        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        user.setUserId(userId);
+
+        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+        Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
+        Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+
+        UserMovie deletedUserMovie = new UserMovie(user, movie1, false);
+        user.addMovieToWatchlist(deletedUserMovie);
+        user.addMovieToWatchlist(new UserMovie(user, movie2, false));
+        user.addMovieToWatchlist(new UserMovie(user, movie3, false));
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        doNothing().when(userMovieRepository).delete(deletedUserMovie);
+
+        // When
+        defaultUserService.removeMovieFromWatchlist(userId, removedMovieId);
+
+        // Verify the (now shrinked) size of the watchlist
+        assertEquals(CORRECT_MOVIES_AMOUNT, user.getWatchList().size());
+        assertFalse(user.getWatchList().contains(deletedUserMovie));
+    }
+
     
 }
