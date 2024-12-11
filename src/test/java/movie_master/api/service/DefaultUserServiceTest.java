@@ -145,4 +145,31 @@ public class DefaultUserServiceTest {
         // When -> then
         assertThrows(UserNotFoundException.class, () -> defaultUserService.getWatchList(userId));
     }
+
+    // TODO: Hier nog tests voor die andere dingen?
+
+    @Test
+    void succesUpdateWatchList() throws UserNotFoundException, UserMovieNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Long movieId = 1L;
+
+        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        user.setUserId(userId);
+        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+        UserMovie userMovie = new UserMovie(user, movie1, false);
+        user.addMovieToWatchlist(userMovie);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.save(user)).thenReturn(user);
+
+        // When
+        UserMovie resultUserMovie = defaultUserService.updateWatchItemStatus(userId, movieId, true);
+
+        // Then
+        assertEquals(userMovie, resultUserMovie);
+        assertTrue(resultUserMovie.isWatched());
+    }
+
+    
 }
