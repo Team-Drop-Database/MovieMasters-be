@@ -26,8 +26,11 @@ public class FriendshipService {
         return friendshipRepository.save(friendship);
     }
 
-    public Friendship updateFriendshipStatus(User user, User friend, FriendshipStatus status) throws FriendshipNotFoundException {
-        Friendship friendship = findFriendshipInBothDirections(user, friend);
+    public Friendship updateFriendshipStatus(User friend, User user, FriendshipStatus status) throws FriendshipNotFoundException {
+        Friendship friendship = getFriendship(friend, user);
+        if (friendship == null) {
+            throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
+        }
         friendship.setStatus(status);
         return friendshipRepository.save(friendship);
     }
