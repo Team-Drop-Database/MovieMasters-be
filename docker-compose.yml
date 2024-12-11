@@ -16,6 +16,10 @@ services:
       - SHOW_SQL=false
       - TMDB_API_KEY=${TMDB_API_KEY}
       - CLIENT_HOST=${CLIENT_HOST}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_TESTING=${JWT_TESTING}
+      - DEFAULT_USER_NAME=${DEFAULT_USER_NAME}
+      - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
     networks:
       - movie_master_network
 
