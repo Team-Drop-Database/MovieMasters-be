@@ -97,6 +97,10 @@ public class User {
         return watchlist;
     }
 
+    public void setWatchlist(Set<UserMovie> watchlist) {
+        this.watchlist = watchlist;
+    }
+
     public void setUserId(Long userId) {
         this.userId = userId;
     }

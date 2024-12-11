@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import movie_master.api.dto.UserDto;
-import movie_master.api.exception.MovieNotFoundException;
-import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
@@ -13,7 +11,6 @@ import movie_master.api.model.role.Role;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
-import movie_master.api.service.MovieService;
 import movie_master.api.service.UserService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,8 +18,7 @@ import okhttp3.Response;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +31,6 @@ public class DataLoader implements ApplicationRunner {
     private final MovieRepository movieRepository;
     private final UserService userService;
     private final UserRepository userRepository;
-    private final MovieService movieService;
 
     @Value("${tmdb.api-key}")
     private String apiKey;
@@ -48,26 +43,34 @@ public class DataLoader implements ApplicationRunner {
 
     @Autowired
     public DataLoader(MovieRepository movieRepository,
-                      UserService userService, UserRepository userRepository, MovieService movieService) {
+                      UserService userService, UserRepository userRepository) {
         this.movieRepository = movieRepository;
         this.userService = userService;
         this.userRepository = userRepository;
-        this.movieService = movieService;
     }
 
-    public void run(ApplicationArguments args) throws UserNotFoundException, MovieNotFoundException {
-        AddMovies();
-        AddUser();
-        //AddUserMovie();
-    }
-
-    public void AddMovies(){
+    public void run(ApplicationArguments args) {
         List<Movie> movies = movieRepository.findAll();
-        if (!movies.isEmpty()) {
-            return;
+        if (movies.isEmpty()) {
+            if (apiKey.isEmpty()) {
+                throw new IllegalArgumentException("Add TMDB_API_KEY to your env variables");
+            }
+            AddMovies();
         }
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            if (username.isEmpty()) {
+                throw new IllegalArgumentException("Add DEFAULT_USER_NAME to your env variables");
+            }
+            if (password.isEmpty()) {
+                throw new IllegalArgumentException("Add DEFAULT_USER_PASSWORD to your env variables");
+            }
+            AddUser();
+            AddUserMovie();
+        }
+    }
 
-        OkHttpClient client = new OkHttpClient();
+    public void AddMovies() {OkHttpClient client = new OkHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Collecting movies from the movie database api
@@ -88,17 +91,12 @@ public class DataLoader implements ApplicationRunner {
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
                 movieRepository.save(movie);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void AddUser(){
-        List<User> users = userRepository.findAll();
-        if (!users.isEmpty()) {
-            return;
-        }
-
+    public void AddUser() {
         RegisterUserRequest user = new RegisterUserRequest(
                 "%s@mail.com".formatted(username),
                 username,
@@ -112,11 +110,21 @@ public class DataLoader implements ApplicationRunner {
     }
 
     public void AddUserMovie() {
+        // Get the user from the database and empty the watchlist
         User user = userRepository.findByUsername(username).get();
-        user.addMovieToWatchlist(new UserMovie(
-                user,
-                movieService.findAll().getFirst(),
-                false));
+        user.setWatchlist(new HashSet<>());
+
+        // Take some movies
+        List<Movie> sampleMovies = movieRepository.findAll().stream()
+                .limit(7).collect(Collectors.toList());
+
+        // Assign them to the user, set some on 'watched' others on 'unwatched'
+        sampleMovies.forEach((movie) -> {
+            UserMovie userMovie = new UserMovie(user, movie, Math.random() > 0.5);
+            userMovie.setMovie(movie);
+            user.addMovieToWatchlist(userMovie);
+        });
+
         userRepository.save(user);
     }
 }

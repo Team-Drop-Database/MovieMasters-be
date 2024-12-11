@@ -276,8 +276,8 @@ public class DefaultUserService implements UserService {
             EmailTakenException,
             UsernameTakenException,
             UserNotFoundException {
-        // Only allowing the user itself or a mod to update the user
-        if (!Objects.equals(userId, jwtUserId) && Objects.equals(Role.ROLE_USER, jwtUserRole)) {
+        // Only allowing the user itself to update
+        if (!Objects.equals(userId, jwtUserId)) {
             throw new UnauthorizedException();
         }
 
@@ -309,13 +309,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserDto updateUserRole(Long userId, String role, Role jwtUserRole)
-            throws UnauthorizedException, UserNotFoundException {
-        // Only mods can change the role of a user
-        if (!Objects.equals(Role.ROLE_MOD, jwtUserRole)) {
-            throw new UnauthorizedException();
-        }
-
+    public UserDto updateUserRole(Long userId, String role, Role jwtUserRole) throws UserNotFoundException {
         User updatedUser = userRepository
                 .findById(userId)
                 .map(user -> {
