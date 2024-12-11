@@ -227,6 +227,29 @@ class UserControllerTest {
     }
 
     @Test
+    void succesRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Long movieId = 1L;
+
+        Map<String, Object> expectedMessage =  Map.of(
+            "message", "Successfully removed item from watchlist",
+            "userId", userId,
+            "movieId", movieId
+            );
+
+        // This method returns void and is already tested elsewhere; so can be ignored here
+        doNothing().when(defaultUserService).removeMovieFromWatchlist(userId, movieId);
+        
+        // When
+        ResponseEntity<Object> result = userController.removeMovieFromWatchlist(userId, movieId);
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
+        assertEquals(result.getBody(), expectedMessage);
+    }
+
+    @Test
     void failRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException{
         // Given
         Long userId = 1337L;
