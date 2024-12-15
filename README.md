@@ -10,6 +10,8 @@ SHOW_SQL=true
 CLIENT_HOST=http://localhost:YOUR_PORT_NUMBER
 JWT_SECRET=example_jwt_secret
 JWT_TESTING=example_jwt_testing
+DEFAULT_USER_NAME=example_username
+DEFAULT_USER_PASSWORD=example_password
 ```
 
 ## Getting started
