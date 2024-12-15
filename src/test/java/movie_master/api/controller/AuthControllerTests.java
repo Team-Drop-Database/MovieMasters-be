@@ -3,7 +3,7 @@ package movie_master.api.controller;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.User;
 import movie_master.api.model.detail.CustomUserDetails;
-import movie_master.api.model.role.Roles;
+import movie_master.api.model.role.Role;
 import movie_master.api.request.LoginRequest;
 import movie_master.api.request.RefreshJwtRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,12 +20,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.security.SignatureException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +42,7 @@ public class AuthControllerTests {
 
     @BeforeEach
     void setup() {
-        User user = new User("mock@gmail.com", "mock", "mocked", Roles.ROLE_USER.name(), true);
+        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true);
         userDetails = new CustomUserDetails(user);
         refreshJwtRequest = new RefreshJwtRequest("refreshJwt");
     }
@@ -55,15 +53,11 @@ public class AuthControllerTests {
 
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
-        List<String> roles = userDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        Role role = userDetails.getRole();
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
-        claims.put("roles", roles);
+        claims.put("role", role);
 
         String jwt = "jwt";
         String refreshJwt = "refreshJwt";
@@ -101,19 +95,15 @@ public class AuthControllerTests {
 
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
-        List<String> roles = userDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        Role role = userDetails.getRole();
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
-        claims.put("roles", roles);
+        claims.put("role", role);
 
         String jwt = "jwt";
 
-        Mockito.when(jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, roles)).thenReturn(true);
+        Mockito.when(jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, role)).thenReturn(true);
         Mockito.when(jwtUtil.generateJwt(claims, username)).thenReturn(jwt);
 
         ResponseEntity<Object> result = authController.refresh(refreshJwtRequest);
@@ -129,13 +119,9 @@ public class AuthControllerTests {
 
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
-        List<String> roles = userDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        Role role = userDetails.getRole();
 
-        Mockito.when(jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, roles)).thenReturn(false);
+        Mockito.when(jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, role)).thenReturn(false);
 
         ResponseEntity<Object> result = authController.refresh(refreshJwtRequest);
 

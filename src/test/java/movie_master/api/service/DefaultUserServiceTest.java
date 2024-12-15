@@ -8,7 +8,7 @@ import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
-import movie_master.api.model.role.Roles;
+import movie_master.api.model.role.Role;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import org.junit.jupiter.api.Test;
@@ -48,14 +48,14 @@ public class DefaultUserServiceTest {
             registerRequest.email(),
             registerRequest.username(),
             encodedPassword,
-            Roles.ROLE_USER.name(),
+            Role.ROLE_USER,
             true
         );
         User createdUser = new User(
             "ervin.@gmail.com",
             "dedede",
             encodedPassword,
-            Roles.ROLE_USER.name(),
+            Role.ROLE_USER,
             true
         );
         UserDto userDto = new UserDto(
@@ -64,7 +64,7 @@ public class DefaultUserServiceTest {
             userToCreate.getUsername(),
             userToCreate.getProfilePicture(),
             userToCreate.getDateJoined(),
-            userToCreate.getRoles()
+            userToCreate.getRole()
         );
 
         // any() because mocking datetimes sucks
@@ -107,7 +107,7 @@ public class DefaultUserServiceTest {
     void retrieveWatchlistSuccessfully() throws UserNotFoundException {
         // Given
         Long userId = 69L;
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
         Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
