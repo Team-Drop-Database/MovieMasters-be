@@ -1,6 +1,7 @@
 package movie_master.api.jwt;
 
-import java.util.List;
+import movie_master.api.model.role.Role;
+
 import java.util.Map;
 
 public interface JwtUtil {
@@ -9,6 +10,6 @@ public interface JwtUtil {
     Object extractClaims(String token);
     Long getUserId(String jwt);
     String getSubject(String jwt);
-    List<String> getRoles(String jwt);
-    boolean isJwtValid(String jwt, Long userId, String username, List<String> roles);
+    Role getRole(String jwt);
+    boolean isJwtValid(String jwt, Long userId, String username, Role role);
 }

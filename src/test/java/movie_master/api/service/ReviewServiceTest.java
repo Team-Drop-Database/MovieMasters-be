@@ -8,6 +8,7 @@ import movie_master.api.model.Movie;
 import movie_master.api.model.Review;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
+import movie_master.api.model.role.Role;
 import movie_master.api.repository.ReviewRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.PostReviewRequest;
@@ -126,7 +127,7 @@ class ReviewServiceTest {
                 easyRandom.nextObject(String.class),
                 easyRandom.nextObject(String.class),
                 easyRandom.nextObject(String.class),
-                easyRandom.nextObject(String.class),
+                easyRandom.nextObject(Role.class),
                 easyRandom.nextBoolean()
         );
 
