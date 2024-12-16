@@ -100,14 +100,14 @@ public class FriendshipServiceTest {
     void getFriendsByStatusSuccessfully() {
         // Arrange
         List<Friendship> friendships = List.of(mockFriendship);
-        when(friendshipRepository.findByUserAndStatus(any(User.class), eq(FriendshipStatus.PENDING))).thenReturn(friendships);
+        when(friendshipRepository.findByUserOrFriendAndStatus(any(User.class),any(User.class), eq(FriendshipStatus.PENDING))).thenReturn(friendships);
 
         // Act
         List<Friendship> result = friendshipService.getFriendsByStatus(mockUserDto1, FriendshipStatus.PENDING);
 
         // Assert
         assertEquals(friendships, result);
-        verify(friendshipRepository, times(1)).findByUserAndStatus(any(User.class), eq(FriendshipStatus.PENDING));
+        verify(friendshipRepository, times(1)).findByUserOrFriendAndStatus(any(User.class),any(User.class), eq(FriendshipStatus.PENDING));
     }
 
     @Test

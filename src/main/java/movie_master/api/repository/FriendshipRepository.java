@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
-    List<Friendship> findByUserAndStatus(User user, FriendshipStatus status);
+    List<Friendship> findByUserOrFriendAndStatus(User user, User friend, FriendshipStatus status);
     boolean existsByUserAndFriend(User user, User friend);
     Friendship findByUserAndFriend(User user, User friend);
 }

@@ -45,7 +45,7 @@ public class FriendshipService {
 
     public List<Friendship> getFriendsByStatus(UserDto userDto, FriendshipStatus status) {
         User user = toUser(userDto);
-        return friendshipRepository.findByUserAndStatus(user, status);
+        return friendshipRepository.findByUserOrFriendAndStatus(user, user, status);
     }
 
     public void deleteFriend(UserDto userDto, UserDto friendDto) throws FriendshipNotFoundException{
