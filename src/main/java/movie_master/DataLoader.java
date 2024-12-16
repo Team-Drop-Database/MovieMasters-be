@@ -3,17 +3,20 @@ package movie_master;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import movie_master.api.dto.UserDto;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
+import movie_master.api.model.role.Role;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserRepository;
+import movie_master.api.request.RegisterUserRequest;
+import movie_master.api.service.UserService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,30 +28,49 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DataLoader implements ApplicationRunner {
-    private MovieRepository movieRepository;
-    private UserRepository userRepository;
+    private final MovieRepository movieRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Value("${tmdb.api-key}")
     private String apiKey;
 
+    @Value("${default-user.name}")
+    private String username;
+
+    @Value("${default-user.password}")
+    private String password;
+
     @Autowired
-    public DataLoader(MovieRepository movieRepository, 
-                        UserRepository userRepository) {
+    public DataLoader(MovieRepository movieRepository,
+                      UserService userService, UserRepository userRepository) {
         this.movieRepository = movieRepository;
+        this.userService = userService;
         this.userRepository = userRepository;
     }
 
     public void run(ApplicationArguments args) {
-
-        // ADDING MOVIES //
-
-        // Only adding movies if there are non in the database
         List<Movie> movies = movieRepository.findAll();
-        if (!movies.isEmpty()) {
-            return;
+        if (movies.isEmpty()) {
+            if (apiKey.isEmpty()) {
+                throw new IllegalArgumentException("Add TMDB_API_KEY to your env variables");
+            }
+            AddMovies();
         }
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            if (username.isEmpty()) {
+                throw new IllegalArgumentException("Add DEFAULT_USER_NAME to your env variables");
+            }
+            if (password.isEmpty()) {
+                throw new IllegalArgumentException("Add DEFAULT_USER_PASSWORD to your env variables");
+            }
+            AddUser();
+            AddUserMovie();
+        }
+    }
 
-        OkHttpClient client = new OkHttpClient();
+    public void AddMovies() {OkHttpClient client = new OkHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Collecting movies from the movie database api
@@ -67,30 +89,34 @@ public class DataLoader implements ApplicationRunner {
             for (JsonNode node : arrayNode) {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
-                movie.setTmdbRating(
-                        BigDecimal.valueOf(movie.getTmdbRating()).setScale(1, RoundingMode.UP).doubleValue());
                 movieRepository.save(movie);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
-        // ADDING A USER WITH USERMOVIES //
-
-        // Check if there's a user
-        List<User> users = userRepository.findAll();
-        if (!users.isEmpty()) {
-            return;
+    public void AddUser() {
+        RegisterUserRequest user = new RegisterUserRequest(
+                "%s@mail.com".formatted(username),
+                username,
+                password);
+        try {
+            UserDto createdUser = userService.register(user);
+            userService.updateUserRole(createdUser.id(), Role.ROLE_MOD.toString(), Role.ROLE_MOD);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        // If not, create a new one
-        User user = new User("test.user@gmail.com", "Bobs", 
-        "Burgers", "user", true);
-        userRepository.save(user);
+    public void AddUserMovie() {
+        // Get the user from the database and empty the watchlist
+        User user = userRepository.findByUsername(username).get();
+        user.setWatchlist(new HashSet<>());
 
         // Take some movies
         List<Movie> sampleMovies = movieRepository.findAll().stream()
-        .limit(7).collect(Collectors.toList());
+                .limit(7).collect(Collectors.toList());
 
         // Assign them to the user, set some on 'watched' others on 'unwatched'
         sampleMovies.forEach((movie) -> {
@@ -99,7 +125,6 @@ public class DataLoader implements ApplicationRunner {
             user.addMovieToWatchlist(userMovie);
         });
 
-        // Save
         userRepository.save(user);
     }
 }

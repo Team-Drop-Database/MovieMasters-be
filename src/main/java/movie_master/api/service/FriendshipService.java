@@ -1,5 +1,6 @@
 package movie_master.api.service;
 
+import movie_master.api.dto.UserDto;
 import movie_master.api.exception.FriendshipNotFoundException;
 import movie_master.api.model.Friendship;
 import movie_master.api.model.User;
@@ -14,11 +15,18 @@ public class FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
 
+    private User toUser(UserDto userDto) {
+        return new User(userDto);
+    }
+
     public FriendshipService(FriendshipRepository friendshipRepository) {
         this.friendshipRepository = friendshipRepository;
     }
 
-    public Friendship addFriend(User user, User friend) throws FriendshipNotFoundException {
+    public Friendship addFriend(UserDto userDto, UserDto friendDto) throws FriendshipNotFoundException {
+        User user = toUser(userDto);
+        User friend = toUser(friendDto);
+
         if (friendshipRepository.existsByUserAndFriend(user, friend)) {
             throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
         }
@@ -26,26 +34,33 @@ public class FriendshipService {
         return friendshipRepository.save(friendship);
     }
 
-    public Friendship updateFriendshipStatus(User friend, User user, FriendshipStatus status) throws FriendshipNotFoundException {
-        Friendship friendship = getFriendship(friend, user);
+    public Friendship updateFriendshipStatus(UserDto userDto, UserDto friendDto, FriendshipStatus status) throws FriendshipNotFoundException {
+        Friendship friendship = getFriendship(userDto, friendDto);
         if (friendship == null) {
-            throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());
+            throw new FriendshipNotFoundException(friendDto.id(), friendDto.id());
         }
         friendship.setStatus(status);
         return friendshipRepository.save(friendship);
     }
 
-    public List<Friendship> getFriendsByStatus(User user, FriendshipStatus status) {
+    public List<Friendship> getFriendsByStatus(UserDto userDto, FriendshipStatus status) {
+        User user = toUser(userDto);
         return friendshipRepository.findByUserAndStatus(user, status);
     }
 
-    public void deleteFriend(User user, User friend) throws FriendshipNotFoundException{
+    public void deleteFriend(UserDto userDto, UserDto friendDto) throws FriendshipNotFoundException{
+        User user = toUser(userDto);
+        User friend = toUser(friendDto);
+
         Friendship friendship = findFriendshipInBothDirections(user, friend);
         friendshipRepository.delete(friendship);
 
     }
 
-    public Friendship getFriendship(User user, User friend) throws FriendshipNotFoundException {
+    public Friendship getFriendship(UserDto userDto, UserDto friendDto) throws FriendshipNotFoundException {
+        User user = toUser(userDto);
+        User friend = toUser(friendDto);
+
         Friendship friendship = friendshipRepository.findByUserAndFriend(user, friend);
         if (friendship == null) {
             throw new FriendshipNotFoundException(user.getUserId(), friend.getUserId());

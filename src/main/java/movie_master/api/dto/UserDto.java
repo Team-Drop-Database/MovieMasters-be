@@ -1,5 +1,7 @@
 package movie_master.api.dto;
 
+import movie_master.api.model.role.Role;
+
 import java.time.LocalDate;
 
 /**
@@ -9,6 +11,6 @@ import java.time.LocalDate;
  * @param username
  * @param profile_picture
  * @param date_joined
- * @param roles
+ * @param role
  */
-public record UserDto(Long id, String email, String username, String profile_picture, LocalDate date_joined, String roles) {}
+public record UserDto(Long id, String email, String username, String profile_picture, LocalDate date_joined, Role role) {}

@@ -1,10 +1,13 @@
 package movie_master.api.controller;
 
+import movie_master.api.dto.UserDto;
 import movie_master.api.exception.UnauthorizedFriendshipActionException;
 import movie_master.api.jwt.JwtUtil;
+import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Friendship;
 import movie_master.api.model.User;
 import movie_master.api.model.friendship.FriendshipStatus;
+import movie_master.api.model.role.Role;
 import movie_master.api.request.FriendshipRequest;
 import movie_master.api.service.FriendshipService;
 import movie_master.api.service.UserService;
@@ -36,30 +39,37 @@ public class FriendshipControllerTest {
     private User mockUser1;
     private User mockUser2;
     private User mockUser3;
+    private UserDto mockUserDto1;
+    private UserDto mockUserDto2;
 
     @BeforeEach
     void setup() {
+        UserDtoMapper userDtoMapper = new UserDtoMapper();
+
         jwtTokenUser1 = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoxLCJzdWIiOiJ1c2VyMSIsI" +
                 "mlhdCI6MTczMzc2Nzc4MCwiZXhwIjoxNzQxNTQzNzgwfQ.0yWfkHVkb9vzQi4Raq-VxNAsKBFuZWBRqC3bR0FgZWI";
         jwtTokenUser2 = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoyLCJzdWIiOiJ1c2VyMiIsImlh" +
                 "dCI6MTczMzc2Nzc4MCwiZXhwIjoxNzQxNTQzNzgwfQ.xWFksILDJbDk8E7FXi1JEBuCkS43-G3OQgRhY2lQKkg";
 
-        mockUser1 = new User("user1@gmail.com", "user1", "password1", "ROLE_USER", true);
+        mockUser1 = new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true);
         mockUser1.setUserId(1L);
-        mockUser2 = new User("user2@gmail.com", "user2", "password2", "ROLE_USER", true);
+        mockUser2 = new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true);
         mockUser2.setUserId(2L);
-        mockUser3 = new User("user3@gmail.com", "user3", "password3", "ROLE_USER", true);
+        mockUser3 = new User("user3@gmail.com", "user3", "password3", Role.ROLE_USER, true);
         mockUser3.setUserId(3L);
+
+        mockUserDto1 = userDtoMapper.apply(mockUser1);
+        mockUserDto2 = userDtoMapper.apply(mockUser2);
     }
 
     @Test
     void addFriendSuccessfully() throws Exception {
         // Arrange
         Friendship friendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.PENDING);
-        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
-        when(userService.findUserById(mockUser1.getUserId())).thenReturn(mockUser1);
-        when(userService.findUserByUsername(mockUser2.getUsername())).thenReturn(mockUser2);
-        when(friendshipService.addFriend(mockUser1, mockUser2)).thenReturn(friendship);
+        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUserDto1.id());
+        when(userService.getUserById(mockUserDto1.id())).thenReturn(mockUserDto1);
+        when(userService.getUserByUsername(mockUser2.getUsername())).thenReturn(mockUserDto2);
+        when(friendshipService.addFriend(mockUserDto1, mockUserDto2)).thenReturn(friendship);
 
         // Act
         ResponseEntity<Friendship> response = friendshipController.addFriend(
@@ -78,12 +88,12 @@ public class FriendshipControllerTest {
         Friendship existingFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.PENDING);
         Friendship updatedFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.ACCEPTED);
 
-        when(jwtUtil.getUserId(jwtTokenUser2.replace("Bearer ", ""))).thenReturn(mockUser2.getUserId());
-        when(userService.findUserById(mockUser2.getUserId())).thenReturn(mockUser2);
-        when(userService.findUserByUsername(mockUser1.getUsername())).thenReturn(mockUser1);
+        when(jwtUtil.getUserId(jwtTokenUser2.replace("Bearer ", ""))).thenReturn(mockUserDto2.id());
+        when(userService.getUserById(mockUserDto2.id())).thenReturn(mockUserDto2);
+        when(userService.getUserByUsername(mockUser1.getUsername())).thenReturn(mockUserDto1);
 
-        when(friendshipService.getFriendship(mockUser1, mockUser2)).thenReturn(existingFriendship);
-        when(friendshipService.updateFriendshipStatus(mockUser2, mockUser1, FriendshipStatus.ACCEPTED)).thenReturn(updatedFriendship);
+        when(friendshipService.getFriendship(mockUserDto1, mockUserDto2)).thenReturn(existingFriendship);
+        when(friendshipService.updateFriendshipStatus(mockUserDto2, mockUserDto1, FriendshipStatus.ACCEPTED)).thenReturn(updatedFriendship);
 
         // Act
         ResponseEntity<Friendship> response = friendshipController.updateFriendshipStatus(
@@ -101,11 +111,11 @@ public class FriendshipControllerTest {
         // Arrange
         Friendship existingFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.PENDING);
 
-        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
-        when(userService.findUserById(mockUser1.getUserId())).thenReturn(mockUser1);
-        when(userService.findUserByUsername(mockUser2.getUsername())).thenReturn(mockUser2);
+        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUserDto1.id());
+        when(userService.getUserById(mockUserDto1.id())).thenReturn(mockUserDto1);
+        when(userService.getUserByUsername(mockUser2.getUsername())).thenReturn(mockUserDto2);
 
-        when(friendshipService.getFriendship(mockUser2, mockUser1)).thenReturn(existingFriendship);
+        when(friendshipService.getFriendship(mockUserDto2, mockUserDto1)).thenReturn(existingFriendship);
 
         // Act & Assert
         UnauthorizedFriendshipActionException exception = assertThrows(
@@ -127,9 +137,9 @@ public class FriendshipControllerTest {
                 new Friendship(mockUser1, mockUser3, FriendshipStatus.ACCEPTED)
         );
 
-        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
-        when(userService.findUserById(mockUser1.getUserId())).thenReturn(mockUser1);
-        when(friendshipService.getFriendsByStatus(mockUser1, FriendshipStatus.ACCEPTED)).thenReturn(friends);
+        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUserDto1.id());
+        when(userService.getUserById(mockUserDto1.id())).thenReturn(mockUserDto1);
+        when(friendshipService.getFriendsByStatus(mockUserDto1, FriendshipStatus.ACCEPTED)).thenReturn(friends);
 
         // Act
         ResponseEntity<List<Friendship>> response = friendshipController.getFriendsByStatus(
@@ -145,9 +155,9 @@ public class FriendshipControllerTest {
     @Test
     void deleteFriendSuccessfully() throws Exception {
         // Arrange
-        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
-        when(userService.findUserById(mockUser1.getUserId())).thenReturn(mockUser1);
-        when(userService.findUserByUsername(mockUser2.getUsername())).thenReturn(mockUser2);
+        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUserDto1.id());
+        when(userService.getUserById(mockUserDto1.id())).thenReturn(mockUserDto1);
+        when(userService.getUserByUsername(mockUser2.getUsername())).thenReturn(mockUserDto2);
 
         // Act
         friendshipController.deleteFriend(
@@ -156,6 +166,6 @@ public class FriendshipControllerTest {
         );
 
         // Assert
-        verify(friendshipService, times(1)).deleteFriend(mockUser1, mockUser2);
+        verify(friendshipService, times(1)).deleteFriend(mockUserDto1, mockUserDto2);
     }
 }

@@ -1,11 +1,11 @@
 package movie_master.api.controller;
 
+import movie_master.api.dto.UserDto;
 import movie_master.api.exception.FriendshipNotFoundException;
 import movie_master.api.exception.UnauthorizedFriendshipActionException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.Friendship;
-import movie_master.api.model.User;
 import movie_master.api.model.friendship.FriendshipStatus;
 import movie_master.api.request.FriendshipRequest;
 import movie_master.api.service.FriendshipService;
@@ -34,10 +34,10 @@ public class FriendshipController {
     public ResponseEntity<Friendship> addFriend(@RequestBody FriendshipRequest request,
                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
-        User user = userService.findUserById(userId);
-        User friend = userService.findUserByUsername(request.username());
+        UserDto userDto = userService.getUserById(userId);
+        UserDto friendDto = userService.getUserByUsername(request.username());
 
-        Friendship friendship = friendshipService.addFriend(user, friend);
+        Friendship friendship = friendshipService.addFriend(userDto, friendDto);
         return ResponseEntity.ok(friendship);
     }
 
@@ -45,15 +45,15 @@ public class FriendshipController {
     public ResponseEntity<Friendship> updateFriendshipStatus(@RequestBody FriendshipRequest request,
                                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, UnauthorizedFriendshipActionException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
-        User user = userService.findUserById(userId);
-        User friend = userService.findUserByUsername(request.username());
-        Friendship existingFriendship = friendshipService.getFriendship(friend, user);
+        UserDto userDto = userService.getUserById(userId);
+        UserDto friendDto = userService.getUserByUsername(request.username());
+        Friendship existingFriendship = friendshipService.getFriendship(friendDto, userDto);
 
         if (!existingFriendship.getFriend().getUserId().equals(userId)) {
             throw new UnauthorizedFriendshipActionException(userId, existingFriendship.getFriend().getUserId());
         }
 
-        Friendship friendship = friendshipService.updateFriendshipStatus(user, friend, request.status());
+        Friendship friendship = friendshipService.updateFriendshipStatus(userDto, friendDto, request.status());
         return ResponseEntity.ok(friendship);
     }
 
@@ -61,9 +61,9 @@ public class FriendshipController {
     public ResponseEntity<List<Friendship>> getFriendsByStatus(@RequestParam FriendshipStatus status,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
-        User user = userService.findUserById(userId);
+        UserDto userDto = userService.getUserById(userId);
 
-        List<Friendship> friends = friendshipService.getFriendsByStatus(user, status);
+        List<Friendship> friends = friendshipService.getFriendsByStatus(userDto, status);
         return ResponseEntity.ok(friends);
     }
 
@@ -72,9 +72,9 @@ public class FriendshipController {
     public void deleteFriend(@RequestBody FriendshipRequest request,
                              @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
-        User user = userService.findUserById(userId);
-        User friend = userService.findUserByUsername(request.username());
+        UserDto userDto = userService.getUserById(userId);
+        UserDto friendDto = userService.getUserByUsername(request.username());
 
-        friendshipService.deleteFriend(user, friend);
+        friendshipService.deleteFriend(userDto, friendDto);
     }
 }

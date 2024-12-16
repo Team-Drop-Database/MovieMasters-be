@@ -5,12 +5,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import movie_master.api.model.role.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,15 +93,15 @@ public class DefaultJwtUtil implements JwtUtil {
 
     // Extract the given roles of a user
     @Override
-    public List<String> getRoles(String jwt) {
-        return extractClaims(jwt).get("roles", List.class);
+    public Role getRole(String jwt) {
+        return Role.valueOf(extractClaims(jwt).get("role", String.class));
     }
 
     // Check whether the jwt is valid
     @Override
-    public boolean isJwtValid(String jwt, Long userId, String username, List<String> roles) {
+    public boolean isJwtValid(String jwt, Long userId, String username, Role role) {
         return (getUserId(jwt).equals(userId) && getSubject(jwt).equals(username)
-                && getRoles(jwt).equals(roles) && !isJwtExpired(jwt));
+                && getRole(jwt).equals(role) && !isJwtExpired(jwt));
     }
 
     // Helper method to check whether the jwt is valid

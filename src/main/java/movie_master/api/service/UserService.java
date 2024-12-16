@@ -1,15 +1,13 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
-import movie_master.api.model.User;
+import movie_master.api.exception.*;
+import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
-import movie_master.api.exception.EmailTakenException;
-import movie_master.api.exception.MovieNotFoundException;
-import movie_master.api.exception.UserMovieNotFoundException;
-import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.UserMovie;
+import movie_master.api.request.UpdateUserRequest;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,10 +15,14 @@ import java.util.Set;
  */
 public interface UserService {
     UserDto register(RegisterUserRequest registerUserRequest) throws EmailTakenException, UsernameTakenException;
+    UserDto getUserByEmail(String email) throws EmailNotFoundException;
+    UserDto getUserByUsername(String username) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;
-    User findUserById(Long userId) throws UserNotFoundException;
-    User findUserByUsername(String username) throws UserNotFoundException;
+    UserDto getUserById(Long userId) throws UserNotFoundException;
     Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
+    List<UserDto> getAllUsers();
+    UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest, Long jwtUserId, Role jwtUserRole) throws UnauthorizedException, EmailTakenException, UsernameTakenException, UserNotFoundException;
+    UserDto updateUserRole(Long  userId, String role, Role jwtUserRole) throws UserNotFoundException;
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
     void removeMovieFromWatchlist(Long userId, Long movieId) throws UserNotFoundException, UserMovieNotFoundException;
     UserMovie updateWatchItemStatus(Long userId, Long movieId, boolean watched) throws UserNotFoundException, UserMovieNotFoundException;
