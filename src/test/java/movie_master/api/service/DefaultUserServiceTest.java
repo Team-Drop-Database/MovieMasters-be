@@ -11,6 +11,7 @@ import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,8 +25,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultUserServiceTest {
@@ -139,4 +139,49 @@ public class DefaultUserServiceTest {
         // When -> then
         assertThrows(UserNotFoundException.class, () -> defaultUserService.getWatchList(userId));
     }
+
+    @Test
+    void delete_user_succes() throws UserNotFoundException {
+        Long userId = 1L;
+        User existingUser = new User("existinguser@test.com", "existinguser", "password1234", Role.ROLE_USER, true);
+
+        // Mock repository interactions, making sure the user exists
+        Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+        defaultUserService.deleteUserById(userId);
+
+        // Verify if the correct methods are called.
+        Mockito.verify(userRepository, Mockito.times(1)).existsById(userId);
+        Mockito.verify(userRepository, Mockito.times(1)).deleteById(userId);
+
+        // Checking if user still exists
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Verify that the user does not exist anymore
+        assertFalse(userRepository.findById(userId).isPresent());
+    }
+
+    @Test
+    void delete_user_not_found() {
+        Long nonExistingId = 999L;
+
+        // Mock the situation where the user does not exist
+        Mockito.when(userRepository.existsById(nonExistingId)).thenReturn(false); // User does not exist
+
+        // Verify the UserNotFoundException is thrown
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
+            defaultUserService.deleteUserById(nonExistingId);
+        });
+
+        // Optional: Controleer het bericht of de details van de gegooide uitzondering
+        assertEquals("User with id '999' does not exist", exception.getMessage());
+
+        // Verify that deleteById is never called because the user does not exist
+        Mockito.verify(userRepository, Mockito.never()).deleteById(nonExistingId);
+
+        // Verify that existsById was called to check if the user exists
+        Mockito.verify(userRepository, Mockito.times(1)).existsById(nonExistingId);
+    }
+
 }
