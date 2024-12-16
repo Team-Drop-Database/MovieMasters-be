@@ -1,7 +1,9 @@
 package movie_master.api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import movie_master.api.model.friendship.FriendshipStatus;
 
@@ -17,6 +19,7 @@ public class Friendship {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
 
     @ManyToOne
@@ -64,6 +67,11 @@ public class Friendship {
 
     public User getFriend() {
         return friend;
+    }
+
+    @JsonProperty("friendUsername")
+    public String getFriendUsername() {
+        return friend.getUsername();  // Return the username of the friend
     }
 
     public void setFriend(User friend) {
