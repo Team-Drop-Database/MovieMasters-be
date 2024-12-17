@@ -1,16 +1,20 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
+import movie_master.api.dto.UserMovie.UserMovieDto;
 import movie_master.api.exception.EmailTakenException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.mapper.UserDtoMapper;
+import movie_master.api.mapper.UserMovieDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
+import movie_master.utils.TestUtils;
+import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,9 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,10 +36,13 @@ public class DefaultUserServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private UserDtoMapper userDtoMapper;
+    @Mock private UserMovieDtoMapper userMovieDtoMapper;
     @InjectMocks private DefaultUserService defaultUserService;
 
     private final RegisterUserRequest registerRequest = new RegisterUserRequest("mock@gmail.com",
             "mock1234", "12345678");
+
+    EasyRandom easyRandom = new EasyRandom();
 
     @Test
     void registerUserSuccessfully() throws UsernameTakenException, EmailTakenException {
@@ -111,19 +116,24 @@ public class DefaultUserServiceTest {
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
         Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
-        Set<UserMovie> expectedResult = Set.of(
+        List<UserMovie> userMovies = List.of(
             new UserMovie(user, movie1, false),
             new UserMovie(user, movie2, false),
             new UserMovie(user, movie3, false)
         );
-        for (UserMovie userMovie : expectedResult) {
+        for (UserMovie userMovie : userMovies) {
             user.addMovieToWatchlist(userMovie);
         }
+        List<UserMovieDto> mapped = TestUtils.createMultipleRandomRecords(UserMovieDto.class, easyRandom, userMovies.size());
+        Set<UserMovieDto> expectedResult = new HashSet<>(mapped);
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        for (int i = 0; i < userMovies.size(); i++) {
+            Mockito.when(userMovieDtoMapper.mapUserMovieToDto(userMovies.get(i))).thenReturn(mapped.get(i));
+        }
 
         // When
-        Set<UserMovie> result = defaultUserService.getWatchList(userId);
+        Set<UserMovieDto> result = defaultUserService.getWatchList(userId);
 
         // Then
         assertEquals(expectedResult, result);
