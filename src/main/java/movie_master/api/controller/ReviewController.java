@@ -34,6 +34,12 @@ public class ReviewController {
         return ResponseEntity.ok(foundReviews);
     }
 
+    @GetMapping("/movie")
+    public ResponseEntity<List<ReviewDto>> getReviewsByMovie(@RequestParam long movieId) {
+        List<ReviewDto> foundReviews = service.findByMovie(movieId);
+        return ResponseEntity.ok(foundReviews);
+    }
+
     @PostMapping
     public ResponseEntity<Object> placeReview(
         HttpServletRequest httpServletRequest,

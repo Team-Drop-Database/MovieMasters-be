@@ -8,11 +8,13 @@ import movie_master.api.model.Review;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.repository.ReviewRepository;
+import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.PostReviewRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,15 +26,18 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final UserMovieRepository userMovieRepository;
     private final ReviewDtoMapper mapper;
 
     public ReviewService(
         ReviewRepository reviewRepository,
         UserRepository userRepository,
+        UserMovieRepository userMovieRepository,
         ReviewDtoMapper mapper
     ) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
+        this.userMovieRepository = userMovieRepository;
         this.mapper = mapper;
     }
 
@@ -49,6 +54,14 @@ public class ReviewService {
         return reviewRepository.findAll()
             .stream()
             .limit(maxAmount)
+            .map(mapper::mapToDTO)
+            .toList();
+    }
+
+    // Retrieve a list of reviews by movie
+    public List<ReviewDto> findByMovie(long id) {
+        return userMovieRepository.findReviewsByMovieId(id).stream()
+            .filter(Objects::nonNull)
             .map(mapper::mapToDTO)
             .toList();
     }
@@ -77,14 +90,26 @@ public class ReviewService {
         if (userMovie.isEmpty()) {
             throw new MovieNotInWatchlistException(reviewRequest.movieId(), reviewRequest.userId());
         }
+        UserMovie foundUserMovie = userMovie.get();
 
-        Review reviewToStore = new Review(
-            userMovie.get(),
-            reviewRequest.rating(),
-            reviewRequest.comment()
-        );
+        Review reviewToStore;
+        if (foundUserMovie.getReview() == null) {
+            // If the user has not reviewed movie yet, create new
+            reviewToStore = new Review(
+                foundUserMovie,
+                reviewRequest.rating(),
+                reviewRequest.comment()
+            );
+        } else {
+            // Else update existing
+            reviewToStore = foundUserMovie.getReview();
+            reviewToStore.setRating(reviewRequest.rating());
+            reviewToStore.setComment(reviewRequest.comment());
+        }
 
         Review storedReview = reviewRepository.save(reviewToStore);
+        foundUserMovie.setReview(storedReview);
+        userMovieRepository.save(foundUserMovie);
 
         return mapper.mapToDTO(storedReview);
     }
