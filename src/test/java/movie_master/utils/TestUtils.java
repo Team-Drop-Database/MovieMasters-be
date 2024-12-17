@@ -15,7 +15,11 @@ public class TestUtils {
         RecordComponent[] recordComponents = recordType.getRecordComponents();
         Object[] randomValues = new Object[recordComponents.length];
         for (int i = 0; i < recordComponents.length; i++) {
-            randomValues[i] = easyRandom.nextObject(recordComponents[i].getType());
+            if (recordComponents[i].getType().isRecord()) {
+                randomValues[i] = createRandomRecord(recordComponents[i].getType(), easyRandom);
+            } else {
+                randomValues[i] = easyRandom.nextObject(recordComponents[i].getType());
+            }
         }
         // create a random instance with random values
         try {
