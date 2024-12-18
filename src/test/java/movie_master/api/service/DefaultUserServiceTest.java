@@ -3,6 +3,7 @@ package movie_master.api.service;
 import movie_master.api.dto.UserDto;
 import movie_master.api.dto.UserMovie.UserMovieDto;
 import movie_master.api.exception.EmailTakenException;
+import movie_master.api.exception.UserMovieNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.mapper.UserDtoMapper;
@@ -10,6 +11,7 @@ import movie_master.api.mapper.UserMovieDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
+import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.model.role.Role;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
@@ -27,13 +29,17 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultUserServiceTest {
 
     //TODO mock movie repository
     @Mock private UserRepository userRepository;
+    @Mock private UserMovieRepository userMovieRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private UserDtoMapper userDtoMapper;
     @Mock private UserMovieDtoMapper userMovieDtoMapper;
@@ -149,4 +155,115 @@ public class DefaultUserServiceTest {
         // When -> then
         assertThrows(UserNotFoundException.class, () -> defaultUserService.getWatchList(userId));
     }
+
+    // TODO: Hier nog tests voor die andere dingen?
+
+    @Test
+    void succesUpdateWatchList() throws UserNotFoundException, UserMovieNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Long movieId = 1L;
+
+        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        user.setUserId(userId);
+        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+        UserMovie userMovie = new UserMovie(user, movie1, false);
+        user.addMovieToWatchlist(userMovie);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.save(user)).thenReturn(user);
+
+        // When
+        UserMovie resultUserMovie = defaultUserService.updateWatchItemStatus(userId, movieId, true);
+
+        // Then
+        assertEquals(userMovie, resultUserMovie);
+        assertTrue(resultUserMovie.isWatched());
+    }
+
+    @Test
+    void failUpdateWatchList()  throws UserNotFoundException, UserMovieNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Long movieId = 7L;
+
+        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        user.setUserId(userId);
+        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+        UserMovie userMovie = new UserMovie(user, movie1, false);
+        user.addMovieToWatchlist(userMovie);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // When
+        assertThrows(UserMovieNotFoundException.class, () -> defaultUserService.updateWatchItemStatus(userId, movieId, true));
+
+        // Then
+        assertFalse(userMovie.isWatched());
+    }
+    
+    @Test
+    void succesRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException{
+
+        // Given
+        Long userId = 1337L;
+        Long removedMovieId = 1L;
+
+        final int CORRECT_MOVIES_AMOUNT = 2;
+
+        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        user.setUserId(userId);
+
+        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+        Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
+        Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+
+        UserMovie deletedUserMovie = new UserMovie(user, movie1, false);
+        user.addMovieToWatchlist(deletedUserMovie);
+        user.addMovieToWatchlist(new UserMovie(user, movie2, false));
+        user.addMovieToWatchlist(new UserMovie(user, movie3, false));
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        doNothing().when(userMovieRepository).delete(deletedUserMovie);
+
+        // When
+        defaultUserService.removeMovieFromWatchlist(userId, removedMovieId);
+
+        // Verify the (now shrinked) size of the watchlist
+        assertEquals(CORRECT_MOVIES_AMOUNT, user.getWatchList().size());
+        assertFalse(user.getWatchList().contains(deletedUserMovie));
+    }
+
+    @Test
+    void failRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException {
+        
+        // Given
+        Long userId = 1337L;
+        Long removedMovieId = 5L;
+
+        final int CORRECT_MOVIES_AMOUNT = 3;
+
+        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        user.setUserId(userId);
+
+        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+        Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
+        Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
+
+        UserMovie attemptedDeletedUserMovie = new UserMovie(user, movie1, false);
+        user.addMovieToWatchlist(attemptedDeletedUserMovie);
+        user.addMovieToWatchlist(new UserMovie(user, movie2, false));
+        user.addMovieToWatchlist(new UserMovie(user, movie3, false));
+        
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // When (also 'then'; since it checks if it throws the error)
+        assertThrows(UserMovieNotFoundException.class, () -> defaultUserService.removeMovieFromWatchlist(userId, removedMovieId));
+
+        // Then
+        // Verify the (still unchanged) size of the watchlist
+        assertEquals(CORRECT_MOVIES_AMOUNT, user.getWatchList().size());
+        assertTrue(user.getWatchList().contains(attemptedDeletedUserMovie));
+    }
+    
 }
