@@ -190,7 +190,10 @@ public class DefaultUserService implements UserService {
             throw new UserMovieNotFoundException(movieId);
         }
 
-        UserMovie userMovie = user.getWatchList().stream().filter(e -> e.getMovie().getId() == movieId).collect(Collectors.toList()).get(0);
+        UserMovie userMovie = user.getWatchList().stream()
+        .filter(e -> e.getMovie().getId() == movieId)
+        .collect(Collectors.toList()).get(0);
+        
         user.getWatchList().remove(userMovie);
         userMovieRepository.delete(userMovie);
     }
