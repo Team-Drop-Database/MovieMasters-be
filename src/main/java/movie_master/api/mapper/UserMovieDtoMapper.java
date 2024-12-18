@@ -19,6 +19,7 @@ public class UserMovieDtoMapper {
     }
 
     private UserMovieReviewDto mapReviewToUserMovieReviewDto(Review review) {
+        if (review == null) return null;
         return new UserMovieReviewDto(
             review.getReviewId(),
             review.getRating(),
