@@ -2,7 +2,6 @@ package movie_master.api.controller;
 
 import movie_master.api.dto.FriendshipDto;
 import movie_master.api.dto.UserDto;
-import movie_master.api.exception.FriendshipNotFoundException;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Friendship;
@@ -87,12 +86,9 @@ public class FriendshipControllerTest {
         // Arrange
         Friendship updatedFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.ACCEPTED);
 
-        // Stubbing for the friend initiating the request
         when(jwtUtil.getUserId(jwtTokenUser2.replace("Bearer ", ""))).thenReturn(mockUserDto2.id());
         when(userService.getUserById(mockUserDto2.id())).thenReturn(mockUserDto2);
         when(userService.getUserByUsername(mockUser1.getUsername())).thenReturn(mockUserDto1);
-
-        // Existing friendship retrieved and updated
         when(friendshipService.updateFriendshipStatus(mockUserDto2, mockUserDto1, FriendshipStatus.ACCEPTED)).thenReturn(updatedFriendship);
 
         // Act
