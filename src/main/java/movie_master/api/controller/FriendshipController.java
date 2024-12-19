@@ -1,8 +1,8 @@
 package movie_master.api.controller;
 
+import movie_master.api.dto.FriendshipDto;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.FriendshipNotFoundException;
-import movie_master.api.exception.UnauthorizedFriendshipActionException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.Friendship;
@@ -43,27 +43,22 @@ public class FriendshipController {
 
     @PutMapping("/update")
     public ResponseEntity<Friendship> updateFriendshipStatus(@RequestBody FriendshipRequest request,
-                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, UnauthorizedFriendshipActionException, FriendshipNotFoundException {
+                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException, FriendshipNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         UserDto userDto = userService.getUserById(userId);
         UserDto friendDto = userService.getUserByUsername(request.username());
-        Friendship existingFriendship = friendshipService.getFriendship(friendDto, userDto);
-
-        if (!existingFriendship.getFriend().getUserId().equals(userId)) {
-            throw new UnauthorizedFriendshipActionException(userId, existingFriendship.getFriend().getUserId());
-        }
 
         Friendship friendship = friendshipService.updateFriendshipStatus(userDto, friendDto, request.status());
         return ResponseEntity.ok(friendship);
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<List<Friendship>> getFriendsByStatus(@RequestParam FriendshipStatus status,
-                                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
+    public ResponseEntity<List<FriendshipDto>> getFriendsByStatus(@RequestParam FriendshipStatus status,
+                                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken) throws UserNotFoundException {
         Long userId = jwtUtil.getUserId(jwtToken.replace("Bearer ", ""));
         UserDto userDto = userService.getUserById(userId);
 
-        List<Friendship> friends = friendshipService.getFriendsByStatus(userDto, status);
+        List<FriendshipDto> friends = friendshipService.getFriendsByStatus(userDto, status);
         return ResponseEntity.ok(friends);
     }
 

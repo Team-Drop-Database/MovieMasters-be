@@ -1,13 +1,16 @@
 package movie_master.api.service;
 
+import movie_master.api.dto.FriendshipDto;
 import movie_master.api.dto.UserDto;
 import movie_master.api.exception.FriendshipNotFoundException;
+import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Friendship;
 import movie_master.api.model.User;
 import movie_master.api.model.friendship.FriendshipStatus;
 import movie_master.api.model.role.Role;
 import movie_master.api.repository.FriendshipRepository;
+import movie_master.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,12 +29,17 @@ public class FriendshipServiceTest {
 
     @Mock
     private FriendshipRepository friendshipRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private FriendshipService friendshipService;
 
     private UserDto mockUserDto1;
     private UserDto mockUserDto2;
     private Friendship mockFriendship;
+    private FriendshipDto mockFriendshipDto;
 
     @BeforeEach
     void setup() {
@@ -45,11 +54,14 @@ public class FriendshipServiceTest {
         mockUserDto1 = userDtoMapper.apply(mockUser1);
         mockUserDto2 = userDtoMapper.apply(mockUser2);
         mockFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.PENDING);
+        mockFriendshipDto = new FriendshipDto(1L, mockUser2.getUsername(), FriendshipStatus.PENDING, LocalDateTime.now());
     }
 
     @Test
-    void addFriendSuccessfully() throws FriendshipNotFoundException {
+    void addFriendSuccessfully() throws FriendshipNotFoundException, UserNotFoundException {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         when(friendshipRepository.existsByUserAndFriend(any(User.class), any(User.class))).thenReturn(false);
         when(friendshipRepository.save(any(Friendship.class))).thenReturn(mockFriendship);
 
@@ -64,6 +76,8 @@ public class FriendshipServiceTest {
     @Test
     void addFriendAlreadyExists() {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         when(friendshipRepository.existsByUserAndFriend(any(User.class), any(User.class))).thenReturn(true);
 
         // Act & Assert
@@ -72,8 +86,10 @@ public class FriendshipServiceTest {
     }
 
     @Test
-    void updateFriendshipStatusSuccessfully() throws FriendshipNotFoundException {
+    void updateFriendshipStatusSuccessfully() throws FriendshipNotFoundException, UserNotFoundException {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         mockFriendship.setStatus(FriendshipStatus.REJECTED);
         when(friendshipRepository.findByUserAndFriend(any(User.class), any(User.class))).thenReturn(mockFriendship);
         when(friendshipRepository.save(any(Friendship.class))).thenReturn(mockFriendship);
@@ -89,6 +105,8 @@ public class FriendshipServiceTest {
     @Test
     void updateFriendshipStatusNotFound() {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         when(friendshipRepository.findByUserAndFriend(any(User.class), any(User.class))).thenReturn(null);
 
         // Act & Assert
@@ -97,22 +115,26 @@ public class FriendshipServiceTest {
     }
 
     @Test
-    void getFriendsByStatusSuccessfully() {
+    void getFriendsByStatusSuccessfully() throws UserNotFoundException {
         // Arrange
-        List<Friendship> friendships = List.of(mockFriendship);
-        when(friendshipRepository.findByUserOrFriendAndStatus(any(User.class),any(User.class), eq(FriendshipStatus.PENDING))).thenReturn(friendships);
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        List<FriendshipDto> friendships = List.of(mockFriendshipDto);
+        when(friendshipRepository.findFriendshipsByUserAndStatus(any(User.class), eq(FriendshipStatus.PENDING))).thenReturn(friendships);
 
         // Act
-        List<Friendship> result = friendshipService.getFriendsByStatus(mockUserDto1, FriendshipStatus.PENDING);
+        List<FriendshipDto> result = friendshipService.getFriendsByStatus(mockUserDto1, FriendshipStatus.PENDING);
 
         // Assert
         assertEquals(friendships, result);
-        verify(friendshipRepository, times(1)).findByUserOrFriendAndStatus(any(User.class),any(User.class), eq(FriendshipStatus.PENDING));
+        verify(friendshipRepository, times(1)).findFriendshipsByUserAndStatus(any(User.class), eq(FriendshipStatus.PENDING));
     }
 
+
     @Test
-    void deleteFriendSuccessfully() throws FriendshipNotFoundException {
+    void deleteFriendSuccessfully() throws FriendshipNotFoundException, UserNotFoundException {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         when(friendshipRepository.findByUserAndFriend(any(User.class), any(User.class))).thenReturn(mockFriendship);
 
         // Act
@@ -125,6 +147,8 @@ public class FriendshipServiceTest {
     @Test
     void deleteFriendNotFound() {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         when(friendshipRepository.findByUserAndFriend(any(User.class), any(User.class))).thenReturn(null);
 
         // Act & Assert
@@ -132,10 +156,11 @@ public class FriendshipServiceTest {
         verify(friendshipRepository, never()).delete(any(Friendship.class));
     }
 
-
     @Test
-    void getFriendshipSuccessfully() throws FriendshipNotFoundException {
+    void getFriendshipSuccessfully() throws FriendshipNotFoundException, UserNotFoundException {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         when(friendshipRepository.findByUserAndFriend(any(User.class), any(User.class))).thenReturn(mockFriendship);
 
         // Act
@@ -149,6 +174,8 @@ public class FriendshipServiceTest {
     @Test
     void getFriendshipNotFound() {
         // Arrange
+        when(userRepository.findById(mockUserDto1.id())).thenReturn(java.util.Optional.of(new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true)));
+        when(userRepository.findById(mockUserDto2.id())).thenReturn(java.util.Optional.of(new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true)));
         when(friendshipRepository.findByUserAndFriend(any(User.class), any(User.class))).thenReturn(null);
 
         // Act & Assert

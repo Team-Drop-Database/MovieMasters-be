@@ -1,9 +1,11 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
+import movie_master.api.dto.UserMovie.UserMovieDto;
 import movie_master.api.exception.*;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.mapper.UserDtoMapper;
+import movie_master.api.mapper.UserMovieDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
@@ -33,18 +35,20 @@ public class DefaultUserService implements UserService {
     // Utilities
     private final PasswordEncoder passwordEncoder;
     private final UserDtoMapper userDtoMapper;
+    private final UserMovieDtoMapper userMovieDtoMapper;
     private final JwtUtil jwtUtil;
 
     public DefaultUserService(
             UserRepository userRepository, MovieRepository movieRepository,
             UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
-            UserDtoMapper userDtoMapper,
+            UserDtoMapper userDtoMapper, UserMovieDtoMapper userMovieDtoMapper,
             JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
         this.userMovieRepository = userMovieRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
+        this.userMovieDtoMapper = userMovieDtoMapper;
         this.jwtUtil = jwtUtil;
     }
 
@@ -125,7 +129,7 @@ public class DefaultUserService implements UserService {
      * watchlist of this user.
      */
     @Override
-    public Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException {
+    public Set<UserMovieDto> getWatchList(Long userId) throws UserNotFoundException {
 
         // Retrieve the user in Optional form
         Optional<User> user = userRepository.findById(userId);
@@ -133,7 +137,9 @@ public class DefaultUserService implements UserService {
         // If it does not exist, throw an exception. Otherwise,
         // return the watchlist.
         if (user.isPresent()) {
-            return user.get().getWatchList();
+            return user.get().getWatchList().stream()
+                .map(userMovieDtoMapper::mapUserMovieToDto)
+                .collect(Collectors.toSet());
         } else {
             throw new UserNotFoundException(userId);
         }
@@ -201,7 +207,10 @@ public class DefaultUserService implements UserService {
             throw new UserMovieNotFoundException(movieId);
         }
 
-        UserMovie userMovie = user.getWatchList().stream().filter(e -> e.getMovie().getId() == movieId).collect(Collectors.toList()).get(0);
+        UserMovie userMovie = user.getWatchList().stream()
+        .filter(e -> e.getMovie().getId() == movieId)
+        .collect(Collectors.toList()).get(0);
+        
         user.getWatchList().remove(userMovie);
         userMovieRepository.delete(userMovie);
     }

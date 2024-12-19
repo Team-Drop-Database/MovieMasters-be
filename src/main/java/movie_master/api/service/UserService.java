@@ -1,10 +1,11 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.UserDto;
+import movie_master.api.dto.UserMovie.UserMovieDto;
 import movie_master.api.exception.*;
+import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
-import movie_master.api.model.UserMovie;
 import movie_master.api.request.UpdateUserRequest;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public interface UserService {
     UserDto getUserByEmail(String email) throws EmailNotFoundException;
     UserDto getUserByUsername(String username) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;
+    Set<UserMovieDto> getWatchList(Long userId) throws UserNotFoundException;
     UserDto getUserById(Long userId) throws UserNotFoundException;
-    Set<UserMovie> getWatchList(Long userId) throws UserNotFoundException;
     List<UserDto> getAllUsers();
     UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest, Long jwtUserId, Role jwtUserRole) throws UnauthorizedException, EmailTakenException, UsernameTakenException, UserNotFoundException;
     UserDto updateUserRole(Long  userId, String role, Role jwtUserRole) throws UserNotFoundException;

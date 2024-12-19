@@ -2,17 +2,16 @@ package movie_master.api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import movie_master.api.dto.UserDto;
+import movie_master.api.dto.UserMovie.UserMovieDto;
 import movie_master.api.exception.*;
-import movie_master.api.exception.MovieNotFoundException;
-import movie_master.api.exception.UserMovieNotFoundException;
-import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.exception.UsernameTakenException;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.service.DefaultUserService;
+import movie_master.utils.TestUtils;
+import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,16 +25,22 @@ import org.springframework.http.ResponseEntity;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
     @Mock private DefaultUserService defaultUserService;
     @InjectMocks private UserController userController;
+
+    EasyRandom easyRandom = new EasyRandom();
 
     @Test
     void registerSuccessfully() throws EmailTakenException, UsernameTakenException {
@@ -94,14 +99,8 @@ class UserControllerTest {
     void retrieveWatchlistSuccessfully() throws UserNotFoundException {
         // Given
         long userId = 1337;
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
-        Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
-        Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
-        Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
-        Set<UserMovie> expectedBody = Set.of(
-            new UserMovie(user, movie1, false),
-            new UserMovie(user, movie2, false),
-            new UserMovie(user, movie3, false)
+        Set<UserMovieDto> expectedBody = new HashSet<>(
+            TestUtils.createMultipleRandomRecords(UserMovieDto.class, easyRandom, 5)
         );
 
         Mockito.when(defaultUserService.getWatchList(userId)).thenReturn(expectedBody);
@@ -278,6 +277,49 @@ class UserControllerTest {
         // When
         ResponseEntity<Object> result = userController.updateWatchItemStatus(userId, watchlistItemId, true);
 
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
+        assertEquals(result.getBody(), expectedMessage);
+    }
+
+    @Test
+    void succesRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Long movieId = 1L;
+
+        Map<String, Object> expectedMessage =  Map.of(
+            "message", "Successfully removed item from watchlist",
+            "userId", userId,
+            "movieId", movieId
+            );
+
+        // This method returns void and is already tested elsewhere; so can be ignored here
+        doNothing().when(defaultUserService).removeMovieFromWatchlist(userId, movieId);
+        
+        // When
+        ResponseEntity<Object> result = userController.removeMovieFromWatchlist(userId, movieId);
+
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.OK.value()));
+        assertEquals(result.getBody(), expectedMessage);
+    }
+
+    @Test
+    void failRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException{
+        // Given
+        Long userId = 1337L;
+        Long movieId = 1L;
+
+        UserMovieNotFoundException expectedError = new UserMovieNotFoundException(movieId);
+        String expectedMessage = "Could not remove movie from watchlist. Exception message: "
+         + expectedError.getMessage();
+
+        doThrow(expectedError).when(defaultUserService).removeMovieFromWatchlist(userId, movieId);
+        
+        // When
+        ResponseEntity<Object> result = userController.removeMovieFromWatchlist(userId, movieId);
+        
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
         assertEquals(result.getBody(), expectedMessage);

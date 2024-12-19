@@ -1,7 +1,8 @@
 package movie_master.api.controller;
 
+import movie_master.api.dto.FriendshipDto;
 import movie_master.api.dto.UserDto;
-import movie_master.api.exception.UnauthorizedFriendshipActionException;
+import movie_master.api.exception.FriendshipNotFoundException;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.model.Friendship;
@@ -20,10 +21,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +42,6 @@ public class FriendshipControllerTest {
     private User mockUser3;
     private UserDto mockUserDto1;
     private UserDto mockUserDto2;
-
     @BeforeEach
     void setup() {
         UserDtoMapper userDtoMapper = new UserDtoMapper();
@@ -85,14 +85,14 @@ public class FriendshipControllerTest {
     @Test
     void updateFriendshipStatusSuccessfully() throws Exception {
         // Arrange
-        Friendship existingFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.PENDING);
         Friendship updatedFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.ACCEPTED);
 
+        // Stubbing for the friend initiating the request
         when(jwtUtil.getUserId(jwtTokenUser2.replace("Bearer ", ""))).thenReturn(mockUserDto2.id());
         when(userService.getUserById(mockUserDto2.id())).thenReturn(mockUserDto2);
         when(userService.getUserByUsername(mockUser1.getUsername())).thenReturn(mockUserDto1);
 
-        when(friendshipService.getFriendship(mockUserDto1, mockUserDto2)).thenReturn(existingFriendship);
+        // Existing friendship retrieved and updated
         when(friendshipService.updateFriendshipStatus(mockUserDto2, mockUserDto1, FriendshipStatus.ACCEPTED)).thenReturn(updatedFriendship);
 
         // Act
@@ -107,34 +107,11 @@ public class FriendshipControllerTest {
     }
 
     @Test
-    void updateFriendshipStatusUnauthorized() throws Exception {
-        // Arrange
-        Friendship existingFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.PENDING);
-
-        when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUserDto1.id());
-        when(userService.getUserById(mockUserDto1.id())).thenReturn(mockUserDto1);
-        when(userService.getUserByUsername(mockUser2.getUsername())).thenReturn(mockUserDto2);
-
-        when(friendshipService.getFriendship(mockUserDto2, mockUserDto1)).thenReturn(existingFriendship);
-
-        // Act & Assert
-        UnauthorizedFriendshipActionException exception = assertThrows(
-                UnauthorizedFriendshipActionException.class,
-                () -> friendshipController.updateFriendshipStatus(
-                        new FriendshipRequest(mockUser2.getUsername(), FriendshipStatus.ACCEPTED),
-                        jwtTokenUser1
-                )
-        );
-
-        assertEquals("User with id 1 is not authorized to update the friendship status with user 2.", exception.getMessage());
-    }
-
-    @Test
     void getFriendsByStatusSuccessfully() throws Exception {
         // Arrange
-        List<Friendship> friends = List.of(
-                new Friendship(mockUser1, mockUser2, FriendshipStatus.ACCEPTED),
-                new Friendship(mockUser1, mockUser3, FriendshipStatus.ACCEPTED)
+        List<FriendshipDto> friends = List.of(
+                new FriendshipDto(1L, mockUser2.getUsername(), FriendshipStatus.ACCEPTED, LocalDateTime.now()),
+                new FriendshipDto(2L, mockUser3.getUsername(), FriendshipStatus.ACCEPTED, LocalDateTime.now())
         );
 
         when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUserDto1.id());
@@ -142,7 +119,7 @@ public class FriendshipControllerTest {
         when(friendshipService.getFriendsByStatus(mockUserDto1, FriendshipStatus.ACCEPTED)).thenReturn(friends);
 
         // Act
-        ResponseEntity<List<Friendship>> response = friendshipController.getFriendsByStatus(
+        ResponseEntity<List<FriendshipDto>> response = friendshipController.getFriendsByStatus(
                 FriendshipStatus.ACCEPTED,
                 jwtTokenUser1
         );

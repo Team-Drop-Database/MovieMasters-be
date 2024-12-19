@@ -49,6 +49,11 @@ public class Friendship {
         this.friendshipDate = LocalDateTime.now();
     }
 
+    @JsonProperty("friendUsername")
+    public String getFriendUsername() {
+        return friend.getUsername();
+    }
+
     public Long getId() {
         return id;
     }
@@ -67,11 +72,6 @@ public class Friendship {
 
     public User getFriend() {
         return friend;
-    }
-
-    @JsonProperty("friendUsername")
-    public String getFriendUsername() {
-        return friend.getUsername();  // Return the username of the friend
     }
 
     public void setFriend(User friend) {
