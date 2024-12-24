@@ -164,7 +164,7 @@ public class DefaultUserServiceTest {
         Long userId = 1337L;
         Long movieId = 1L;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         user.setUserId(userId);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         UserMovie userMovie = new UserMovie(user, movie1, false);
@@ -187,7 +187,7 @@ public class DefaultUserServiceTest {
         Long userId = 1337L;
         Long movieId = 7L;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         user.setUserId(userId);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         UserMovie userMovie = new UserMovie(user, movie1, false);
@@ -201,7 +201,7 @@ public class DefaultUserServiceTest {
         // Then
         assertFalse(userMovie.isWatched());
     }
-    
+
     @Test
     void succesRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException{
 
@@ -211,7 +211,7 @@ public class DefaultUserServiceTest {
 
         final int CORRECT_MOVIES_AMOUNT = 2;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         user.setUserId(userId);
 
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
@@ -236,14 +236,14 @@ public class DefaultUserServiceTest {
 
     @Test
     void failRemoveFromWatchlist() throws UserNotFoundException, UserMovieNotFoundException {
-        
+
         // Given
         Long userId = 1337L;
         Long removedMovieId = 5L;
 
         final int CORRECT_MOVIES_AMOUNT = 3;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", "QA", true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
         user.setUserId(userId);
 
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
@@ -254,7 +254,7 @@ public class DefaultUserServiceTest {
         user.addMovieToWatchlist(attemptedDeletedUserMovie);
         user.addMovieToWatchlist(new UserMovie(user, movie2, false));
         user.addMovieToWatchlist(new UserMovie(user, movie3, false));
-        
+
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // When (also 'then'; since it checks if it throws the error)
@@ -265,5 +265,50 @@ public class DefaultUserServiceTest {
         assertEquals(CORRECT_MOVIES_AMOUNT, user.getWatchList().size());
         assertTrue(user.getWatchList().contains(attemptedDeletedUserMovie));
     }
-    
+
+
+    @Test
+    void delete_user_succes() throws UserNotFoundException {
+        Long userId = 1L;
+        User existingUser = new User("existinguser@test.com", "existinguser", "password1234", Role.ROLE_USER, true);
+
+        // Mock repository interactions, making sure the user exists
+        Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+        defaultUserService.deleteUserById(userId);
+
+        // Verify if the correct methods are called.
+        Mockito.verify(userRepository, Mockito.times(1)).existsById(userId);
+        Mockito.verify(userRepository, Mockito.times(1)).deleteById(userId);
+
+        // Checking if user still exists
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Verify that the user does not exist anymore
+        assertFalse(userRepository.findById(userId).isPresent());
+    }
+
+    @Test
+    void delete_user_not_found() {
+        Long nonExistingId = 999L;
+
+        // Mock the situation where the user does not exist
+        Mockito.when(userRepository.existsById(nonExistingId)).thenReturn(false); // User does not exist
+
+        // Verify the UserNotFoundException is thrown
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
+            defaultUserService.deleteUserById(nonExistingId);
+        });
+
+        // Optional: Controleer het bericht of de details van de gegooide uitzondering
+        assertEquals("User with id '999' does not exist", exception.getMessage());
+
+        // Verify that deleteById is never called because the user does not exist
+        Mockito.verify(userRepository, Mockito.never()).deleteById(nonExistingId);
+
+        // Verify that existsById was called to check if the user exists
+        Mockito.verify(userRepository, Mockito.times(1)).existsById(nonExistingId);
+    }
+
 }
