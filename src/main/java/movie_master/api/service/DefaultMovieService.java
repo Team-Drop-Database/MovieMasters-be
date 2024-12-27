@@ -2,17 +2,16 @@ package movie_master.api.service;
 
 import movie_master.api.model.Movie;
 import movie_master.api.repository.MovieRepository;
-import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DefaultMovieService implements MovieService {
 
-    private final int NUMBER_OF_MOVIES_PER_PAGE = 20;
+    private final int RESULTS_PER_PAGE = 3;
     private final MovieRepository movieRepository;
 
     public DefaultMovieService(MovieRepository movieRepository) {
@@ -23,8 +22,8 @@ public class DefaultMovieService implements MovieService {
         return movieRepository.findAll();
     }
 
-    public List<Movie> findByTitleContaining(String title) {
-        return movieRepository.findMovieByTitleContaining(title, Limit.of(NUMBER_OF_MOVIES_PER_PAGE));
+    public List<Movie> findByTitleContaining(String title, int page) {
+        return movieRepository.findByTitleContaining(title, PageRequest.of(page, RESULTS_PER_PAGE));
     }
 
     public Optional<Movie> findById(Long id) {
@@ -37,5 +36,9 @@ public class DefaultMovieService implements MovieService {
 
     public Movie save(Movie movie) {
         return movieRepository.save(movie);
+    }
+
+    public int getNumberOfPages(String title) {
+        return (int) Math.ceil((double) this.movieRepository.countByTitleContaining(title) / RESULTS_PER_PAGE);
     }
 }
