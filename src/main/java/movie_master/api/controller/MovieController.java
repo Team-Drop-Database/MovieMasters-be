@@ -49,6 +49,12 @@ public class MovieController {
                 new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Returns the number of pages from a movie search
+     *
+     * @param title title of the movie we want to know the number of pages of
+     * @return number representing the number of pages
+     */
     @GetMapping("/pages")
     public ResponseEntity<Integer> getNumberOfPages(@RequestParam String title){
         return ResponseEntity.ok(this.movieService.getNumberOfPages(title));
