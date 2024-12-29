@@ -52,9 +52,11 @@ public class AuthController {
             Long userId = userDetails.getUserId();
             String username = userDetails.getUsername();
             Role role = userDetails.getRole();
+            String profilePicture = userDetails.getProfilePicture();
             Map<String, Object> claims = new HashMap<>();
             claims.put("userId", userId);
             claims.put("role", role);
+            claims.put("profileUrl", profilePicture);
 
             String jwt = jwtUtil.generateJwt(claims, username);
             String refreshJwt = jwtUtil.generateRefreshJwt(claims, username);
@@ -80,6 +82,7 @@ public class AuthController {
             Long userId = userDetails.getUserId();
             String username = userDetails.getUsername();
             Role role = userDetails.getRole();
+            String profilePicture = userDetails.getProfilePicture();
 
             // validate the claims and if the token has not expired
             if (!jwtUtil.isJwtValid(refreshJwtRequest.jwt(), userId, username, role)) {
@@ -90,6 +93,7 @@ public class AuthController {
             Map<String, Object> claims = new HashMap<>();
             claims.put("userId", userId);
             claims.put("role", role);
+            claims.put("profileUrl", profilePicture);
 
             String jwt = jwtUtil.generateJwt(claims, username);
 
