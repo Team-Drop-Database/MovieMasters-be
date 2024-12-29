@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doAnswer;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
@@ -296,7 +296,7 @@ class UserControllerTest {
 
         // This method returns void and is already tested elsewhere; so can be ignored here
         doNothing().when(defaultUserService).removeMovieFromWatchlist(userId, movieId);
-        
+
         // When
         ResponseEntity<Object> result = userController.removeMovieFromWatchlist(userId, movieId);
 
@@ -316,12 +316,50 @@ class UserControllerTest {
          + expectedError.getMessage();
 
         doThrow(expectedError).when(defaultUserService).removeMovieFromWatchlist(userId, movieId);
-        
+
         // When
         ResponseEntity<Object> result = userController.removeMovieFromWatchlist(userId, movieId);
-        
+
         // Then
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
         assertEquals(result.getBody(), expectedMessage);
+    }
+
+    @Test
+    void deleteUserSuccessfully() throws UserNotFoundException {
+        Long userId = 1L;
+
+        // No need to mock a return value since deleteUserById returns void
+        Mockito.doNothing().when(defaultUserService).deleteUserById(userId);
+
+        // When
+        ResponseEntity<Object> result = userController.deleteUser(userId);
+
+        // Then
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+        assertNull(result.getBody()); // Since NO_CONTENT implies no body
+
+        // Verify the service method was called once
+        Mockito.verify(defaultUserService, Mockito.times(1)).deleteUserById(userId);
+    }
+
+    @Test
+    void deleteUserNotFound() throws UserNotFoundException {
+        // Given
+        Long userId = 999L;
+        UserNotFoundException exception = new UserNotFoundException(userId);
+        String expectedMessage = String.format("User with id '%d' does not exist", userId);
+
+        Mockito.doThrow(exception).when(defaultUserService).deleteUserById(userId);
+
+        // When
+        ResponseEntity<Object> result = userController.deleteUser(userId);
+
+        // Then
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+        assertEquals(expectedMessage, result.getBody());
+
+        // Verify the service method was called once
+        Mockito.verify(defaultUserService, Mockito.times(1)).deleteUserById(userId);
     }
 }
