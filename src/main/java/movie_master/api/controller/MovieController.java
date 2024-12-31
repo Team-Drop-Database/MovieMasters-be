@@ -27,12 +27,21 @@ public class MovieController {
      * @return List of movies
      */
     @GetMapping
-    public List<Movie> getAllMovies(@RequestParam(required = false) String title,
-                                    @RequestParam(required = false) int page) {
+    public ResponseEntity<List<Movie>> getAllMovies(@RequestParam(required = false) String title,
+                                    @RequestParam(required = false) Integer page) {
+        List<Movie> movies;
         if (title != null) {
-            return movieService.findByTitleContaining(title, page);
+            page = page == null ? 0 : page;
+            movies =  movieService.findByTitleContaining(title, page);
+        } else {
+            movies =  movieService.findAll();
         }
-        return movieService.findAll();
+
+        if (movies.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(movies);
     }
 
     /**
