@@ -8,8 +8,6 @@ import java.util.Optional;
 
 @Service
 public interface MovieService {
-    List<Movie> findAll();
-
     List<Movie> findByTitleContaining(String title, int pageNumber);
 
     Optional<Movie> findById(Long id);

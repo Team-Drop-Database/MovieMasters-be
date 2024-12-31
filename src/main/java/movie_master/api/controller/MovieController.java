@@ -27,15 +27,10 @@ public class MovieController {
      * @return List of movies
      */
     @GetMapping
-    public ResponseEntity<List<Movie>> getAllMovies(@RequestParam(required = false) String title,
+    public ResponseEntity<List<Movie>> getMoviesByTitle(@RequestParam String title,
                                     @RequestParam(required = false) Integer page) {
-        List<Movie> movies;
-        if (title != null) {
-            page = page == null ? 0 : page;
-            movies =  movieService.findByTitleContaining(title, page);
-        } else {
-            movies =  movieService.findAll();
-        }
+        page = page == null ? 0 : page;
+        List<Movie> movies = movieService.findByTitleContaining(title, page);
 
         if (movies.isEmpty()) {
             return ResponseEntity.notFound().build();

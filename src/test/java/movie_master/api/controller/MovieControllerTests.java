@@ -36,16 +36,6 @@ public class MovieControllerTests {
     }
 
     @Test
-    public void getAllMoviesSuccess() throws Exception {
-        List<Movie> movies = getMovies();
-        mockMvc.perform(get("/movies")
-                .header("Authorization", "Bearer %s".formatted(jwtTesting))
-                .content(objectMapper.writeValueAsString(movies))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void getMoviesByTitleReturnsMovies() throws Exception {
         List<Movie> movies = getMovies();
         this.mockMvc.perform(get("/movies?title=a")

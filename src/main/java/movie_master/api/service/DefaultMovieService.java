@@ -18,10 +18,6 @@ public class DefaultMovieService implements MovieService {
         this.movieRepository = movieRepository;
     }
 
-    public List<Movie> findAll() {
-        return movieRepository.findAll();
-    }
-
     public List<Movie> findByTitleContaining(String title, int page) {
         return movieRepository.findByTitleContaining(title, PageRequest.of(page, RESULTS_PER_PAGE));
     }
