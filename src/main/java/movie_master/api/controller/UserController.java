@@ -96,7 +96,7 @@ public class UserController {
             UserDto user = userService.updateUserRole(userId,
                     newRole,
                     jwtUtil.getRole(jwt.replace("Bearer ", "")));
-            return ResponseEntity.ok().body(generateTokens(user.id(), user.username(), user.role()));
+            return ResponseEntity.ok().body(generateTokens(user.id(), user.username(), user.role(), user.profile_picture()));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
@@ -136,7 +136,7 @@ public class UserController {
                     updateUserRequest,
                     jwtUtil.getUserId(jwt),
                     jwtUtil.getRole(jwt));
-            return ResponseEntity.ok(generateTokens(user.id(), user.username(), user.role()));
+            return ResponseEntity.ok(generateTokens(user.id(), user.username(), user.role(), user.profile_picture()));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (UnauthorizedException e) {
@@ -259,10 +259,11 @@ public class UserController {
      * @param role     role of the user
      * @return JWT token and JWT refresh token
      */
-    private Map<String, String> generateTokens(Long userId, String username, Role role) {
+    private Map<String, String> generateTokens(Long userId, String username, Role role, String profileUrl) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
+        claims.put("profileUrl", profileUrl);
 
         String jwt = jwtUtil.generateJwt(claims, username);
         String refreshJwt = jwtUtil.generateRefreshJwt(claims, username);
