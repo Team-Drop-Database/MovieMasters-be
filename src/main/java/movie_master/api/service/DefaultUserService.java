@@ -264,6 +264,16 @@ public class DefaultUserService implements UserService {
         return users;
     }
 
+    @Override
+    public User findById(Long userId) throws UserNotFoundException {
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+        return user.get();
+    }
+
     private boolean emailIsTakenByDifferentUser(String email, Long userId) {
         Optional<User> userFoundByEmail = this.userRepository
                 .findByEmail(email);
