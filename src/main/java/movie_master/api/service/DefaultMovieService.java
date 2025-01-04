@@ -11,7 +11,7 @@ import java.util.Optional;
 @Service
 public class DefaultMovieService implements MovieService {
 
-    private final int RESULTS_PER_PAGE = 3;
+    private final int RESULTS_PER_PAGE = 10;
     private final MovieRepository movieRepository;
 
     public DefaultMovieService(MovieRepository movieRepository) {
