@@ -47,6 +47,16 @@ public class User {
         watchlist = new HashSet<>();
     }
 
+    public User(String email, String username, String password, Role role, boolean enabled, String profilePicture) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.enabled = enabled;
+        this.profilePicture = profilePicture;
+        watchlist = new HashSet<>();
+    }
+
     public User(UserDto userDto) {
         this.userId = userDto.id();
         this.email = userDto.email();
