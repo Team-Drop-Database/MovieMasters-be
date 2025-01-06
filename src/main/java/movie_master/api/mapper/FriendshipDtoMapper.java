@@ -13,17 +13,15 @@ import org.springframework.stereotype.Service;
 public class FriendshipDtoMapper {
 
     public FriendshipDto toFriendshipDto(Friendship friendship, Long userId) {
-        String friendUsername = friendship.getUser().getUserId().equals(userId)
-                ? friendship.getFriend().getUsername()
-                : friendship.getUser().getUsername();
+        boolean isUserFirst = friendship.getUser().getUserId().equals(userId);
 
-        String friendProfilePicture = friendship.getUser().getUserId().equals(userId)
-                ? friendship.getFriend().getProfilePicture()
-                : friendship.getUser().getProfilePicture();
+        String username = friendship.getUser().getUsername();
+        String friendUsername = isUserFirst ? friendship.getFriend().getUsername() : friendship.getUser().getUsername();
+        String friendProfilePicture = isUserFirst ? friendship.getFriend().getProfilePicture() : friendship.getUser().getProfilePicture();
 
         return new FriendshipDto(
                 friendship.getId(),
-                userId,
+                username,
                 friendUsername,
                 friendProfilePicture,
                 friendship.getStatus(),
