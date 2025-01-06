@@ -45,7 +45,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String servletPath = request.getServletPath();
 
         return (servletPath.equals("/users") && request.getMethod().equals("POST")) || (servletPath.startsWith("/auth"))
-                || (servletPath.startsWith("/reviews") && request.getMethod().equals("GET"));
+                || (servletPath.startsWith("/reviews") && request.getMethod().equals("GET"))
+                || (servletPath.startsWith("/movies") && request.getMethod().equals("GET"));
     }
 
     /**

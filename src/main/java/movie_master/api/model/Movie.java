@@ -65,7 +65,7 @@ public class Movie {
     }
 
     public void setTmdbRating(double tmdbRating) {
-        this.tmdbRating = tmdbRating;
+        this.tmdbRating = Math.round(tmdbRating * 10.0) / 10.0;
     }
 
     public Date getReleaseDate() {

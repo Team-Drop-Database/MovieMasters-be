@@ -19,14 +19,32 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    /**
+     * Gets all movies or movies where the title contains the title parameter
+     *
+     * @param title title that should be in the movie title
+     * @param page page number for pagination (starts at 0)
+     * @return List of movies
+     */
     @GetMapping
-    public List<Movie> getAllMovies(@RequestParam(required = false) String title) {
-        if (title != null) {
-            return movieService.findByTitleContaining(title);
+    public ResponseEntity<List<Movie>> getMoviesByTitle(@RequestParam String title,
+                                    @RequestParam(required = false) Integer page) {
+        page = page == null ? 0 : page;
+        List<Movie> movies = movieService.findByTitleContaining(title, page);
+
+        if (movies.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return movieService.findAll();
+
+        return ResponseEntity.ok(movies);
     }
 
+    /**
+     * Gets a movie by the given ID
+     *
+     * @param id ID of the movie
+     * @return a movie object
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getMovie(@PathVariable Long id) {
         Optional<Movie> movie = movieService.findById(id);
@@ -35,6 +53,23 @@ public class MovieController {
                 new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Returns the number of pages from a movie search
+     *
+     * @param title title of the movie we want to know the number of pages of
+     * @return number representing the number of pages
+     */
+    @GetMapping("/pages")
+    public ResponseEntity<Integer> getNumberOfPages(@RequestParam String title){
+        return ResponseEntity.ok(this.movieService.getNumberOfPages(title));
+    }
+
+    /**
+     * Deletes a movie by the given ID
+     *
+     * @param id ID of the movie to delete
+     * @return boolean to indicate of the movie is deleted successful
+     */
     @DeleteMapping("/{id}")
     public Boolean deleteMovie(@PathVariable Long id) {
         movieService.deleteById(id);

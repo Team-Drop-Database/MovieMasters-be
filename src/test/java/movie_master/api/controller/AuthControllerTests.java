@@ -37,12 +37,11 @@ public class AuthControllerTests {
     @Mock private UserDetailsService userDetailsService;
     @Mock private Authentication authentication;
     @Mock private BadCredentialsException badCredentialsException;
-    @Mock private SignatureException signatureException;
     @InjectMocks private AuthController authController;
 
     @BeforeEach
     void setup() {
-        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true);
+        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true, "www.image.com/image.png");
         userDetails = new CustomUserDetails(user);
         refreshJwtRequest = new RefreshJwtRequest("refreshJwt");
     }
@@ -54,10 +53,12 @@ public class AuthControllerTests {
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
         Role role = userDetails.getRole();
+        String profilePicture = userDetails.getProfilePicture();
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
+        claims.put("profileUrl", profilePicture);
 
         String jwt = "jwt";
         String refreshJwt = "refreshJwt";
@@ -96,10 +97,12 @@ public class AuthControllerTests {
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
         Role role = userDetails.getRole();
+        String profilePicture = userDetails.getProfilePicture();
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
+        claims.put("profileUrl", profilePicture);
 
         String jwt = "jwt";
 
