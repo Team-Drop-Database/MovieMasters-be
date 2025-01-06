@@ -17,9 +17,14 @@ public class FriendshipDtoMapper {
                 ? friendship.getFriend().getUsername()
                 : friendship.getUser().getUsername();
 
+        String friendProfilePicture = friendship.getUser().getUserId().equals(userId)
+                ? friendship.getFriend().getProfilePicture()
+                : friendship.getUser().getProfilePicture();
+
         return new FriendshipDto(
                 friendship.getId(),
                 friendUsername,
+                friendProfilePicture,
                 friendship.getStatus(),
                 friendship.getFriendshipDate()
         );

@@ -91,7 +91,7 @@ class DefaultFriendshipServiceTest {
     @Test
     void updateFriendshipStatusSuccessfully() throws FriendshipNotFoundException, UserNotFoundException {
         // Arrange
-        FriendshipDto updatedFriendshipDto = new FriendshipDto(mockUser1.getUserId(), mockUser2.getUsername(), FriendshipStatus.ACCEPTED, LocalDateTime.now());
+        FriendshipDto updatedFriendshipDto = new FriendshipDto(mockUser1.getUserId(), mockUser2.getUsername(), null, FriendshipStatus.ACCEPTED, LocalDateTime.now());
         when(userRepository.findByUsername(mockUser2.getUsername())).thenReturn(java.util.Optional.of(mockUser2));
         when(userRepository.findById(mockUser1.getUserId())).thenReturn(java.util.Optional.of(mockUser1));
         when(friendshipRepository.findByUserIdAndFriendId(mockUser2.getUserId(), mockUser1.getUserId())).thenReturn(mockFriendship);
@@ -121,6 +121,7 @@ class DefaultFriendshipServiceTest {
         FriendshipDto expectedFriendshipDto = new FriendshipDto(
                 mockFriendship.getId(),
                 mockFriendship.getFriend().getUsername(),
+                mockFriendship.getFriend().getProfilePicture(),
                 mockFriendship.getStatus(),
                 mockFriendship.getFriendshipDate()
         );
