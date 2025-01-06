@@ -6,9 +6,10 @@ import java.time.LocalDateTime;
 /**
  * Data transfer object that is being returned to the client
  * @param id
+ * @param userId
  * @param friendUsername
  * @param friendProfilePicture
  * @param status
  * @param friendshipDate
  */
-public record FriendshipDto(Long id, String friendUsername, String friendProfilePicture, FriendshipStatus status, LocalDateTime friendshipDate) {}
+public record FriendshipDto(Long id, Long userId, String friendUsername, String friendProfilePicture, FriendshipStatus status, LocalDateTime friendshipDate) {}

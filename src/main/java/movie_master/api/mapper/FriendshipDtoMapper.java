@@ -23,6 +23,7 @@ public class FriendshipDtoMapper {
 
         return new FriendshipDto(
                 friendship.getId(),
+                userId,
                 friendUsername,
                 friendProfilePicture,
                 friendship.getStatus(),
