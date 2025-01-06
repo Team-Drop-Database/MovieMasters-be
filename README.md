@@ -13,6 +13,7 @@ JWT_TESTING=example_jwt_testing
 DEFAULT_USER_NAME=example_username
 DEFAULT_USER_PASSWORD=example_password
 TMDB_API_KEY=<tmdb_api_read_access_token>
+PORT=8080
 ```
 
 ## Getting started
