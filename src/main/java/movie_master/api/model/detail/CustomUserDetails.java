@@ -19,6 +19,7 @@ public class CustomUserDetails implements UserDetails {
     private final String username;
     private final String password;
     private final List<GrantedAuthority> authorities;
+    private final String profilePicture;
     private final boolean enabled;
 
     public CustomUserDetails(User user) {
@@ -26,6 +27,7 @@ public class CustomUserDetails implements UserDetails {
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().toString()));
+        this.profilePicture = user.getProfilePicture();
         this.enabled = user.isEnabled();
     }
 
@@ -45,6 +47,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getPassword() {
         return this.password;
+    }
+
+    public String getProfilePicture() {
+        return this.profilePicture;
     }
 
     @Override
