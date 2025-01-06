@@ -54,10 +54,12 @@ public class AuthControllerTests {
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
         Role role = userDetails.getRole();
+        String profilePicture = userDetails.getProfilePicture();
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
+        claims.put("profileUrl", profilePicture);
 
         String jwt = "jwt";
         String refreshJwt = "refreshJwt";
@@ -96,10 +98,12 @@ public class AuthControllerTests {
         Long userId = userDetails.getUserId();
         String username = userDetails.getUsername();
         Role role = userDetails.getRole();
+        String profilePicture = userDetails.getProfilePicture();
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("role", role);
+        claims.put("profileUrl", profilePicture);
 
         String jwt = "jwt";
 
