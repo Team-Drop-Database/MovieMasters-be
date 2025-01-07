@@ -42,3 +42,7 @@ out/
 
 ## Environment variables
 *.env
+
+# nginx
+nginx/*.crt
+nginx/*.key

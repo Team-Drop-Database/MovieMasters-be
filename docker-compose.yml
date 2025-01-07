@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8082:8082"
     depends_on:
       mysql_db:
         condition: service_healthy
@@ -27,7 +27,7 @@ services:
   mysql_db:
     image: mysql
     ports:
-      - "3306:3306"
+      - "3304:3306"
     environment:
       - MYSQL_DATABASE=movie_master
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
@@ -39,6 +39,19 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 10
       interval: 3s
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx_server_be
+    ports:
+      - "8081:8081"
+      - "8080:8080"
+    depends_on:
+      - app
+      - mysql_db
+    networks:
+      - movie_master_network
 
 volumes:
   mysql-data:
