@@ -146,6 +146,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Delete a user
+     *
+     * @param userId ID of the user to delete
+     * @return - 204 no content if the user is succesfully deleted
+     *         - 404 not found if the user with the given ID does not exist
+     */
     @DeleteMapping("/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable Long userId) {
         try {
