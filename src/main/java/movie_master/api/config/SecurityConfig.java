@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)  // Add the JWT filter
                 .build();
     }
-            
+
     /**
      * Cors configuration
      */
