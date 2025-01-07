@@ -16,6 +16,9 @@ TMDB_API_KEY=<tmdb_api_read_access_token>
 PORT=8080
 ```
 
+## Important note about running the backend in production
+The port number of the backend should be **8082**. This is very important, and it will not work otherwise. The reason is that the way Nginx and Docker Compose are currently configured is, for a large part, still hardcoded. In the future, this should be changed to use environment variables instead.
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
