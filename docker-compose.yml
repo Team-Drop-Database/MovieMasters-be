@@ -46,3 +46,4 @@ volumes:
 networks:
   movie_master_network:
     name: movie_master_network
+    external: true
