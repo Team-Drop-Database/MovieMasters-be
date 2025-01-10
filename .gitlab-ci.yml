@@ -2,6 +2,7 @@ stages:
   - build
 build-job:
   stage: build
+  image: gradle:jdk21
   tags:
     - hva
-  script: echo "hello world"
+  script: mvn package -Dmaven.test.skip=true
