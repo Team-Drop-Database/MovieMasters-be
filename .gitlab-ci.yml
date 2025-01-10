@@ -4,4 +4,4 @@ build-job:
   stage: build
   tags:
     - hva
-  script: "hello world"
+  script: echo "hello world"
