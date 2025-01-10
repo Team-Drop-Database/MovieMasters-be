@@ -1,8 +1,17 @@
 stages:
   - build
+  - test
+
 build-job:
   stage: build
   image: gradle:jdk21
   tags:
     - hva
   script: ./gradlew build -x test
+
+test-job:
+  stage: test
+  image: gradle:jdk21
+  tags:
+    - hva
+  script: ./gradlew --build-cache test
