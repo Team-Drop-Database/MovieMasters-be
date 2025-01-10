@@ -5,4 +5,4 @@ build-job:
   image: gradle:jdk21
   tags:
     - hva
-  script: mvn package -Dmaven.test.skip=true
+  script: gradle build
