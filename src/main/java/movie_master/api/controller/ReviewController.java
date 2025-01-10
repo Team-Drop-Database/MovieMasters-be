@@ -53,7 +53,7 @@ public class ReviewController {
         }
     }
 
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping()
     public ResponseEntity<Object> deleteReview(@RequestParam long reviewId) {
         try {
             service.deleteReview(reviewId);
