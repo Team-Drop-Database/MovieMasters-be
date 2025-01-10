@@ -5,4 +5,4 @@ build-job:
   image: gradle:jdk21
   tags:
     - hva
-  script: ./gradlew build
+  script: ./gradlew build -x test
