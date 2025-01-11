@@ -25,6 +25,4 @@ pull_app_job:
     PORT: 2222
   before_script: chmod 400 $SSH_KEY
   script: 
-    - ssh -o StrictHostKeyChecking=no -i <(echo $SSH_KEY | base64 -d) $SSH_USERNAME@$SSH_HOST -p $PORT "
-      echo Hello World!
-      "
+    - echo $SSH_USERNAME
