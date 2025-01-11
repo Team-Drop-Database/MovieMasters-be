@@ -23,6 +23,6 @@ pull_app_job:
     - hva
   variables:
     PORT: 2222
-  script: ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_KEY" | base64 -d) $SSH_USERNAME@$SSH_HOST -p $PORT "
+  script: ssh -o StrictHostKeyChecking=no -i <(echo $SSH_KEY | base64 -d) $SSH_USERNAME@$SSH_HOST -p $PORT "
     echo Hello World!
     "
