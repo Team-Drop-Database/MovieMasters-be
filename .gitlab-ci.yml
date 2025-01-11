@@ -1,17 +1,28 @@
 stages:
-  - build
-  - test
+  # - build
+  # - test
+  - pull_app
 
-build-job:
-  stage: build
-  image: gradle:jdk21
+# build-job:
+#   stage: build
+#   image: gradle:jdk21
+#   tags:
+#     - hva
+#   script: ./gradlew build -x test
+
+# test-job:
+#   stage: test
+#   image: gradle:jdk21
+#   tags:
+#     - hva
+#   script: ./gradlew --build-cache test
+
+pull_app_job:
+  stage: pull_app
   tags:
     - hva
-  script: ./gradlew build -x test
-
-test-job:
-  stage: test
-  image: gradle:jdk21
-  tags:
-    - hva
-  script: ./gradlew --build-cache test
+  variables:
+    PORT: 2222
+  script: ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USERNAME@$SSH_HOST -p $PORT "
+    echo Hello World!
+    "
