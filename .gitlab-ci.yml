@@ -30,6 +30,5 @@ pull_app_job:
     - chmod 400 $SSH_PRIVATE_KEY
   script: 
     - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY $SSH_USERNAME@$SSH_HOST -p 2222 "
-        cd app/backend
-        git pull
+        cd app/backend && git pull
         "
