@@ -18,11 +18,14 @@ stages:
 #   script: ./gradlew --build-cache test
 
 x_job:
+  image: docker:latest
   stage: x
   tags:
     - hva
   variables:
     PORT: 2222
   before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
     - chmod 400 $SSH_PRIVATE_KEY
-  script: ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY $SSH_USERNAME@$SSH_HOST -p PORT
+  script: ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY $SSH_USERNAME@$SSH_HOST -p 2222
