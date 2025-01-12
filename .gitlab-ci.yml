@@ -18,6 +18,7 @@ stages:
 #   script: ./gradlew --build-cache test
 
 x_job:
+  image: docker:latest
   stage: x
   tags:
     - hva
