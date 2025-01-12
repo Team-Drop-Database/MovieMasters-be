@@ -1,7 +1,7 @@
 stages:
   # - build
   # - test
-  - pull_app
+  - x
 
 # build-job:
 #   stage: build
@@ -17,11 +17,13 @@ stages:
 #     - hva
 #   script: ./gradlew --build-cache test
 
-pull_app_job:
-  stage: pull_app
+x_job:
+  stage: x
   tags:
     - hva
   variables:
     PORT: 2222
-  script: 
-    - ssh
+  before_script: chmod 400 $SSH_PRIVATE_KEY
+  script:
+    - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY $SSH_USERNAME@$SSH_HOST "
+        echo Hello World!"
