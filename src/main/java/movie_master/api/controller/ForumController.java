@@ -1,0 +1,78 @@
+package movie_master.api.controller;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import movie_master.api.exception.UserNotFoundException;
+import movie_master.api.model.Topic;
+import movie_master.api.model.Comment;
+import movie_master.api.service.TopicService;
+import movie_master.api.service.CommentService;
+import movie_master.api.jwt.JwtUtil;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/forum")
+public class ForumController {
+    private final TopicService topicService;
+    private final CommentService commentService;
+    private final JwtUtil jwtUtil;
+
+    public ForumController(TopicService topicService, CommentService commentService, JwtUtil jwtUtil) {
+        this.topicService = topicService;
+        this.commentService = commentService;
+        this.jwtUtil = jwtUtil;
+    }
+
+    @GetMapping("/topics")
+    public ResponseEntity<List<Topic>> getAllTopics() {
+        List<Topic> topics = topicService.getAllTopics();
+        return ResponseEntity.ok(topics);
+    }
+
+    @GetMapping("/topics/{topicId}/comments")
+    public ResponseEntity<Object> getCommentsForTopic(@PathVariable Long topicId) {
+        try {
+            List<Comment> comments = commentService.getCommentsForTopic(topicId);
+            return ResponseEntity.ok(comments);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/topics")
+    public ResponseEntity<Object> createTopic(@Valid @RequestBody Topic request,
+                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
+                                              HttpServletRequest httpServletRequest) {
+        try {
+            Long userId = jwtUtil.getUserId(jwt.replace("Bearer ", ""));
+
+            Topic topic = topicService.createTopic(request.getTitle(), request.getDescription(), userId);
+            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(topic);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/topics/{topicId}/comments")
+    public ResponseEntity<Object> createComment(@PathVariable Long topicId,
+                                                @Valid @RequestBody Comment request,
+                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
+                                                HttpServletRequest httpServletRequest) {
+        try {
+            Long userId = jwtUtil.getUserId(jwt.replace("Bearer ", ""));
+
+            Comment comment = commentService.createComment(request.getContent(), topicId, userId);
+            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(comment);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+}
