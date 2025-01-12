@@ -1,25 +1,25 @@
 stages:
-  # - build
-  # - test
-  - pull_app
+  - build
+  - test
+  - pull_project
 
-# build-job:
-#   stage: build
-#   image: gradle:jdk21
-#   tags:
-#     - hva
-#   script: ./gradlew build -x test
+build-job:
+  stage: build
+  image: gradle:jdk21
+  tags:
+    - hva
+  script: ./gradlew build -x test
 
-# test-job:
-#   stage: test
-#   image: gradle:jdk21
-#   tags:
-#     - hva
-#   script: ./gradlew --build-cache test
+test-job:
+  stage: test
+  image: gradle:jdk21
+  tags:
+    - hva
+  script: ./gradlew --build-cache test
 
-pull_app_job:
-  stage: pull_app
-  image: docker:latest
+pull_project_job:
+  stage: pull_project
+  image: ubuntu:latest
   tags:
     - hva
   variables:
