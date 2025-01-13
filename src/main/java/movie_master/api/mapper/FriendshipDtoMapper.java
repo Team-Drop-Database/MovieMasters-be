@@ -18,11 +18,16 @@ public class FriendshipDtoMapper {
         String username = friendship.getUser().getUsername();
         String friendUsername = isUserFirst ? friendship.getFriend().getUsername() : friendship.getUser().getUsername();
         String friendProfilePicture = isUserFirst ? friendship.getFriend().getProfilePicture() : friendship.getUser().getProfilePicture();
+        
+        Long friendId = friendship.getFriend().getUserId();
+        userId = friendship.getUser().getUserId();
 
         return new FriendshipDto(
                 friendship.getId(),
                 username,
+                userId,
                 friendUsername,
+                friendId,
                 friendProfilePicture,
                 friendship.getStatus(),
                 friendship.getFriendshipDate()
