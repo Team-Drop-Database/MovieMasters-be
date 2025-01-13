@@ -1,7 +1,9 @@
 package movie_master.api.service;
 
+import movie_master.api.dto.Forum.CommentDto;
 import movie_master.api.exception.TopicNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
+import movie_master.api.mapper.CommentDtoMapper;
 import movie_master.api.model.Comment;
 import movie_master.api.model.Topic;
 import movie_master.api.model.User;
@@ -16,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,12 +35,16 @@ class DefaultCommentServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CommentDtoMapper commentDtoMapper;
+
     @InjectMocks
     private DefaultCommentService commentService;
 
     private User mockUser;
     private Topic mockTopic;
     private Comment mockComment;
+    private CommentDto mockCommentDto;
 
     @BeforeEach
     void setup() {
@@ -48,66 +55,82 @@ class DefaultCommentServiceTest {
         mockTopic.setTopicId(1L);
 
         mockComment = new Comment("Test Comment", mockTopic, mockUser);
+        mockComment.setCommentId(1L);
+        mockCommentDto = new CommentDto(
+                mockComment.getCommentId(),
+                mockComment.getContent(),
+                mockUser.getUsername(),
+                mockUser.getProfilePicture(),
+                mockTopic,
+                mockComment.getCreatedAt()
+        );
     }
 
     @Test
     void getCommentsForTopicSuccessfully() throws TopicNotFoundException {
         // Arrange
         List<Comment> mockComments = List.of(mockComment);
-        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(java.util.Optional.of(mockTopic));
+        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(Optional.of(mockTopic));
         when(commentRepository.findAllByTopic(mockTopic)).thenReturn(mockComments);
+        when(commentDtoMapper.toCommentDto(mockComment)).thenReturn(mockCommentDto);
 
         // Act
-        List<Comment> result = commentService.getCommentsForTopic(mockTopic.getTopicId());
+        List<CommentDto> result = commentService.getCommentsForTopic(mockTopic.getTopicId());
 
         // Assert
-        assertEquals(mockComments, result);
+        assertEquals(List.of(mockCommentDto), result);
         verify(commentRepository, times(1)).findAllByTopic(mockTopic);
+        verify(commentDtoMapper, times(1)).toCommentDto(mockComment);
     }
 
     @Test
     void getCommentsForTopicTopicNotFound() {
         // Arrange
-        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(java.util.Optional.empty());
+        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(TopicNotFoundException.class, () -> commentService.getCommentsForTopic(mockTopic.getTopicId()));
+        assertThrows(TopicNotFoundException.class, () ->
+                commentService.getCommentsForTopic(mockTopic.getTopicId()));
         verify(commentRepository, never()).findAllByTopic(any(Topic.class));
     }
 
     @Test
     void createCommentSuccessfully() throws UserNotFoundException, TopicNotFoundException {
         // Arrange
-        when(userRepository.findById(mockUser.getUserId())).thenReturn(java.util.Optional.of(mockUser));
-        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(java.util.Optional.of(mockTopic));
+        when(userRepository.findById(mockUser.getUserId())).thenReturn(Optional.of(mockUser));
+        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(Optional.of(mockTopic));
         when(commentRepository.save(any(Comment.class))).thenReturn(mockComment);
+        when(commentDtoMapper.toCommentDto(mockComment)).thenReturn(mockCommentDto);
 
         // Act
-        Comment result = commentService.createComment("Test Comment", mockTopic.getTopicId(), mockUser.getUserId());
+        CommentDto result = commentService.createComment("Test Comment", mockTopic.getTopicId(), mockUser.getUserId());
 
         // Assert
-        assertEquals(mockComment, result);
+        assertEquals(mockCommentDto, result);
         verify(commentRepository, times(1)).save(any(Comment.class));
+        verify(commentDtoMapper, times(1)).toCommentDto(mockComment);
     }
 
     @Test
     void createCommentUserNotFound() {
         // Arrange
-        when(userRepository.findById(mockUser.getUserId())).thenReturn(java.util.Optional.empty());
+        when(userRepository.findById(mockUser.getUserId())).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(UserNotFoundException.class, () -> commentService.createComment("Test Comment", mockTopic.getTopicId(), mockUser.getUserId()));
+        assertThrows(UserNotFoundException.class, () ->
+                commentService.createComment("Test Comment", mockTopic.getTopicId(), mockUser.getUserId()));
         verify(commentRepository, never()).save(any(Comment.class));
     }
 
     @Test
     void createCommentTopicNotFound() {
         // Arrange
-        when(userRepository.findById(mockUser.getUserId())).thenReturn(java.util.Optional.of(mockUser));
-        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(java.util.Optional.empty());
+        when(userRepository.findById(mockUser.getUserId())).thenReturn(Optional.of(mockUser));
+        when(topicRepository.findById(mockTopic.getTopicId())).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(TopicNotFoundException.class, () -> commentService.createComment("Test Comment", mockTopic.getTopicId(), mockUser.getUserId()));
+        assertThrows(TopicNotFoundException.class, () ->
+                commentService.createComment("Test Comment", mockTopic.getTopicId(), mockUser.getUserId()));
         verify(commentRepository, never()).save(any(Comment.class));
     }
 }

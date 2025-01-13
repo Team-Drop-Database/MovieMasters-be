@@ -1,6 +1,8 @@
 package movie_master.api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import movie_master.api.dto.Forum.CommentDto;
+import movie_master.api.dto.Forum.TopicDto;
 import movie_master.api.exception.TopicNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.model.Comment;
@@ -36,11 +38,12 @@ public class ForumControllerTest {
     private User mockUser1;
     private Topic mockTopic;
     private Comment mockComment;
+    private TopicDto mockTopicDto;
+    private CommentDto mockCommentDto;
 
     @BeforeEach
     void setup() {
-        jwtTokenUser1 = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoxLCJzdWIiOiJ1c2VyMSIsImlhdCI6MTczMzc2Nzc4MCwiZXhwIjoxNzQxNTQzNzgwfQ.0yWfkHVkb9vzQi4Raq-VxNAsKBFuZWBRqC3bR0FgZWI";
-        String jwtTokenUser2 = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoyLCJzdWIiOiJ1c2VyMiIsImlhdCI6MTczMzc2Nzc4MCwiZXhwIjoxNzQxNTQzNzgwfQ.xWFksILDJbDk8E7FXi1JEBuCkS43-G3OQgRhY2lQKkg";
+        jwtTokenUser1 = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoxLCJzdWIiOiJ1c2VyMSIsImlhdCI6MTczMzc2Nzc4MCwiZXhwIjoxNzQxNTQzNzgwfQ.0yWfkHVkb9vzQi4Raq-VxNAsKBFuZWBRqC3bR0FgZWI";
 
         mockUser1 = new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true);
         mockUser1.setUserId(1L);
@@ -52,6 +55,25 @@ public class ForumControllerTest {
 
         mockComment = new Comment("This is a comment", mockTopic, mockUser1);
         mockComment.setCommentId(1L);
+
+        mockTopicDto = new TopicDto(
+                mockTopic.getTopicId(),
+                mockTopic.getTitle(),
+                mockTopic.getDescription(),
+                mockUser1.getUsername(),
+                mockUser1.getProfilePicture(),
+                mockTopic.getComments().size(),
+                null
+        );
+
+        mockCommentDto = new CommentDto(
+                mockComment.getCommentId(),
+                mockComment.getContent(),
+                mockUser1.getUsername(),
+                null,
+                mockTopic,
+                null
+        );
     }
 
     @Test
@@ -60,7 +82,7 @@ public class ForumControllerTest {
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
 
         when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
-        when(topicService.createTopic(mockTopic.getTitle(), mockTopic.getDescription(), mockUser1.getUserId())).thenReturn(mockTopic);
+        when(topicService.createTopic(mockTopic.getTitle(), mockTopic.getDescription(), mockUser1.getUserId())).thenReturn(mockTopicDto);
         when(mockRequest.getRequestURI()).thenReturn("/forum/topics");
 
         // Act
@@ -68,7 +90,7 @@ public class ForumControllerTest {
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(mockTopic, response.getBody());
+        assertEquals(mockTopicDto, response.getBody());
     }
 
     @Test
@@ -77,7 +99,7 @@ public class ForumControllerTest {
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
 
         when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
-        when(commentService.createComment(mockComment.getContent(), mockTopic.getTopicId(), mockUser1.getUserId())).thenReturn(mockComment);
+        when(commentService.createComment(mockComment.getContent(), mockTopic.getTopicId(), mockUser1.getUserId())).thenReturn(mockCommentDto);
         when(mockRequest.getRequestURI()).thenReturn("/forum/topics/1/comments");
 
         // Act
@@ -85,35 +107,35 @@ public class ForumControllerTest {
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(mockComment, response.getBody());
+        assertEquals(mockCommentDto, response.getBody());
     }
 
     @Test
     void getAllTopicsSuccessfully() {
         // Arrange
-        List<Topic> topics = List.of(mockTopic);
-        when(topicService.getAllTopics()).thenReturn(topics);
+        List<TopicDto> topicDtos = List.of(mockTopicDto);
+        when(topicService.getAllTopics()).thenReturn(topicDtos);
 
         // Act
-        ResponseEntity<List<Topic>> response = forumController.getAllTopics();
+        ResponseEntity<List<TopicDto>> response = forumController.getAllTopics();
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(topics, response.getBody());
+        assertEquals(topicDtos, response.getBody());
     }
 
     @Test
     void getCommentsForTopicSuccessfully() throws TopicNotFoundException {
         // Arrange
-        List<Comment> comments = List.of(mockComment);
-        when(commentService.getCommentsForTopic(mockTopic.getTopicId())).thenReturn(comments);
+        List<CommentDto> commentDtos = List.of(mockCommentDto);
+        when(commentService.getCommentsForTopic(mockTopic.getTopicId())).thenReturn(commentDtos);
 
         // Act
         ResponseEntity<Object> response = forumController.getCommentsForTopic(mockTopic.getTopicId());
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(comments, response.getBody());
+        assertEquals(commentDtos, response.getBody());
     }
 
     @Test
