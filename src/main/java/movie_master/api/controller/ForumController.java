@@ -2,6 +2,8 @@ package movie_master.api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import movie_master.api.dto.Forum.CommentDto;
+import movie_master.api.dto.Forum.TopicDto;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.model.Topic;
 import movie_master.api.model.Comment;
@@ -30,15 +32,15 @@ public class ForumController {
     }
 
     @GetMapping("/topics")
-    public ResponseEntity<List<Topic>> getAllTopics() {
-        List<Topic> topics = topicService.getAllTopics();
+    public ResponseEntity<List<TopicDto>> getAllTopics() {
+        List<TopicDto> topics = topicService.getAllTopics();
         return ResponseEntity.ok(topics);
     }
 
     @GetMapping("/topics/{topicId}/comments")
     public ResponseEntity<Object> getCommentsForTopic(@PathVariable Long topicId) {
         try {
-            List<Comment> comments = commentService.getCommentsForTopic(topicId);
+            List<CommentDto> comments = commentService.getCommentsForTopic(topicId);
             return ResponseEntity.ok(comments);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -52,8 +54,8 @@ public class ForumController {
         try {
             Long userId = jwtUtil.getUserId(jwt.replace("Bearer ", ""));
 
-            Topic topic = topicService.createTopic(request.getTitle(), request.getDescription(), userId);
-            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(topic);
+            TopicDto topicDto = topicService.createTopic(request.getTitle(), request.getDescription(), userId);
+            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(topicDto);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());
         } catch (Exception e) {
@@ -69,8 +71,8 @@ public class ForumController {
         try {
             Long userId = jwtUtil.getUserId(jwt.replace("Bearer ", ""));
 
-            Comment comment = commentService.createComment(request.getContent(), topicId, userId);
-            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(comment);
+            CommentDto commentDto = commentService.createComment(request.getContent(), topicId, userId);
+            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(commentDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
