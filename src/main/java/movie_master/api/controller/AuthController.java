@@ -67,7 +67,11 @@ public class AuthController {
             String refreshJwt = jwtUtil.generateRefreshJwt(claims, username);
 
             return ResponseEntity.ok().body(Map.of("accessToken", jwt, "refreshToken", refreshJwt));
-        } catch (BadCredentialsException e) {
+        } catch (BadCredentialsException | BannedAccountException e) {
+            if(e instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Incorrect username and/or password.");
+            }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
