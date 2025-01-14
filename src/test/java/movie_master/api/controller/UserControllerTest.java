@@ -362,4 +362,28 @@ class UserControllerTest {
         // Verify the service method was called once
         Mockito.verify(defaultUserService, Mockito.times(1)).deleteUserById(userId);
     }
+
+    @Test
+    void succes_change_banned_status() throws UserNotFoundException {
+        // Given
+        Long userId = 999L;
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true, true);
+        user.setUserId(userId);
+
+        Map<String, Object> expectedMessage = Map.of(
+            "message", "Succesfully changed banned status",
+            "userId", userId,
+            "banned_status", true,
+            "user_object", user
+        );
+
+        Mockito.when(defaultUserService.updateUserBannedStatus(userId, true)).thenReturn(user);
+
+        // When
+        ResponseEntity<Object> result = userController.updateUserBannedStatus(userId, true);
+
+        // Then
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(expectedMessage, result.getBody());
+    }
 }
