@@ -82,7 +82,8 @@ public class DefaultUserService implements UserService {
                         registerUserRequest.username(),
                         passwordEncoder.encode(registerUserRequest.password()),
                         Role.ROLE_USER,
-                        true
+                        true,
+                        false
                 )
         );
 
