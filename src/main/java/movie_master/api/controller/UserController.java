@@ -288,11 +288,6 @@ public class UserController {
         }
     }
 
-    // @PutMapping("{userEmail}/ban")
-    // public ResponseEntity<Object> banUserByEmail(){
-
-    // } 
-
     /**
      * Generate jwt and refresh token
      *
