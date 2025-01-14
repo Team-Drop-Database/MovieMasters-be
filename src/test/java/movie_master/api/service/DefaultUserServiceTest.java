@@ -332,5 +332,15 @@ public class DefaultUserServiceTest {
         assertTrue(bannedUser.isBanned());
     }
 
+    @Test
+    void fail_change_banned_status() throws UserNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // When & then (verify that it threw the exception)
+        assertThrows(UserNotFoundException.class,
+         () -> defaultUserService.updateUserBannedStatus(userId, true));
+    }
 
 }
