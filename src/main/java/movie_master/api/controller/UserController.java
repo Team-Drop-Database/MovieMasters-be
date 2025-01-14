@@ -6,6 +6,7 @@ import movie_master.api.dto.UserDto;
 import movie_master.api.dto.UserMovie.UserMovieDto;
 import movie_master.api.exception.*;
 import movie_master.api.jwt.JwtUtil;
+import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
 import movie_master.api.request.RegisterUserRequest;
@@ -21,6 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 /**
  * Controller for users
@@ -257,6 +262,36 @@ public class UserController {
                             + e.getMessage());
         }
     }
+
+    /**
+     * 
+     * @param userId id of the user
+     * @param banned boolean value representing the new 
+     * banned-status of the user
+     * @return a response message indicating succes/failure of updating the 
+     * users' banned status, along with the updated user object.
+     */
+    @PutMapping("{userId}/banstatus")
+    public ResponseEntity<Object> updateUserBannedStatus(@PathVariable Long userId, @RequestParam boolean banned){
+        try {
+            User updatedUser = userService.updateUserBannedStatus(userId, banned);
+            return ResponseEntity.ok(Map.of(
+                "message", "Succesfully changed banned status",
+                "userId", userId,
+                "banned_status", updatedUser.isBanned(),
+                "user_object", updatedUser
+            ));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                    .body("Could not update 'banned' status. Exception message: "
+                            + e.getMessage());
+        }
+    }
+
+    // @PutMapping("{userEmail}/ban")
+    // public ResponseEntity<Object> banUserByEmail(){
+
+    // } 
 
     /**
      * Generate jwt and refresh token
