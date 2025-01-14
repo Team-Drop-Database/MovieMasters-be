@@ -4,6 +4,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
+import movie_master.api.exception.BannedAccountException;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.detail.CustomUserDetails;
 import movie_master.api.model.role.Role;
