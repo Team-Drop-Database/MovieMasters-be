@@ -21,6 +21,7 @@ public class CustomUserDetails implements UserDetails {
     private final List<GrantedAuthority> authorities;
     private final String profilePicture;
     private final boolean enabled;
+    private final boolean banned;
 
     public CustomUserDetails(User user) {
         this.userId = user.getUserId();
@@ -29,6 +30,7 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().toString()));
         this.profilePicture = user.getProfilePicture();
         this.enabled = user.isEnabled();
+        this.banned = user.isBanned();
     }
 
     public Long getUserId() {
@@ -37,6 +39,10 @@ public class CustomUserDetails implements UserDetails {
 
     public Role getRole() {
         return Role.valueOf(this.authorities.getFirst().toString());
+    }
+
+    public boolean isBanned() {
+        return this.banned;
     }
 
     @Override

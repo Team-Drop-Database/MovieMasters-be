@@ -50,6 +50,10 @@ public class AuthController {
 
             CustomUserDetails userDetails = (CustomUserDetails) authenticationRequest.getPrincipal();
 
+            if (userDetails.isBanned()) {
+                throw new BannedAccountException();
+            }
+
             Long userId = userDetails.getUserId();
             String username = userDetails.getUsername();
             Role role = userDetails.getRole();
