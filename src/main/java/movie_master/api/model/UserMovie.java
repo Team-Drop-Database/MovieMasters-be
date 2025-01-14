@@ -11,19 +11,18 @@ public class UserMovie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(optional = false)
     @JsonBackReference
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "movie", nullable = false)
     private Movie movie;
 
     @Column(nullable = false)
     private boolean watched;
 
-    @OneToOne
+    @OneToOne(mappedBy = "userMovie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "review")
     private Review review;
 
