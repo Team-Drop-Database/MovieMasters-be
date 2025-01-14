@@ -48,7 +48,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/movies/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/users/{userId}/role").hasRole("MOD")
-                        .anyRequest().authenticated()
                         .requestMatchers(HttpMethod.PUT, "/users/{userId}/banstatus").hasRole("MOD")
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
