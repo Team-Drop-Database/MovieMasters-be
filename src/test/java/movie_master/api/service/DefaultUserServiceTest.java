@@ -313,4 +313,24 @@ public class DefaultUserServiceTest {
         Mockito.verify(userRepository, Mockito.times(1)).existsById(nonExistingId);
     }
 
+    @Test
+    void succes_change_banned_status() throws UserNotFoundException {
+        // Given
+        Long userId = 1337L;
+
+        User user = new User("example@test.mail", "User McNameface",
+         "password1234", Role.ROLE_USER, true, false);
+        user.setUserId(userId);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.save(user)).thenReturn(user);
+
+        // When
+        User bannedUser = defaultUserService.updateUserBannedStatus(userId, true);
+
+        // Then
+        assertTrue(bannedUser.isBanned());
+    }
+
+
 }
