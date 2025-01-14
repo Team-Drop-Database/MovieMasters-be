@@ -344,4 +344,23 @@ public class DefaultUserService implements UserService {
 
         return this.userDtoMapper.apply(updatedUser);
     }
+
+    /**
+     * Updates the 'banned' status of a user. Note that this is meant to be 
+     * exclusively used by endpoints controlled by administrators.
+     */
+    @Override
+    public User updateUserBannedStatus(Long userId, boolean banned) throws UserNotFoundException {
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (userOpt.isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+
+        User user = userOpt.get();
+        user.setBanned(banned);
+        userRepository.save(user);
+
+        return user;
+    }
 }
