@@ -15,7 +15,7 @@ public class Topic {
 
     private String title;
     private String description;
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -25,13 +25,15 @@ public class Topic {
     @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 
-    public Topic() {}
-
     public Topic(String title, String description, User user) {
         this.title = title;
         this.description = description;
         this.user = user;
+        this.createdAt = LocalDateTime.now();
+        this.comments = new HashSet<>();
     }
+
+    public Topic() {}
 
     // Getters en Setters
     public Long getTopicId() {

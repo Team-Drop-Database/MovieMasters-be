@@ -5,8 +5,8 @@ import jakarta.validation.Valid;
 import movie_master.api.dto.Forum.CommentDto;
 import movie_master.api.dto.Forum.TopicDto;
 import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.model.Topic;
 import movie_master.api.model.Comment;
+import movie_master.api.request.TopicRequest;
 import movie_master.api.service.TopicService;
 import movie_master.api.service.CommentService;
 import movie_master.api.jwt.JwtUtil;
@@ -48,13 +48,13 @@ public class ForumController {
     }
 
     @PostMapping("/topics")
-    public ResponseEntity<Object> createTopic(@Valid @RequestBody Topic request,
+    public ResponseEntity<Object> createTopic(@Valid @RequestBody TopicRequest request,
                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
                                               HttpServletRequest httpServletRequest) {
         try {
             Long userId = jwtUtil.getUserId(jwt.replace("Bearer ", ""));
 
-            TopicDto topicDto = topicService.createTopic(request.getTitle(), request.getDescription(), userId);
+            TopicDto topicDto = topicService.createTopic(request.title(), request.description(), userId);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(topicDto);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());

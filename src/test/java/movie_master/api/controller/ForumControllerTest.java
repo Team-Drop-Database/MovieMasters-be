@@ -9,6 +9,7 @@ import movie_master.api.model.Comment;
 import movie_master.api.model.Topic;
 import movie_master.api.model.User;
 import movie_master.api.model.role.Role;
+import movie_master.api.request.TopicRequest;
 import movie_master.api.service.TopicService;
 import movie_master.api.service.CommentService;
 import movie_master.api.jwt.JwtUtil;
@@ -80,13 +81,14 @@ public class ForumControllerTest {
     void createTopicSuccessfully() throws UserNotFoundException {
         // Arrange
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        TopicRequest topicRequest = new TopicRequest(mockTopic.getTitle(), mockTopic.getDescription());
 
         when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
         when(topicService.createTopic(mockTopic.getTitle(), mockTopic.getDescription(), mockUser1.getUserId())).thenReturn(mockTopicDto);
         when(mockRequest.getRequestURI()).thenReturn("/forum/topics");
 
         // Act
-        ResponseEntity<Object> response = forumController.createTopic(mockTopic, jwtTokenUser1, mockRequest);
+        ResponseEntity<Object> response = forumController.createTopic(topicRequest, jwtTokenUser1, mockRequest);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
