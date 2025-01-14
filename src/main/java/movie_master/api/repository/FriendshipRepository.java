@@ -1,8 +1,10 @@
 package movie_master.api.repository;
 
+import jakarta.transaction.Transactional;
 import movie_master.api.model.Friendship;
 import movie_master.api.model.friendship.FriendshipStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -46,4 +48,14 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
      */
     @Query("SELECT f FROM Friendship f WHERE (f.user.userId = :userId AND f.friend.userId = :friendId)")
     Friendship findByUserIdAndFriendId(Long userId, Long friendId);
+
+    /**
+     * Deletes all friendships where the given user is involved.
+     *
+     * @param userId The ID of the user you want to alienate.
+     */
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Friendship f WHERE f.user.userId = :userId OR f.friend.userId = :userId")
+    void deleteFriendshipByUser(Long userId);
 }

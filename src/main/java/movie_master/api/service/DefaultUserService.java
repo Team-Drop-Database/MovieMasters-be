@@ -10,6 +10,7 @@ import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
+import movie_master.api.repository.FriendshipRepository;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.repository.UserRepository;
@@ -31,6 +32,7 @@ public class DefaultUserService implements UserService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final UserMovieRepository userMovieRepository;
+    private final FriendshipRepository friendshipRepository;
 
     // Utilities
     private final PasswordEncoder passwordEncoder;
@@ -40,12 +42,13 @@ public class DefaultUserService implements UserService {
 
     public DefaultUserService(
             UserRepository userRepository, MovieRepository movieRepository,
-            UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
-            UserDtoMapper userDtoMapper, UserMovieDtoMapper userMovieDtoMapper,
+            UserMovieRepository userMovieRepository, FriendshipRepository friendshipRepository,
+            PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper, UserMovieDtoMapper userMovieDtoMapper,
             JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
         this.userMovieRepository = userMovieRepository;
+        this.friendshipRepository = friendshipRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
         this.userMovieDtoMapper = userMovieDtoMapper;
@@ -90,17 +93,16 @@ public class DefaultUserService implements UserService {
     }
 
     /**
-     * Retrieves the watchlist of a given user.
+     * Deletes a user. Removing all traces.
      *
      * @param userId id of the user
-     * @return A set of UserMovie objects representing the
-     * watchlist of this user.
      */
     @Override
     public void deleteUserById(Long userId) throws UserNotFoundException {
         if (!this.userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
+        friendshipRepository.deleteFriendshipByUser(userId);
         userRepository.deleteById(userId);
     }
 
