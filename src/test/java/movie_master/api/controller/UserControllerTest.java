@@ -386,4 +386,24 @@ class UserControllerTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(expectedMessage, result.getBody());
     }
+
+    @Test
+    void fail_change_banned_status() throws UserNotFoundException {
+        // Given
+        Long userId = 999L;
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true, true);
+        user.setUserId(userId);
+        
+        UserNotFoundException exception = new UserNotFoundException(userId);
+        String expectedMessage = "Could not update 'banned' status. Exception message: " + exception.getMessage();
+
+        Mockito.when(defaultUserService.updateUserBannedStatus(userId, true)).thenThrow(exception);
+
+        // When
+        ResponseEntity<Object> result = userController.updateUserBannedStatus(userId, true);
+
+        // Then
+        assertEquals(HttpStatus.NOT_ACCEPTABLE, result.getStatusCode());
+        assertEquals(expectedMessage, result.getBody());
+    }
 }
