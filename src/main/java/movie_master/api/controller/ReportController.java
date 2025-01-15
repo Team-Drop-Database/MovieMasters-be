@@ -54,4 +54,16 @@ public class ReportController {
             return ResponseEntity.internalServerError().body(new GenericResponse(e.getMessage()));
         }
     }
+
+    @DeleteMapping
+    public ResponseEntity<Object> deleteReport(@RequestParam long reportId, @RequestParam boolean banUser) {
+        try {
+            reportService.deleteReport(reportId, banUser);
+            return ResponseEntity.ok(new GenericResponse("Report deleted successfully"));
+        } catch (ReportNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new GenericResponse(e.getMessage()));
+        }
+    }
 }

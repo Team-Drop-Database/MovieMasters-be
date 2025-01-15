@@ -10,7 +10,7 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "reported_user", nullable = false)
     private User reportedUser;
 

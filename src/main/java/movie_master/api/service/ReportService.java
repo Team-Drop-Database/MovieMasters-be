@@ -51,4 +51,17 @@ public class ReportService {
 
         return reportDtoMapper.mapToDto(report);
     }
+
+    public void deleteReport(long reportId, boolean banUser) throws ReportNotFoundException {
+        if (banUser) {
+            Optional<Report> foundReport = reportRepository.findById(reportId);
+            if (foundReport.isEmpty()) { throw new ReportNotFoundException(reportId); }
+            Report report = foundReport.get();
+            User userToBan = report.getReportedUser();
+            userToBan.setBanned(true);
+            userRepository.save(userToBan);
+        }
+
+        reportRepository.deleteById(reportId);
+    }
 }
