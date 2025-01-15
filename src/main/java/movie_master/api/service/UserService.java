@@ -21,6 +21,7 @@ public interface UserService {
     UserDto getUserByUsername(String username) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;
     Set<UserMovieDto> getWatchList(Long userId) throws UserNotFoundException;
+    UserMovieDto getWatchListItem(Long userId, Long movieId) throws UserNotFoundException;
     User findById(Long userId) throws UserNotFoundException;
     List<UserDto> getAllUsers();
     UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest, Long jwtUserId, Role jwtUserRole) throws UnauthorizedException, EmailTakenException, UsernameTakenException, UserNotFoundException;

@@ -183,6 +183,28 @@ public class UserController {
     }
 
     /**
+     * Retrieves the watchlist item of a user by the given movie
+     *
+     * @param userId id of the user
+     * @param movieId id of the movie
+     * @return UserMovieDto
+     */
+    @GetMapping("/{userId}/watchlist/movie/{movieId}")
+    public ResponseEntity<Object> getWatchListItem(@PathVariable Long userId, @PathVariable Long movieId) {
+        try {
+            UserMovieDto watchList = userService.getWatchListItem(userId, movieId);
+
+            if (watchList != null) {
+                return ResponseEntity.ok(watchList);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (UserNotFoundException e) {
+            // Return HTTP code with 404 error message if the user could not be found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    /**
      * Updates the watchlist of a user by adding a movie to it. Essentially an association
      * ('MovieUser') is created between a user and a movie.
      *

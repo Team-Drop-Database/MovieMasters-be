@@ -129,6 +129,32 @@ public class DefaultUserService implements UserService {
     }
 
     /**
+     * Retrieves a watchlist item related to a specific user and movie
+     *
+     * @param userId id of the user
+     * @param movieId id of the movie
+     * @return watchlist item of the specified user and movie
+     */
+    @Override
+    public UserMovieDto getWatchListItem(Long userId, Long movieId) throws UserNotFoundException {
+        // Retrieve the user in Optional form
+        Optional<User> user = userRepository.findById(userId);
+
+        // If it does not exist, throw an exception. Otherwise,
+        // return the watchlist.
+        if (user.isPresent()) {
+            return user.get()
+                    .getWatchList()
+                    .stream()
+                    .filter(userMovie -> userMovie.getMovie().getId() == movieId)
+                    .map(userMovieDtoMapper::mapUserMovieToDto)
+                    .findAny().orElse(null);
+        } else {
+            throw new UserNotFoundException(userId);
+        }
+    }
+
+    /**
      * Adds a movie to the watchlist of a user.
      *
      * @param userId  id of the user
