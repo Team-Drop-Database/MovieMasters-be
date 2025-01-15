@@ -52,4 +52,14 @@ public class ReviewController {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }
+
+    @DeleteMapping()
+    public ResponseEntity<Object> deleteReview(@RequestParam long reviewId) {
+        try {
+            service.deleteReview(reviewId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
