@@ -27,6 +27,7 @@ public class User {
     private LocalDate dateJoined = LocalDate.now();
     private Role role;
     private boolean enabled;
+    private boolean banned;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference      
@@ -38,21 +39,23 @@ public class User {
 
     public User() {}
 
-    public User(String email, String username, String password, Role role, boolean enabled) {
+    public User(String email, String username, String password, Role role, boolean enabled, boolean banned) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.role = role;
         this.enabled = enabled;
+        this.banned = banned;
         watchlist = new HashSet<>();
     }
 
-    public User(String email, String username, String password, Role role, boolean enabled, String profilePicture) {
+    public User(String email, String username, String password, Role role, boolean enabled, boolean banned, String profilePicture) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.role = role;
         this.enabled = enabled;
+        this.banned = banned;
         this.profilePicture = profilePicture;
         watchlist = new HashSet<>();
     }
@@ -102,6 +105,10 @@ public class User {
         return enabled;
     }
 
+    public boolean isBanned() {
+        return banned;
+    }
+
     public void addMovieToWatchlist(UserMovie movie) {
         watchlist.add(movie);
         movie.setUser(this);
@@ -125,6 +132,10 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
     }
 
     public void setProfilePicture(String profilePicture) {

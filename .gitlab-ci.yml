@@ -1,0 +1,41 @@
+stages:
+  - build
+  - pull_project
+  - deploy
+
+build-job:
+  stage: build
+  image: gradle:jdk21-alpine
+  tags:
+    - hva
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      when: always
+  script: ./gradlew build -x test
+
+pull_project_job:
+  stage: pull_project
+  image: ubuntu:latest
+  tags:
+    - hva
+  only: 
+    - main
+  before_script:
+    - apt-get update -y && apt-get install openssh-client -y && apt-get install sshpass -y
+  script: 
+    - sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST -p 2222 "
+        cd ../movieadmin/app/backend && git pull
+        "
+deploy_job:
+  stage: deploy
+  image: ubuntu:latest
+  tags:
+    - hva
+  only:
+    - main
+  before_script:
+    - apt-get update -y && apt-get install openssh-client -y && apt-get install sshpass -y
+  script: 
+    - sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST -p 2222 "
+        cd ../movieadmin/app/backend && docker compose down --rmi all -v && docker compose build && docker compose up -d
+        "
