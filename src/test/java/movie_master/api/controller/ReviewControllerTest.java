@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -107,5 +108,38 @@ class ReviewControllerTest {
 
         // Then
         assertEquals(result.getBody(), exception.getMessage());
+    }
+
+    @Test
+    void deleteReviewSuccessfulTest() {
+        // Given
+        long reviewId = easyRandom.nextObject(Long.class);
+
+        // No exception is expected when the service deletes the review
+        Mockito.doNothing().when(service).deleteReview(reviewId);
+
+        // When
+        ResponseEntity<Object> result = controller.deleteReview(reviewId);
+
+        // Then
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+        Mockito.verify(service).deleteReview(reviewId);
+    }
+
+    @Test
+    void deleteReviewFailureTest() {
+        // Given
+        long reviewId = easyRandom.nextObject(Long.class);
+        RuntimeException exception = new RuntimeException("Error deleting review");
+
+        // Mock service throwing an exception
+        Mockito.doThrow(exception).when(service).deleteReview(reviewId);
+
+        // When
+        ResponseEntity<Object> result = controller.deleteReview(reviewId);
+
+        // Then
+        assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+        Mockito.verify(service).deleteReview(reviewId);
     }
 }

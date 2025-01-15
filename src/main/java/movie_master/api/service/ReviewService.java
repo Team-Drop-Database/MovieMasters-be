@@ -1,5 +1,6 @@
 package movie_master.api.service;
 
+import jakarta.transaction.Transactional;
 import movie_master.api.dto.ReviewDto;
 import movie_master.api.exception.MovieNotInWatchlistException;
 import movie_master.api.exception.UserNotFoundException;
@@ -114,5 +115,20 @@ public class ReviewService {
         userMovieRepository.save(foundUserMovie);
 
         return mapper.mapToDTO(storedReview);
+    }
+
+    @Transactional
+    public void deleteReview(long reviewId) {
+        // Find the review and its associated UserMovie
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+        UserMovie userMovie = review.getUserMovie();
+
+        // Remove the review from the UserMovie
+        userMovie.setReview(null);
+        userMovieRepository.save(userMovie);
+
+        // Delete the review
+        reviewRepository.deleteById(reviewId);
     }
 }
