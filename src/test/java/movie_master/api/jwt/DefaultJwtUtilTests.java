@@ -27,7 +27,7 @@ public class DefaultJwtUtilTests {
 
     @BeforeEach
     void setup() {
-        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true);
+        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true, false);
         user.setUserId(1L);
         CustomUserDetails userDetails = new CustomUserDetails(user);
         userId = userDetails.getUserId();

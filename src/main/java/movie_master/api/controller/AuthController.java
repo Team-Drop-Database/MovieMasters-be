@@ -4,6 +4,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
+import movie_master.api.exception.BannedAccountException;
 import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.detail.CustomUserDetails;
 import movie_master.api.model.role.Role;
@@ -49,6 +50,10 @@ public class AuthController {
 
             CustomUserDetails userDetails = (CustomUserDetails) authenticationRequest.getPrincipal();
 
+            if (userDetails.isBanned()) {
+                throw new BannedAccountException();
+            }
+
             Long userId = userDetails.getUserId();
             String username = userDetails.getUsername();
             Role role = userDetails.getRole();
@@ -62,7 +67,11 @@ public class AuthController {
             String refreshJwt = jwtUtil.generateRefreshJwt(claims, username);
 
             return ResponseEntity.ok().body(Map.of("accessToken", jwt, "refreshToken", refreshJwt));
-        } catch (BadCredentialsException e) {
+        } catch (BadCredentialsException | BannedAccountException e) {
+            if(e instanceof BadCredentialsException) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Incorrect username and/or password.");
+            }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }

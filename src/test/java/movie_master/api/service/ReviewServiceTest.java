@@ -189,6 +189,7 @@ class ReviewServiceTest {
                 easyRandom.nextObject(String.class),
                 easyRandom.nextObject(String.class),
                 easyRandom.nextObject(Role.class),
+                easyRandom.nextBoolean(),
                 easyRandom.nextBoolean()
         );
 
