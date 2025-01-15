@@ -46,9 +46,9 @@ public class ForumControllerTest {
     void setup() {
         jwtTokenUser1 = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoxLCJzdWIiOiJ1c2VyMSIsImlhdCI6MTczMzc2Nzc4MCwiZXhwIjoxNzQxNTQzNzgwfQ.0yWfkHVkb9vzQi4Raq-VxNAsKBFuZWBRqC3bR0FgZWI";
 
-        mockUser1 = new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true);
+        mockUser1 = new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true, false);
         mockUser1.setUserId(1L);
-        User mockUser2 = new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true);
+        User mockUser2 = new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true, false);
         mockUser2.setUserId(2L);
 
         mockTopic = new Topic("Sample Topic", "This is a sample topic description", mockUser1);
@@ -125,6 +125,34 @@ public class ForumControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(topicDtos, response.getBody());
     }
+
+    @Test
+    void getTopicByIdSuccessfully() throws TopicNotFoundException {
+        // Arrange
+        when(topicService.getTopicById(mockTopic.getTopicId())).thenReturn(mockTopicDto);
+
+        // Act
+        ResponseEntity<Object> response = forumController.getTopicById(mockTopic.getTopicId());
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockTopicDto, response.getBody());
+    }
+
+    @Test
+    void getTopicByIdFailure() throws TopicNotFoundException {
+        // Arrange
+        Long invalidTopicId = 999L;
+        when(topicService.getTopicById(invalidTopicId)).thenThrow(new TopicNotFoundException(invalidTopicId));
+
+        // Act
+        ResponseEntity<Object> response = forumController.getTopicById(invalidTopicId);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Topic with id '999' does not exist", response.getBody());
+    }
+
 
     @Test
     void getCommentsForTopicSuccessfully() throws TopicNotFoundException {

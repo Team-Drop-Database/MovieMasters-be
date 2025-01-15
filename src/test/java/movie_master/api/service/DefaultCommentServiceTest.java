@@ -48,7 +48,7 @@ class DefaultCommentServiceTest {
 
     @BeforeEach
     void setup() {
-        mockUser = new User("user1@gmail.com", "user1", "password1", null, true);
+        mockUser = new User("user1@gmail.com", "user1", "password1", null, true, false);
         mockUser.setUserId(1L);
 
         mockTopic = new Topic("Test Title", "Test Description", mockUser);

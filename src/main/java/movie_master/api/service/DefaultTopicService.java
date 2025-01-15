@@ -1,6 +1,7 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.Forum.TopicDto;
+import movie_master.api.exception.TopicNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.mapper.TopicDtoMapper;
 import movie_master.api.model.Topic;
@@ -31,6 +32,13 @@ public class DefaultTopicService implements TopicService {
         return topics.stream()
                 .map(this.topicDtoMapper::toTopicDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public TopicDto getTopicById(Long topicId) throws TopicNotFoundException {
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new TopicNotFoundException(topicId));
+        return this.topicDtoMapper.toTopicDto(topic);
     }
 
     @Override

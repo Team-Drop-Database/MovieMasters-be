@@ -1,6 +1,7 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.Forum.TopicDto;
+import movie_master.api.exception.TopicNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.mapper.TopicDtoMapper;
 import movie_master.api.model.Topic;
@@ -41,7 +42,7 @@ class DefaultTopicServiceTest {
 
     @BeforeEach
     void setup() {
-        mockUser = new User("user1@gmail.com", "user1", "password1", null, true);
+        mockUser = new User("user1@gmail.com", "user1", "password1", null, true, false);
         mockUser.setUserId(1L);
 
         mockTopic = new Topic("Test Title", "Test Description", mockUser);
@@ -99,5 +100,33 @@ class DefaultTopicServiceTest {
         assertThrows(UserNotFoundException.class, () ->
                 topicService.createTopic("Test Title", "Test Description", mockUser.getUserId()));
         verify(topicRepository, never()).save(any(Topic.class));
+    }
+
+    @Test
+    void getTopicByIdSuccessfully() throws TopicNotFoundException {
+        // Arrange
+        Long topicId = 1L;
+        when(topicRepository.findById(topicId)).thenReturn(Optional.of(mockTopic));
+        when(topicDtoMapper.toTopicDto(mockTopic)).thenReturn(mockTopicDto);
+
+        // Act
+        TopicDto result = topicService.getTopicById(topicId);
+
+        // Assert
+        assertEquals(mockTopicDto, result);
+        verify(topicRepository, times(1)).findById(topicId);
+        verify(topicDtoMapper, times(1)).toTopicDto(mockTopic);
+    }
+
+    @Test
+    void getTopicByIdTopicNotFound() {
+        // Arrange
+        Long topicId = 999L; 
+        when(topicRepository.findById(topicId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(TopicNotFoundException.class, () -> topicService.getTopicById(topicId));
+        verify(topicRepository, times(1)).findById(topicId);
+        verify(topicDtoMapper, never()).toTopicDto(any());
     }
 }

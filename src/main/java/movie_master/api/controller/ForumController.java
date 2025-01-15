@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import movie_master.api.dto.Forum.CommentDto;
 import movie_master.api.dto.Forum.TopicDto;
+import movie_master.api.exception.TopicNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.model.Comment;
 import movie_master.api.request.TopicRequest;
@@ -37,6 +38,18 @@ public class ForumController {
         return ResponseEntity.ok(topics);
     }
 
+    @GetMapping("/topics/{topicId}")
+    public ResponseEntity<Object> getTopicById(@PathVariable Long topicId) {
+        try {
+            TopicDto topic = topicService.getTopicById(topicId);
+            return ResponseEntity.ok(topic);
+        } catch (TopicNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/topics/{topicId}/comments")
     public ResponseEntity<Object> getCommentsForTopic(@PathVariable Long topicId) {
         try {
@@ -57,7 +70,7 @@ public class ForumController {
             TopicDto topicDto = topicService.createTopic(request.title(), request.description(), userId);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(topicDto);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
