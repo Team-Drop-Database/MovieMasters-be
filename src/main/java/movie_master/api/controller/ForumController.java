@@ -6,7 +6,6 @@ import movie_master.api.dto.Forum.CommentDto;
 import movie_master.api.dto.Forum.TopicDto;
 import movie_master.api.exception.TopicNotFoundException;
 import movie_master.api.exception.UserNotFoundException;
-import movie_master.api.model.Comment;
 import movie_master.api.request.TopicRequest;
 import movie_master.api.service.TopicService;
 import movie_master.api.service.CommentService;
@@ -78,13 +77,13 @@ public class ForumController {
 
     @PostMapping("/topics/{topicId}/comments")
     public ResponseEntity<Object> createComment(@PathVariable Long topicId,
-                                                @Valid @RequestBody Comment request,
+                                                @Valid @RequestBody String content,
                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
                                                 HttpServletRequest httpServletRequest) {
         try {
             Long userId = jwtUtil.getUserId(jwt.replace("Bearer ", ""));
 
-            CommentDto commentDto = commentService.createComment(request.getContent(), topicId, userId);
+            CommentDto commentDto = commentService.createComment(content, topicId, userId);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(commentDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

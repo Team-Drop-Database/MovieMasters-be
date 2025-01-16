@@ -104,7 +104,7 @@ public class ForumControllerTest {
         when(mockRequest.getRequestURI()).thenReturn("/forum/topics/1/comments");
 
         // Act
-        ResponseEntity<Object> response = forumController.createComment(mockTopic.getTopicId(), mockComment, jwtTokenUser1, mockRequest);
+        ResponseEntity<Object> response = forumController.createComment(mockTopic.getTopicId(), mockComment.getContent(), jwtTokenUser1, mockRequest);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
