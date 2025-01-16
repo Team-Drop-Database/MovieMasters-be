@@ -82,7 +82,8 @@ public class DefaultUserService implements UserService {
                         registerUserRequest.username(),
                         passwordEncoder.encode(registerUserRequest.password()),
                         Role.ROLE_USER,
-                        true
+                        true,
+                        false
                 )
         );
 
@@ -123,6 +124,32 @@ public class DefaultUserService implements UserService {
             return user.get().getWatchList().stream()
                 .map(userMovieDtoMapper::mapUserMovieToDto)
                 .collect(Collectors.toSet());
+        } else {
+            throw new UserNotFoundException(userId);
+        }
+    }
+
+    /**
+     * Retrieves a watchlist item related to a specific user and movie
+     *
+     * @param userId id of the user
+     * @param movieId id of the movie
+     * @return watchlist item of the specified user and movie
+     */
+    @Override
+    public UserMovieDto getWatchListItem(Long userId, Long movieId) throws UserNotFoundException {
+        // Retrieve the user in Optional form
+        Optional<User> user = userRepository.findById(userId);
+
+        // If it does not exist, throw an exception. Otherwise,
+        // return the watchlist.
+        if (user.isPresent()) {
+            return user.get()
+                    .getWatchList()
+                    .stream()
+                    .filter(userMovie -> userMovie.getMovie().getId() == movieId)
+                    .map(userMovieDtoMapper::mapUserMovieToDto)
+                    .findAny().orElse(null);
         } else {
             throw new UserNotFoundException(userId);
         }
@@ -342,5 +369,24 @@ public class DefaultUserService implements UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         return this.userDtoMapper.apply(updatedUser);
+    }
+
+    /**
+     * Updates the 'banned' status of a user. Note that this is meant to be 
+     * exclusively used by endpoints controlled by administrators.
+     */
+    @Override
+    public User updateUserBannedStatus(Long userId, boolean banned) throws UserNotFoundException {
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (userOpt.isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+
+        User user = userOpt.get();
+        user.setBanned(banned);
+        userRepository.save(user);
+
+        return user;
     }
 }

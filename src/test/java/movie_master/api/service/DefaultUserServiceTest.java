@@ -60,14 +60,16 @@ public class DefaultUserServiceTest {
             registerRequest.username(),
             encodedPassword,
             Role.ROLE_USER,
-            true
+            true,
+            false
         );
         User createdUser = new User(
             "ervin.@gmail.com",
             "dedede",
             encodedPassword,
             Role.ROLE_USER,
-            true
+            true,
+            false
         );
         UserDto userDto = new UserDto(
             userToCreate.getUserId(),
@@ -118,7 +120,7 @@ public class DefaultUserServiceTest {
     void retrieveWatchlistSuccessfully() throws UserNotFoundException {
         // Given
         Long userId = 69L;
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true, false);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         Movie movie2 = new Movie(2, "Lock Stock & Two Smoking Barrels", "Fun adventures", Date.from(Instant.now()), "en-EN", "there", 9);
         Movie movie3 = new Movie(3, "Se7en", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
@@ -164,7 +166,7 @@ public class DefaultUserServiceTest {
         Long userId = 1337L;
         Long movieId = 1L;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true, false);
         user.setUserId(userId);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         UserMovie userMovie = new UserMovie(user, movie1, false);
@@ -187,7 +189,7 @@ public class DefaultUserServiceTest {
         Long userId = 1337L;
         Long movieId = 7L;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true, false);
         user.setUserId(userId);
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
         UserMovie userMovie = new UserMovie(user, movie1, false);
@@ -211,7 +213,7 @@ public class DefaultUserServiceTest {
 
         final int CORRECT_MOVIES_AMOUNT = 2;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true, false);
         user.setUserId(userId);
 
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
@@ -243,7 +245,7 @@ public class DefaultUserServiceTest {
 
         final int CORRECT_MOVIES_AMOUNT = 3;
 
-        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true);
+        User user = new User("example@test.mail", "User McNameface", "password1234", Role.ROLE_USER, true, false);
         user.setUserId(userId);
 
         Movie movie1 = new Movie(1, "Pulp Fiction", "Fun adventures", Date.from(Instant.now()), "en-US", "there", 9);
@@ -270,7 +272,7 @@ public class DefaultUserServiceTest {
     @Test
     void delete_user_succes() throws UserNotFoundException {
         Long userId = 1L;
-        User existingUser = new User("existinguser@test.com", "existinguser", "password1234", Role.ROLE_USER, true);
+        User existingUser = new User("existinguser@test.com", "existinguser", "password1234", Role.ROLE_USER, true, false);
 
         // Mock repository interactions, making sure the user exists
         Mockito.when(userRepository.existsById(userId)).thenReturn(true);
@@ -309,6 +311,36 @@ public class DefaultUserServiceTest {
 
         // Verify that existsById was called to check if the user exists
         Mockito.verify(userRepository, Mockito.times(1)).existsById(nonExistingId);
+    }
+
+    @Test
+    void succes_change_banned_status() throws UserNotFoundException {
+        // Given
+        Long userId = 1337L;
+
+        User user = new User("example@test.mail", "User McNameface",
+         "password1234", Role.ROLE_USER, true, false);
+        user.setUserId(userId);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.save(user)).thenReturn(user);
+
+        // When
+        User bannedUser = defaultUserService.updateUserBannedStatus(userId, true);
+
+        // Then
+        assertTrue(bannedUser.isBanned());
+    }
+
+    @Test
+    void fail_change_banned_status() throws UserNotFoundException {
+        // Given
+        Long userId = 1337L;
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // When & then (verify that it threw the exception)
+        assertThrows(UserNotFoundException.class,
+         () -> defaultUserService.updateUserBannedStatus(userId, true));
     }
 
 }

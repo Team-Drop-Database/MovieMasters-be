@@ -47,10 +47,10 @@ class DefaultFriendshipServiceTest {
     @BeforeEach
     void setup() {
         // Arrange: Create test users and friendships
-        mockUser1 = new User("user1@gmail.com", "user1", "password1", null, true);
+        mockUser1 = new User("user1@gmail.com", "user1", "password1", null, true, false);
         mockUser1.setUserId(1L);
 
-        mockUser2 = new User("user2@gmail.com", "user2", "password2", null, true);
+        mockUser2 = new User("user2@gmail.com", "user2", "password2", null, true, false);
         mockUser2.setUserId(2L);
 
         mockFriendship = new Friendship(mockUser1, mockUser2, FriendshipStatus.PENDING);

@@ -41,7 +41,7 @@ public class AuthControllerTests {
 
     @BeforeEach
     void setup() {
-        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true, "www.image.com/image.png");
+        User user = new User("mock@gmail.com", "mock", "mocked", Role.ROLE_USER, true, false, "www.image.com/image.png");
         userDetails = new CustomUserDetails(user);
         refreshJwtRequest = new RefreshJwtRequest("refreshJwt");
     }

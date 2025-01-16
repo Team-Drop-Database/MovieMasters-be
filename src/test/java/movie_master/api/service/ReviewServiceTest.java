@@ -189,6 +189,7 @@ class ReviewServiceTest {
                 easyRandom.nextObject(String.class),
                 easyRandom.nextObject(String.class),
                 easyRandom.nextObject(Role.class),
+                easyRandom.nextBoolean(),
                 easyRandom.nextBoolean()
         );
 
@@ -196,5 +197,38 @@ class ReviewServiceTest {
 
         // When -> Then
         assertThrows(MovieNotInWatchlistException.class, () -> reviewService.postReview(request));
+    }
+
+    @Test
+    void canDeleteReviewSuccessfully() {
+        // Given
+        long reviewId = easyRandom.nextLong();
+        Review review = easyRandom.nextObject(Review.class);
+        UserMovie userMovie = Mockito.mock(UserMovie.class);
+        review.setUserMovie(userMovie);
+
+        Mockito.when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
+
+        // When
+        reviewService.deleteReview(reviewId);
+
+        // Then
+        Mockito.verify(reviewRepository).findById(reviewId);
+        Mockito.verify(userMovie).setReview(null); // Verify interaction
+        Mockito.verify(userMovieRepository).save(userMovie);
+        Mockito.verify(reviewRepository).deleteById(reviewId);
+    }
+
+    @Test
+    void cannotDeleteReviewWhenNotFound() {
+        // Given
+        long reviewId = easyRandom.nextLong();
+
+        Mockito.when(reviewRepository.findById(reviewId)).thenReturn(Optional.empty());
+
+        // When -> Then
+        assertThrows(RuntimeException.class, () -> reviewService.deleteReview(reviewId));
+        Mockito.verify(reviewRepository).findById(reviewId);
+        Mockito.verifyNoInteractions(userMovieRepository);
     }
 }

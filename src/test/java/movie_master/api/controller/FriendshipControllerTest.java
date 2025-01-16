@@ -47,11 +47,11 @@ public class FriendshipControllerTest {
         jwtTokenUser2 = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcklkIjoyLCJzdWIiOiJ1c2VyMiIsImlh" +
                 "dCI6MTczMzc2Nzc4MCwiZXhwIjoxNzQxNTQzNzgwfQ.xWFksILDJbDk8E7FXi1JEBuCkS43-G3OQgRhY2lQKkg";
 
-        mockUser1 = new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true);
+        mockUser1 = new User("user1@gmail.com", "user1", "password1", Role.ROLE_USER, true, false);
         mockUser1.setUserId(1L);
-        mockUser2 = new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true);
+        mockUser2 = new User("user2@gmail.com", "user2", "password2", Role.ROLE_USER, true, false);
         mockUser2.setUserId(2L);
-        mockUser3 = new User("user3@gmail.com", "user3", "password3", Role.ROLE_USER, true);
+        mockUser3 = new User("user3@gmail.com", "user3", "password3", Role.ROLE_USER, true, false);
         mockUser3.setUserId(3L);
     }
 

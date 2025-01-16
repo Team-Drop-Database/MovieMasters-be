@@ -20,7 +20,9 @@ public interface UserService {
     UserDto getUserByEmail(String email) throws EmailNotFoundException;
     UserDto getUserByUsername(String username) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;
+    User updateUserBannedStatus(Long userId, boolean banned) throws UserNotFoundException;
     Set<UserMovieDto> getWatchList(Long userId) throws UserNotFoundException;
+    UserMovieDto getWatchListItem(Long userId, Long movieId) throws UserNotFoundException;
     User findById(Long userId) throws UserNotFoundException;
     List<UserDto> getAllUsers();
     UserDto updateUser(Long userId, UpdateUserRequest updateUserRequest, Long jwtUserId, Role jwtUserRole) throws UnauthorizedException, EmailTakenException, UsernameTakenException, UserNotFoundException;
