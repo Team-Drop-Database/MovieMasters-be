@@ -7,9 +7,10 @@ import java.time.LocalDateTime;
  * Data transfer object that is being returned to the client
  * @param id
  * @param username
+ * @param userId
  * @param friendUsername
+ * @param friendid
  * @param friendProfilePicture
- * @param friendId
  * @param status
  * @param friendshipDate
  */
