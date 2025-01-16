@@ -58,7 +58,7 @@ public class FriendshipControllerTest {
     @Test
     void addFriendSuccessfully() throws UserNotFoundException, FriendshipAlreadyExistsException, UserCannotFriendThemself {
         // Arrange
-        FriendshipDto friendshipDto = new FriendshipDto(mockUser1.getUserId(), null, mockUser2.getUsername(), null,
+        FriendshipDto friendshipDto = new FriendshipDto(mockUser1.getUserId(), mockUser1.getUsername(), mockUser1.getUserId(), mockUser2.getUsername(), mockUser2.getUserId(),null,
                 FriendshipStatus.PENDING, LocalDateTime.now());
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
 
@@ -80,8 +80,8 @@ public class FriendshipControllerTest {
     @Test
     void updateFriendshipStatusSuccessfully() throws UserNotFoundException, FriendshipNotFoundException {
         // Arrange
-        FriendshipDto updatedFriendshipDto = new FriendshipDto(mockUser1.getUserId(), mockUser1.getUsername(), mockUser2.getUsername(), null,
-                FriendshipStatus.ACCEPTED, LocalDateTime.now());
+        FriendshipDto updatedFriendshipDto = new FriendshipDto(mockUser1.getUserId(), mockUser1.getUsername(), mockUser1.getUserId(), mockUser2.getUsername(), mockUser2.getUserId(),null,
+                FriendshipStatus.PENDING, LocalDateTime.now());
         when(jwtUtil.getUserId(jwtTokenUser2.replace("Bearer ", ""))).thenReturn(mockUser2.getUserId());
         when(defaultFriendshipService.updateFriendshipStatus(mockUser1.getUsername(), mockUser2.getUserId(), FriendshipStatus.ACCEPTED)).thenReturn(updatedFriendshipDto);
 
@@ -119,8 +119,8 @@ public class FriendshipControllerTest {
     void getFriendsByStatusSuccessfully() {
         // Arrange
         List<FriendshipDto> friends = List.of(
-                new FriendshipDto(1L, mockUser1.getUsername(), mockUser2.getUsername(), null, FriendshipStatus.ACCEPTED, LocalDateTime.now()),
-                new FriendshipDto(2L, mockUser2.getUsername(), mockUser3.getUsername(), null, FriendshipStatus.ACCEPTED, LocalDateTime.now())
+                new FriendshipDto(1L, mockUser1.getUsername(), mockUser1.getUserId(), mockUser2.getUsername(), mockUser2.getUserId(), null, FriendshipStatus.ACCEPTED, LocalDateTime.now()),
+                new FriendshipDto(1L, mockUser2.getUsername(), mockUser2.getUserId(), mockUser3.getUsername(), mockUser3.getUserId(), null, FriendshipStatus.ACCEPTED, LocalDateTime.now())
         );
         when(jwtUtil.getUserId(jwtTokenUser1.replace("Bearer ", ""))).thenReturn(mockUser1.getUserId());
         when(defaultFriendshipService.getFriendsByStatus(mockUser1.getUserId(), FriendshipStatus.ACCEPTED)).thenReturn(friends);
