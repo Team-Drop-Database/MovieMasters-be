@@ -72,7 +72,6 @@ public class ForumControllerTest {
                 mockComment.getContent(),
                 mockUser1.getUsername(),
                 null,
-                mockTopic,
                 null
         );
     }

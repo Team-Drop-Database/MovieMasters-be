@@ -61,7 +61,6 @@ class DefaultCommentServiceTest {
                 mockComment.getContent(),
                 mockUser.getUsername(),
                 mockUser.getProfilePicture(),
-                mockTopic,
                 mockComment.getCreatedAt()
         );
     }

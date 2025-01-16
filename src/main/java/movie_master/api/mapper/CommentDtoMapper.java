@@ -18,7 +18,6 @@ public class CommentDtoMapper {
                 comment.getContent(),
                 comment.getUser().getUsername(),
                 comment.getUser().getProfilePicture(),
-                comment.getTopic(),
                 comment.getCreatedAt()
         );
     }
