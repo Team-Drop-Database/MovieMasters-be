@@ -13,4 +13,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByTitleContaining(String title, Pageable pageable);
 
     long countByTitleContaining(String title);
+
+    Movie findByTitle(String title);
 }

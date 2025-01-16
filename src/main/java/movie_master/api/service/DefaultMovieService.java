@@ -1,5 +1,6 @@
 package movie_master.api.service;
 
+import movie_master.api.exception.DuplicateMovieException;
 import movie_master.api.model.Movie;
 import movie_master.api.repository.MovieRepository;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +31,12 @@ public class DefaultMovieService implements MovieService {
         movieRepository.deleteById(id);
     }
 
-    public Movie save(Movie movie) {
+    public Movie save(Movie movie) throws DuplicateMovieException {
+        Movie existingMovie = movieRepository.findByTitle(movie.getTitle());
+
+        if (existingMovie != null) {
+            throw new DuplicateMovieException(movie.getTitle());
+        }
         return movieRepository.save(movie);
     }
 
