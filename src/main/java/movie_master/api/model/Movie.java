@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 import java.util.Date;
@@ -30,6 +33,14 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     private Set<UserMovie> userMovies;
+
+    @ManyToMany
+    @JoinTable(
+        name = "movie_genre",
+        joinColumns = @JoinColumn(name = "movie_id"),
+        inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private Set<Genre> genres;
 
     public Movie(long id, String title, String description, Date releaseDate, String language, String posterPath, double tmdbRating) {
         this.id = id;

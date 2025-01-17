@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import movie_master.api.dto.UserDto;
+import movie_master.api.model.Genre;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
+import movie_master.api.repository.GenreRepository;
 import movie_master.api.repository.MovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataLoader implements ApplicationRunner {
     private final MovieRepository movieRepository;
+    private final GenreRepository genreRepository;
     private final UserService userService;
     private final UserRepository userRepository;
 
@@ -42,14 +45,23 @@ public class DataLoader implements ApplicationRunner {
     private String password;
 
     @Autowired
-    public DataLoader(MovieRepository movieRepository,
+    public DataLoader(MovieRepository movieRepository, GenreRepository genreRepository, 
                       UserService userService, UserRepository userRepository) {
         this.movieRepository = movieRepository;
+        this.genreRepository = genreRepository;
         this.userService = userService;
         this.userRepository = userRepository;
     }
 
     public void run(ApplicationArguments args) {
+        List<Genre> genres = genreRepository.findAll();
+        if (genres.isEmpty()) {
+            if (apiKey.isEmpty()) {
+                throw new IllegalArgumentException("Add TMDB_API_KEY to your env variables");
+            }
+            AddGenres();
+        }
+
         List<Movie> movies = movieRepository.findAll();
         if (movies.isEmpty()) {
             if (apiKey.isEmpty()) {
@@ -90,6 +102,34 @@ public class DataLoader implements ApplicationRunner {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
                 movieRepository.save(movie);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Adds genres to the database
+     */
+    public void AddGenres() {
+        OkHttpClient client = new OkHttpClient();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Request request = new Request.Builder()
+        .url("https://api.themoviedb.org/3/genre/movie/list?language=en")
+        .get()
+        .addHeader("accept", "application/json")
+        .addHeader("Authorization", "Bearer %s".formatted(apiKey))
+        .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            assert response.body() != null;
+
+            // Iterating over the movies and adding them to the database
+            JsonNode arrayNode = objectMapper.readTree(response.body().string()).get("genres");
+            for (JsonNode node : arrayNode) {
+                Genre genre = objectMapper.treeToValue(node, Genre.class);
+                genreRepository.save(genre);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
