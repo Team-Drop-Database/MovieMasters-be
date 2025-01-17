@@ -18,8 +18,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +103,30 @@ public class DataLoader implements ApplicationRunner {
             for (JsonNode node : arrayNode) {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
+
+                // Access the "numbers" array
+                JsonNode idsNode = node.get("genre_ids");
+
+                // Extract the array as a list of integers
+                List<Long> ids = new ArrayList<>();
+                if (idsNode != null && idsNode.isArray()) {
+                    for (JsonNode numberNode : idsNode) {
+                        ids.add(numberNode.asLong());
+                    }
+                }
+
+                ids.forEach(id -> {
+                    Optional<Genre> genreOpt = genreRepository.findById(id);
+                    if (genreOpt.isEmpty()) {
+                        // Change this later to an exception
+                        System.err.println("Error: could not find genre!");
+                    }
+                    Genre genre = genreOpt.get();
+                    movie.addGenre(genre);
+                    //genre.addMovie(movie);
+                    //genreRepository.save(genre);
+                });
+
                 movieRepository.save(movie);
             }
         } catch (Exception e) {

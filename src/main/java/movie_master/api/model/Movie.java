@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -40,7 +41,7 @@ public class Movie {
         joinColumns = @JoinColumn(name = "movie_id"),
         inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    private Set<Genre> genres;
+    private Set<Genre> genres = new HashSet<>();
 
     public Movie(long id, String title, String description, Date releaseDate, String language, String posterPath, double tmdbRating) {
         this.id = id;
@@ -109,5 +110,9 @@ public class Movie {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void addGenre(Genre genre) {
+        this.genres.add(genre);
     }
 }

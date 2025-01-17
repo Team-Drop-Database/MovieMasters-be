@@ -35,4 +35,8 @@ public class Genre {
     public String getName() {
         return name;
     }
+
+    public void addMovie(Movie movie) {
+        movies.add(movie);
+    }
 }
