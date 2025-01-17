@@ -1,9 +1,11 @@
 package movie_master.api.controller;
 
+import movie_master.api.exception.GenreNotFoundException;
 import movie_master.api.model.Movie;
 import movie_master.api.service.MovieService;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,15 +67,18 @@ public class MovieController {
      * @return A list of movies that fall under these genres
      */
     @GetMapping("/genrefilter")
-    public List<Movie> getMoviesByGenre(@RequestParam List<String> genres) {
-        List<Movie> movies = new ArrayList<>();
-        genres.forEach(genre -> {
-            movies.addAll(movieService.findByGenre(genre));
-        });
-        return movies;
+    public ResponseEntity<Object> getMoviesByGenre(@RequestParam List<String> genres) {
+        try {
+            List<Movie> movies = new ArrayList<>();
+            for (int i = 0; i < genres.size(); i++) {
+                movies.addAll(movieService.findByGenre(genres.get(i)));
+            }
+            return ResponseEntity.ok(movies);
+        } catch (GenreNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
     
-
     /**
      * Returns the number of pages from a movie search
      *

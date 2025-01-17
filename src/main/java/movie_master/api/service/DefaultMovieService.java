@@ -1,5 +1,6 @@
 package movie_master.api.service;
 
+import movie_master.api.exception.GenreNotFoundException;
 import movie_master.api.model.Genre;
 import movie_master.api.model.Movie;
 import movie_master.api.repository.GenreRepository;
