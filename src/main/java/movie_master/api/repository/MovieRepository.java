@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByTitleContaining(String title, Pageable pageable);
+    List<Movie> findAllByGenres_Name(String genreName);
 
     long countByTitleContaining(String title);
 }
