@@ -24,7 +24,11 @@ public class DefaultMovieService implements MovieService {
         this.genreRepository = genreRepository;
     }
 
-    public List<Movie> findByGenre(String genreName) {
+    public List<Movie> findByGenre(String genreName) throws GenreNotFoundException {
+        List<Genre> genres = genreRepository.findByName(genreName);
+        if(genres.isEmpty()) {
+            throw new GenreNotFoundException(genreName);
+        }
         return movieRepository.findAllByGenres_Name(genreName);
     }
 
