@@ -114,7 +114,7 @@ public class DataLoader implements ApplicationRunner {
                         ids.add(numberNode.asLong());
                     }
                 }
-
+                
                 // Iterate over the id's, assign genre objects to this movie
                 ids.forEach(id -> {
                     Optional<Genre> genreOpt = genreRepository.findById(id);

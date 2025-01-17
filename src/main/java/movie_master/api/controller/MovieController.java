@@ -7,8 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/movies")
@@ -52,6 +56,23 @@ public class MovieController {
                 new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() ->
                 new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+    /**
+     * Retrieve a list of movies based on a
+     *  given list of genres.
+     * 
+     * @param genres A list of genres, e.g. 'thriller' or 'western'
+     * @return A list of movies that fall under these genres
+     */
+    @GetMapping("/genrefilter")
+    public List<Movie> getMoviesByGenre(@RequestParam List<String> genres) {
+        List<Movie> movies = new ArrayList<>();
+        genres.forEach(genre -> {
+            movies.addAll(movieService.findByGenre(genre));
+        });
+        return movies;
+    }
+    
 
     /**
      * Returns the number of pages from a movie search
