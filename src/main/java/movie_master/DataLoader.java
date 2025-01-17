@@ -104,10 +104,10 @@ public class DataLoader implements ApplicationRunner {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
 
-                // Access the "numbers" array
+                // Retrieve the array of genre id's
                 JsonNode idsNode = node.get("genre_ids");
 
-                // Extract the array as a list of integers
+                // Extract the array as a list of longs
                 List<Long> ids = new ArrayList<>();
                 if (idsNode != null && idsNode.isArray()) {
                     for (JsonNode numberNode : idsNode) {
@@ -115,6 +115,7 @@ public class DataLoader implements ApplicationRunner {
                     }
                 }
 
+                // Iterate over the id's, assign genre objects to this movie
                 ids.forEach(id -> {
                     Optional<Genre> genreOpt = genreRepository.findById(id);
                     if (genreOpt.isEmpty()) {
@@ -123,10 +124,9 @@ public class DataLoader implements ApplicationRunner {
                     }
                     Genre genre = genreOpt.get();
                     movie.addGenre(genre);
-                    //genre.addMovie(movie);
-                    //genreRepository.save(genre);
                 });
 
+                // Save the movie
                 movieRepository.save(movie);
             }
         } catch (Exception e) {
