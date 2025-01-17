@@ -6,6 +6,7 @@ import movie_master.api.exception.*;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
+import movie_master.api.model.PasswordResetToken;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 
@@ -30,4 +31,6 @@ public interface UserService {
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
     void removeMovieFromWatchlist(Long userId, Long movieId) throws UserNotFoundException, UserMovieNotFoundException;
     UserMovie updateWatchItemStatus(Long userId, Long movieId, boolean watched) throws UserNotFoundException, UserMovieNotFoundException;
+    void requestPasswordReset(String email) throws EmailNotFoundException, UserAlreadyHasPasswordResetToken;
+    UserDto resetPassword(String passwordResetToken) throws InvalidPasswordTokenException, UserNotFoundException;
 }

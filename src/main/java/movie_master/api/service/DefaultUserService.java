@@ -10,11 +10,15 @@ import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
+import movie_master.api.model.PasswordResetToken;
 import movie_master.api.repository.MovieRepository;
+import movie_master.api.repository.PasswordResetTokenRepository;
 import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +35,7 @@ public class DefaultUserService implements UserService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final UserMovieRepository userMovieRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     // Utilities
     private final PasswordEncoder passwordEncoder;
@@ -38,18 +43,25 @@ public class DefaultUserService implements UserService {
     private final UserMovieDtoMapper userMovieDtoMapper;
     private final JwtUtil jwtUtil;
 
+    // Service
+    private final EmailService emailService;
+
     public DefaultUserService(
             UserRepository userRepository, MovieRepository movieRepository,
-            UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
+            UserMovieRepository userMovieRepository,
+            PasswordResetTokenRepository passwordResetTokenRepository,
+            PasswordEncoder passwordEncoder,
             UserDtoMapper userDtoMapper, UserMovieDtoMapper userMovieDtoMapper,
-            JwtUtil jwtUtil) {
+            JwtUtil jwtUtil, EmailService emailService) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
         this.userMovieRepository = userMovieRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
         this.userMovieDtoMapper = userMovieDtoMapper;
         this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
     }
 
     /**
@@ -388,5 +400,72 @@ public class DefaultUserService implements UserService {
         userRepository.save(user);
 
         return user;
+    }
+
+    /**
+     * Creates a password reset token for the user, if the user does not have one
+     * Also, it sends the user an email that contains instructions for resetting their password
+     */
+    @Override
+    public void requestPasswordReset(String email) throws EmailNotFoundException, UserAlreadyHasPasswordResetToken {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        // If there is no user with that email, throw an exception
+        if (userOpt.isEmpty()) {
+            throw new EmailNotFoundException(email);
+        }
+
+        User user = userOpt.get();
+
+        // Find the password reset token of the user
+        Optional<PasswordResetToken> passwordResetTokenOpt = passwordResetTokenRepository.findByUser(user);
+
+        // If there is already a password reset token, and it is still valid, throw an exception
+        if (passwordResetTokenOpt.isPresent() && passwordResetTokenOpt.get().isValid()) {
+            throw new UserAlreadyHasPasswordResetToken();
+        } else if (passwordResetTokenOpt.isPresent() && !passwordResetTokenOpt.get().isValid()) {
+            // remove the invalid password reset token of the user so that a new one can be created
+            passwordResetTokenRepository.delete(passwordResetTokenOpt.get());
+        }
+
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+
+        passwordResetToken.setUser(user);
+
+        passwordResetTokenRepository.save(passwordResetToken);
+
+//        emailService.sendEmail(user.getEmail(),
+//                "Movie Master Password Reset Link",
+//                ("<h1>Reset your password</h1><p>Click on this link in order to reset your password. " +
+//                        "http://localhost:3001/signin/password/reset?token=%s</p>")
+//                        .formatted(passwordResetToken));
+    }
+
+    /**
+     * TODO
+     * 1. Check if password token is not empty (Controller)
+     * 2. Check if password token is valid
+     * 3. Check if user exists
+     * 4. Change password
+     * 5. Save
+     * 6. Remove token
+     */
+    @Override
+    public UserDto resetPassword(String token) throws InvalidPasswordTokenException, UserNotFoundException {
+        Optional<PasswordResetToken> passwordResetTokenOpt = passwordResetTokenRepository.findByValue(token);
+
+        // TOKEN IS TAMPERED, DOES NOT EXIST
+        if (passwordResetTokenOpt.isEmpty()) {
+            throw new InvalidPasswordTokenException();
+        }
+
+        PasswordResetToken passwordResetToken = passwordResetTokenOpt.get();
+
+        // TOKEN is valid
+        if (passwordResetToken.isValid()) {
+
+        }
+
+        return null;
     }
 }

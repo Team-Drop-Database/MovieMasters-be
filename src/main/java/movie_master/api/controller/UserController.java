@@ -9,6 +9,7 @@ import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
+import movie_master.api.request.PasswordResetRequest;
 import movie_master.api.request.RegisterUserRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
@@ -308,6 +309,28 @@ public class UserController {
                     .body("Could not update 'banned' status. Exception message: "
                             + e.getMessage());
         }
+    }
+
+    @PostMapping("/password-reset")
+    public ResponseEntity<Object> requestPasswordReset(
+            HttpServletRequest httpServletRequest,
+            @Valid @RequestBody PasswordResetRequest passwordResetTokenRequest) {
+        try {
+            userService.requestPasswordReset(passwordResetTokenRequest.email());
+
+            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI()))
+                    .body("Instructions for resetting your password have been sent");
+        } catch (EmailNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UserAlreadyHasPasswordResetToken e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // change-password
+    @PutMapping("/password-reset")
+    public ResponseEntity<Object> resetPassword(@RequestParam String passwordResetToken) {
+        return null;
     }
 
     /**
