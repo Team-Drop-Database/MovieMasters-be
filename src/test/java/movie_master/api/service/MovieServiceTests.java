@@ -1,5 +1,6 @@
 package movie_master.api.service;
 
+import movie_master.api.exception.DuplicateMovieException;
 import movie_master.api.model.Movie;
 import movie_master.api.repository.MovieRepository;
 import org.junit.jupiter.api.Assertions;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -52,10 +52,21 @@ public class MovieServiceTests {
     }
 
     @Test
-    public void saveReturnsMovie() throws ParseException {
+    void saveReturnsMovie() throws DuplicateMovieException {
+        // When
         Movie savedMovie = movieService.save(movie);
 
+        // Then
         Assertions.assertNotNull(savedMovie);
         Assertions.assertEquals(movie.getId(), savedMovie.getId());
+    }
+
+    @Test
+    void saveDuplicateMovieThrowsDuplicateMovieException() throws DuplicateMovieException {
+        // When
+        Mockito.when(movieService.save(movie)).thenThrow(DuplicateMovieException.class);
+
+        // Then
+        Assertions.assertThrows(DuplicateMovieException.class, () -> movieService.save(movie));
     }
 }
