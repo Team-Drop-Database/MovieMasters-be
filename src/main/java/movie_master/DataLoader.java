@@ -87,9 +87,10 @@ public class DataLoader implements ApplicationRunner {
     public void AddMovies() {OkHttpClient client = new OkHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
 
+        for(int i = 1; i <= 5; i++) {
         // Collecting movies from the movie database api
         Request request = new Request.Builder()
-                .url("https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1")
+                .url("https://api.themoviedb.org/3/movie/top_rated?language=en-US&page="+i)
                 .get()
                 .addHeader("accept", "application/json")
                 .addHeader("Authorization", "Bearer %s".formatted(apiKey))
@@ -132,6 +133,8 @@ public class DataLoader implements ApplicationRunner {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        }
+
     }
 
     /**
