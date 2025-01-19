@@ -1,6 +1,8 @@
 package movie_master.api.controller;
 
 import movie_master.api.exception.GenreNotFoundException;
+import movie_master.api.exception.GenresNotLoadedException;
+import movie_master.api.model.Genre;
 import movie_master.api.model.Movie;
 import movie_master.api.service.MovieService;
 
@@ -78,6 +80,17 @@ public class MovieController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @GetMapping("/genres")
+    public ResponseEntity<Object> getMovieGenres() {
+        try {
+            List<Genre> genres = movieService.findAllGenres();
+            return ResponseEntity.ok(genres);
+        } catch (GenresNotLoadedException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    
     
     /**
      * Returns the number of pages from a movie search
