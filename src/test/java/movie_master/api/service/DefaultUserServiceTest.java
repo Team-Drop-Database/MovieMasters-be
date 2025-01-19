@@ -11,6 +11,7 @@ import movie_master.api.mapper.UserMovieDtoMapper;
 import movie_master.api.model.Movie;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
+import movie_master.api.repository.FriendshipRepository;
 import movie_master.api.repository.UserMovieRepository;
 import movie_master.api.model.role.Role;
 import movie_master.api.repository.UserRepository;
@@ -40,6 +41,7 @@ public class DefaultUserServiceTest {
     //TODO mock movie repository
     @Mock private UserRepository userRepository;
     @Mock private UserMovieRepository userMovieRepository;
+    @Mock private FriendshipRepository friendshipRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private UserDtoMapper userDtoMapper;
     @Mock private UserMovieDtoMapper userMovieDtoMapper;
@@ -88,7 +90,7 @@ public class DefaultUserServiceTest {
         Mockito.when(passwordEncoder.encode(Mockito.any())).thenReturn(encodedPassword);
 
         // When
-        UserDto registeredUser = defaultUserService.register(registerRequest);
+        UserDto registeredUser = defaultUserService.register(registerRequest.email(), registerRequest.username(), registerRequest.password());
 
         // Then
         assertEquals(userDto, registeredUser);
@@ -102,7 +104,7 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findByUsername(registerRequest.username())).thenReturn(Optional.empty());
 
         // When -> then
-        assertThrows(EmailTakenException.class, () -> defaultUserService.register(registerRequest));
+        assertThrows(EmailTakenException.class, () -> defaultUserService.register(registerRequest.email(), registerRequest.username(), registerRequest.password()));
     }
 
     @Test
@@ -113,7 +115,7 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findByUsername(registerRequest.username())).thenReturn(Optional.of(foundUser));
 
         // When -> then
-        assertThrows(UsernameTakenException.class, () -> defaultUserService.register(registerRequest));
+        assertThrows(UsernameTakenException.class, () -> defaultUserService.register(registerRequest.email(), registerRequest.username(), registerRequest.password()));
     }
 
     @Test
@@ -282,6 +284,7 @@ public class DefaultUserServiceTest {
 
         // Verify if the correct methods are called.
         Mockito.verify(userRepository, Mockito.times(1)).existsById(userId);
+        Mockito.verify(friendshipRepository, Mockito.times(1)).deleteFriendshipByUser(userId);
         Mockito.verify(userRepository, Mockito.times(1)).deleteById(userId);
 
         // Checking if user still exists

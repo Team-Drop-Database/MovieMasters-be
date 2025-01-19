@@ -171,7 +171,7 @@ public class DataLoader implements ApplicationRunner {
                 username,
                 password);
         try {
-            UserDto createdUser = userService.register(user);
+            UserDto createdUser = userService.register(user.email(), user.username(), user.password());
             userService.updateUserRole(createdUser.id(), Role.ROLE_MOD.toString(), Role.ROLE_MOD);
         } catch (Exception e) {
             throw new RuntimeException(e);

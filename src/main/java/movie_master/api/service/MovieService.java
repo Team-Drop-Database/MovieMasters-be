@@ -3,6 +3,7 @@ package movie_master.api.service;
 import movie_master.api.exception.GenreNotFoundException;
 import movie_master.api.exception.GenresNotLoadedException;
 import movie_master.api.model.Genre;
+import movie_master.api.exception.DuplicateMovieException;
 import movie_master.api.model.Movie;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public interface MovieService {
 
     void deleteById(Long id);
 
-    Movie save(Movie movie);
+    Movie save(Movie movie) throws DuplicateMovieException;
 
     int getNumberOfPages(String title);
 }

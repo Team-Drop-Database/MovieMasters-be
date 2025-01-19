@@ -3,6 +3,7 @@ package movie_master.api.service;
 import movie_master.api.exception.GenreNotFoundException;
 import movie_master.api.exception.GenresNotLoadedException;
 import movie_master.api.model.Genre;
+import movie_master.api.exception.DuplicateMovieException;
 import movie_master.api.model.Movie;
 import movie_master.api.repository.GenreRepository;
 import movie_master.api.repository.MovieRepository;
@@ -63,7 +64,12 @@ public class DefaultMovieService implements MovieService {
         movieRepository.deleteById(id);
     }
 
-    public Movie save(Movie movie) {
+    public Movie save(Movie movie) throws DuplicateMovieException {
+        Optional<Movie> existingMovie = movieRepository.findByTitle(movie.getTitle());
+
+        if (existingMovie.isPresent()) {
+            throw new DuplicateMovieException(movie.getTitle());
+        }
         return movieRepository.save(movie);
     }
 

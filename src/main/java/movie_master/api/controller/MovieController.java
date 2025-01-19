@@ -48,6 +48,26 @@ public class MovieController {
     }
 
     /**
+     * Saves a movie
+     * @param movie movie to save
+     *
+     * @return the saved movie
+     */
+    @PostMapping
+    public ResponseEntity<Object> saveMovie(@RequestBody Movie movie) {
+        try {
+            Movie savedMovie = movieService.save(movie);
+
+            if (savedMovie == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            return ResponseEntity.ok(savedMovie);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
      * Gets a movie by the given ID
      *
      * @param id ID of the movie

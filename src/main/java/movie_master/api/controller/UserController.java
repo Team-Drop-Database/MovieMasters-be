@@ -9,7 +9,9 @@ import movie_master.api.jwt.JwtUtil;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
+import movie_master.api.request.PasswordResetRequest;
 import movie_master.api.request.RegisterUserRequest;
+import movie_master.api.request.ResetPasswordRequest;
 import movie_master.api.request.UpdateUserRequest;
 import movie_master.api.service.UserService;
 import org.springframework.http.HttpHeaders;
@@ -117,7 +119,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<Object> register(HttpServletRequest httpServletRequest, @Valid @RequestBody RegisterUserRequest registerUserRequest) {
         try {
-            UserDto userDto = userService.register(registerUserRequest);
+            UserDto userDto = userService.register(registerUserRequest.email(), registerUserRequest.username(), registerUserRequest.password());
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(userDto);
         } catch (EmailTakenException | UsernameTakenException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -306,6 +308,40 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                     .body("Could not update 'banned' status. Exception message: "
                             + e.getMessage());
+        }
+    }
+
+    /**
+     * Requests a password reset for a user by sending them instructions by email
+     */
+    @PostMapping("/password-reset")
+    public ResponseEntity<Object> requestPasswordReset(
+            HttpServletRequest httpServletRequest,
+            @Valid @RequestBody PasswordResetRequest passwordResetTokenRequest) {
+        try {
+            userService.requestPasswordReset(passwordResetTokenRequest.email());
+
+            return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI()))
+                    .body("Instructions for resetting your password have been sent");
+        } catch (EmailNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UserAlreadyHasPasswordResetToken e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * Resets the user's password if the password reset token is valid
+     */
+    @PutMapping("/password-reset")
+    public ResponseEntity<Object> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        try {
+            userService.resetPassword(resetPasswordRequest.passwordResetToken(),
+                    resetPasswordRequest.newPassword());
+            return ResponseEntity.ok("Your password has been successfully reset");
+        } catch (InvalidPasswordResetTokenException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
