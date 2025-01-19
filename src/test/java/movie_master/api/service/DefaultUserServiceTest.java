@@ -90,7 +90,7 @@ public class DefaultUserServiceTest {
         Mockito.when(passwordEncoder.encode(Mockito.any())).thenReturn(encodedPassword);
 
         // When
-        UserDto registeredUser = defaultUserService.register(registerRequest);
+        UserDto registeredUser = defaultUserService.register(registerRequest.email(), registerRequest.username(), registerRequest.password());
 
         // Then
         assertEquals(userDto, registeredUser);
@@ -104,7 +104,7 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findByUsername(registerRequest.username())).thenReturn(Optional.empty());
 
         // When -> then
-        assertThrows(EmailTakenException.class, () -> defaultUserService.register(registerRequest));
+        assertThrows(EmailTakenException.class, () -> defaultUserService.register(registerRequest.email(), registerRequest.username(), registerRequest.password()));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class DefaultUserServiceTest {
         Mockito.when(userRepository.findByUsername(registerRequest.username())).thenReturn(Optional.of(foundUser));
 
         // When -> then
-        assertThrows(UsernameTakenException.class, () -> defaultUserService.register(registerRequest));
+        assertThrows(UsernameTakenException.class, () -> defaultUserService.register(registerRequest.email(), registerRequest.username(), registerRequest.password()));
     }
 
     @Test

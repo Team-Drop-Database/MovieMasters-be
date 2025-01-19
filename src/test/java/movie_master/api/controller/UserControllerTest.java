@@ -50,7 +50,7 @@ class UserControllerTest {
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
         UserDto expectedBody = new UserDto(1L, "email", "username", "ugly", LocalDate.now(), Role.ROLE_USER);
 
-        Mockito.when(defaultUserService.register(request)).thenReturn(expectedBody);
+        Mockito.when(defaultUserService.register(request.email(), request.username(), request.password())).thenReturn(expectedBody);
         Mockito.when(httpServletRequest.getRequestURI()).thenReturn(uri);
 
         // When
@@ -68,7 +68,7 @@ class UserControllerTest {
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
         EmailTakenException exception = new EmailTakenException("Email already exists");
 
-        Mockito.when(defaultUserService.register(request)).thenThrow(exception);
+        Mockito.when(defaultUserService.register(request.email(), request.username(), request.password())).thenThrow(exception);
 
         // When
         ResponseEntity<Object> result = userController.register(httpServletRequest, request);
@@ -85,7 +85,7 @@ class UserControllerTest {
         RegisterUserRequest request = new RegisterUserRequest("email", "username", "password");
         UsernameTakenException exception = new UsernameTakenException("Username already exists");
 
-        Mockito.when(defaultUserService.register(request)).thenThrow(exception);
+        Mockito.when(defaultUserService.register(request.email(), request.username(), request.password())).thenThrow(exception);
 
         // When
         ResponseEntity<Object> result = userController.register(httpServletRequest, request);
