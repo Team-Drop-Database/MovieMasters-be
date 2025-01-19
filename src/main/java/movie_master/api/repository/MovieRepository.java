@@ -7,10 +7,13 @@ import org.springframework.stereotype.Repository;
 import movie_master.api.model.Movie;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByTitleContaining(String title, Pageable pageable);
 
     long countByTitleContaining(String title);
+
+    Optional<Movie> findByTitle(String title);
 }
