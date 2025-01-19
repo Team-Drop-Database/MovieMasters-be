@@ -16,7 +16,8 @@ import java.util.Set;
  * Interface for user services
  */
 public interface UserService {
-    UserDto register(RegisterUserRequest registerUserRequest) throws EmailTakenException, UsernameTakenException;
+    //TODO: String email username, password instead of registerUserRequest
+    UserDto register(String email, String username, String password) throws EmailTakenException, UsernameTakenException;
     UserDto getUserByEmail(String email) throws EmailNotFoundException;
     UserDto getUserByUsername(String username) throws UserNotFoundException;
     void deleteUserById(Long userId) throws UserNotFoundException;
@@ -30,4 +31,6 @@ public interface UserService {
     UserMovie addMovieToWatchlist(Long userId, Long movieId) throws UserNotFoundException, MovieNotFoundException;
     void removeMovieFromWatchlist(Long userId, Long movieId) throws UserNotFoundException, UserMovieNotFoundException;
     UserMovie updateWatchItemStatus(Long userId, Long movieId, boolean watched) throws UserNotFoundException, UserMovieNotFoundException;
+    void requestPasswordReset(String email) throws EmailNotFoundException, UserAlreadyHasPasswordResetToken;
+    void resetPassword(String passwordResetToken, String newPassword) throws InvalidPasswordResetTokenException;
 }
