@@ -25,6 +25,8 @@ public class Movie {
     private String posterPath;
     @JsonAlias("vote_average")
     private double tmdbRating;
+    @JsonAlias("mm_avg_rating")
+    private Double mmAvgRating;
 
     @OneToMany(mappedBy = "movie")
     private Set<UserMovie> userMovies;
@@ -37,6 +39,7 @@ public class Movie {
         this.language = language;
         this.posterPath = posterPath;
         this.tmdbRating = tmdbRating;
+        this.mmAvgRating = null;
     }
 
     public Movie() {
@@ -97,4 +100,13 @@ public class Movie {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public Double getMmAvgRating() {
+        return mmAvgRating;
+    }
+
+    public void setMmAvgRating(Double mmAvgRating) {
+        this.mmAvgRating = mmAvgRating;
+    }
+
 }
