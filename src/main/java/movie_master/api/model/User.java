@@ -33,7 +33,7 @@ public class User {
     @JsonManagedReference      
     private Set<UserMovie> watchlist;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany
     @JsonManagedReference
     private Set<Friendship> friendships = new HashSet<>();
 

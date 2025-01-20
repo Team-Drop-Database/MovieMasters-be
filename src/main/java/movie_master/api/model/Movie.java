@@ -2,10 +2,7 @@ package movie_master.api.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.Set;
@@ -14,6 +11,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Movie {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
     @JsonAlias("overview")

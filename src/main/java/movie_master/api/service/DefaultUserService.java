@@ -3,18 +3,16 @@ package movie_master.api.service;
 import movie_master.api.dto.UserDto;
 import movie_master.api.dto.UserMovie.UserMovieDto;
 import movie_master.api.exception.*;
-import movie_master.api.jwt.JwtUtil;
 import movie_master.api.mapper.UserDtoMapper;
 import movie_master.api.mapper.UserMovieDtoMapper;
 import movie_master.api.model.Movie;
+import movie_master.api.model.PasswordResetToken;
 import movie_master.api.model.User;
 import movie_master.api.model.UserMovie;
 import movie_master.api.model.role.Role;
-import movie_master.api.repository.MovieRepository;
-import movie_master.api.repository.UserMovieRepository;
-import movie_master.api.repository.UserRepository;
-import movie_master.api.request.RegisterUserRequest;
+import movie_master.api.repository.*;
 import movie_master.api.request.UpdateUserRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,25 +29,36 @@ public class DefaultUserService implements UserService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final UserMovieRepository userMovieRepository;
+    private final FriendshipRepository friendshipRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     // Utilities
     private final PasswordEncoder passwordEncoder;
     private final UserDtoMapper userDtoMapper;
     private final UserMovieDtoMapper userMovieDtoMapper;
-    private final JwtUtil jwtUtil;
+
+    // Service
+    private final EmailService emailService;
+
+    @Value("${client.host}")
+    private String clientHost;
 
     public DefaultUserService(
             UserRepository userRepository, MovieRepository movieRepository,
-            UserMovieRepository userMovieRepository, PasswordEncoder passwordEncoder,
-            UserDtoMapper userDtoMapper, UserMovieDtoMapper userMovieDtoMapper,
-            JwtUtil jwtUtil) {
+            UserMovieRepository userMovieRepository,
+            FriendshipRepository friendshipRepository,
+            PasswordResetTokenRepository passwordResetTokenRepository,
+            PasswordEncoder passwordEncoder, UserDtoMapper userDtoMapper, UserMovieDtoMapper userMovieDtoMapper,
+            EmailService emailService) {
         this.userRepository = userRepository;
         this.movieRepository = movieRepository;
         this.userMovieRepository = userMovieRepository;
+        this.friendshipRepository = friendshipRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDtoMapper = userDtoMapper;
         this.userMovieDtoMapper = userMovieDtoMapper;
-        this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
     }
 
     /**
@@ -57,30 +66,30 @@ public class DefaultUserService implements UserService {
      * RegisterUserRequest object.
      */
     @Override
-    public UserDto register(RegisterUserRequest registerUserRequest)
+    public UserDto register(String email, String username, String password)
             throws EmailTakenException, UsernameTakenException {
 
         // Check if the given email or password already exists somewhere
         Optional<User> userFoundByEmail = this.userRepository
-                .findByEmail(registerUserRequest.email());
+                .findByEmail(email);
         Optional<User> userFoundByUsername = this.userRepository
-                .findByUsername(registerUserRequest.username());
+                .findByUsername(username);
 
         // If so, throw an exception
         if (userFoundByEmail.isPresent()) {
-            throw new EmailTakenException(registerUserRequest.email());
+            throw new EmailTakenException(email);
         }
 
         if (userFoundByUsername.isPresent()) {
-            throw new UsernameTakenException(registerUserRequest.username());
+            throw new UsernameTakenException(username);
         }
 
         // Save the result and map the user object to a DTO before returning
         User createdUser = this.userRepository.save(
                 new User(
-                        registerUserRequest.email(),
-                        registerUserRequest.username(),
-                        passwordEncoder.encode(registerUserRequest.password()),
+                        email,
+                        username,
+                        passwordEncoder.encode(password),
                         Role.ROLE_USER,
                         true,
                         false
@@ -91,17 +100,16 @@ public class DefaultUserService implements UserService {
     }
 
     /**
-     * Retrieves the watchlist of a given user.
+     * Deletes a user. Removing all traces.
      *
      * @param userId id of the user
-     * @return A set of UserMovie objects representing the
-     * watchlist of this user.
      */
     @Override
     public void deleteUserById(Long userId) throws UserNotFoundException {
         if (!this.userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
+        friendshipRepository.deleteFriendshipByUser(userId);
         userRepository.deleteById(userId);
     }
 
@@ -388,5 +396,81 @@ public class DefaultUserService implements UserService {
         userRepository.save(user);
 
         return user;
+    }
+
+    /**
+     * Creates a password reset token for the user, if the user does not have one
+     * Also, it sends the user an email that contains instructions for resetting their password
+     */
+    @Override
+    public void requestPasswordReset(String email) throws EmailNotFoundException, UserAlreadyHasPasswordResetToken {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        // If there is no user with that email, throw an exception
+        if (userOpt.isEmpty()) {
+            throw new EmailNotFoundException(email);
+        }
+
+        User user = userOpt.get();
+
+        // Find the password reset token of the user
+        Optional<PasswordResetToken> passwordResetTokenOpt = passwordResetTokenRepository.findByUser(user);
+
+        // If there is already a password reset token, and it is still valid, throw an exception
+        if (passwordResetTokenOpt.isPresent() && passwordResetTokenOpt.get().hasNotExpired()) {
+            throw new UserAlreadyHasPasswordResetToken();
+        } else if (passwordResetTokenOpt.isPresent() && !passwordResetTokenOpt.get().hasNotExpired()) {
+            // remove the invalid password reset token of the user so that a new one can be created
+            passwordResetTokenRepository.delete(passwordResetTokenOpt.get());
+        }
+
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+
+        passwordResetToken.setUser(user);
+
+        passwordResetTokenRepository.save(passwordResetToken);
+
+        emailService.sendEmail(user.getEmail(),
+                "Movie Master Password Reset Link",
+                ("<h1>Reset your password</h1>" +
+                        "<p>Click on this link in order to reset your password.</p>" +
+                        "<p><b>Please note that this link is only valid for 15 minutes.</b>" +
+                        "</p>%s/signin/password/reset?passwordResetToken=%s</p>")
+                        .formatted(clientHost, passwordResetToken));
+    }
+
+    /**
+     * Resets the password of a user
+     * In order to reset the password, the user needs to have a valid password reset token
+     * Otherwise it will not be possible to reset their password
+     */
+    @Override
+    public void resetPassword(String token, String newPassword) throws InvalidPasswordResetTokenException {
+        Optional<PasswordResetToken> passwordResetTokenOpt = passwordResetTokenRepository.findByValue(token);
+
+        // The given password reset token does not exist
+        if (passwordResetTokenOpt.isEmpty()) {
+            throw new InvalidPasswordResetTokenException();
+        }
+
+        PasswordResetToken passwordResetToken = passwordResetTokenOpt.get();
+
+        // The given password reset token has expired
+        if (!passwordResetToken.hasNotExpired()) {
+            throw new InvalidPasswordResetTokenException();
+        }
+
+        User user = passwordResetToken.getUser();
+
+        // encode the new password
+        String newEncodedPassword = passwordEncoder.encode(newPassword);
+
+        user.setPassword(newEncodedPassword);
+
+        // save the changes
+        userRepository.save(user);
+
+        // remove the used reset password token
+        passwordResetTokenRepository.delete(passwordResetToken);
     }
 }

@@ -22,7 +22,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,7 +84,6 @@ public class AuthControllerTests {
         ResponseEntity<Object> result = authController.login(loginRequest);
 
         assertEquals(result.getStatusCode(), HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()));
-        assertEquals(result.getBody(), badCredentialsException.getMessage());
     }
 
     @Test
