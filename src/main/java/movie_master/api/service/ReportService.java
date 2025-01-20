@@ -84,6 +84,7 @@ public class ReportService {
 
     /**
      * Deletes a report by its ID and optionally bans the user associated with the report.
+     * When user is banned, reports relating to that user also get deleted.
      *
      * @param reportId the ID of the report to delete
      * @param banUser a boolean indicating whether to ban the user associated with the report
@@ -97,8 +98,9 @@ public class ReportService {
             User userToBan = report.getReportedUser();
             userToBan.setBanned(true);
             userRepository.save(userToBan);
+            reportRepository.deleteByUser(userToBan.getUserId());
+        } else {
+            reportRepository.deleteById(reportId);
         }
-
-        reportRepository.deleteById(reportId);
     }
 }
