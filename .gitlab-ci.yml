@@ -20,7 +20,7 @@ sonarqube-check:
     paths:
       - sonar-scanner/
   script: 
-    - mvn verify sonar:sonar
+    - gradle sonar
   allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
