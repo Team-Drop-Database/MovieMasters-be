@@ -2,9 +2,17 @@ package movie_master.api.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -30,6 +38,14 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     private Set<UserMovie> userMovies;
+
+    @ManyToMany
+    @JoinTable(
+        name = "movie_genre",
+        joinColumns = @JoinColumn(name = "movie_id"),
+        inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private Set<Genre> genres = new HashSet<>();
 
     public Movie(long id, String title, String description, Date releaseDate, String language, String posterPath, double tmdbRating) {
         this.id = id;
@@ -101,6 +117,10 @@ public class Movie {
         this.title = title;
     }
 
+    public void addGenre(Genre genre) {
+        this.genres.add(genre);
+    }
+    
     public Double getMmAvgRating() {
         return mmAvgRating;
     }

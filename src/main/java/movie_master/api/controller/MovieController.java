@@ -1,14 +1,22 @@
 package movie_master.api.controller;
 
+import movie_master.api.exception.GenreNotFoundException;
+import movie_master.api.exception.GenresNotLoadedException;
+import movie_master.api.model.Genre;
 import movie_master.api.model.Movie;
 import movie_master.api.service.MovieService;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/movies")
@@ -73,6 +81,37 @@ public class MovieController {
                 new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Retrieve a list of movies based on a
+     *  given list of genres.
+     * 
+     * @param genres A list of genres, e.g. 'thriller' or 'western'
+     * @return A list of movies that fall under these genres
+     */
+    @GetMapping("/genrefilter")
+    public ResponseEntity<Object> getMoviesByGenre(@RequestParam List<String> genres) {
+        try {
+            List<Movie> movies = new ArrayList<>();
+            for (int i = 0; i < genres.size(); i++) {
+                movies.addAll(movieService.findByGenre(genres.get(i)));
+            }
+            return ResponseEntity.ok(movies);
+        } catch (GenreNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/genres")
+    public ResponseEntity<Object> getMovieGenres() {
+        try {
+            List<Genre> genres = movieService.findAllGenres();
+            return ResponseEntity.ok(genres);
+        } catch (GenresNotLoadedException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    
+    
     /**
      * Returns the number of pages from a movie search
      *
