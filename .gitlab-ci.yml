@@ -24,7 +24,7 @@ pull_project_job:
     - apt-get update -y && apt-get install openssh-client -y && apt-get install sshpass -y
   script: 
     - sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST -p 2222 "
-        cd ../movieadmin/app/backend && git pull
+        cd ../movieadmin/app/backend && git pull https://$GITLAB_USERNAME:$GITLAB_ACCESS_TOKEN@gitlab.fdmci.hva.nl/se-specialization-2024-1/projects-tse3/drop-database/backend.git
         "
 deploy_job:
   stage: deploy

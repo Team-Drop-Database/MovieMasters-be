@@ -21,6 +21,10 @@ services:
       - DEFAULT_USER_NAME=${DEFAULT_USER_NAME}
       - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
       - PORT=${PORT}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
     networks:
       - movie_master_network
 
