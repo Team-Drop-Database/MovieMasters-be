@@ -200,7 +200,6 @@ public class UserController {
     public ResponseEntity<Object> getWatchListItem(@PathVariable Long userId, @PathVariable Long movieId) {
         try {
             UserMovieDto watchList = userService.getWatchListItem(userId, movieId);
-
             if (watchList != null) {
                 return ResponseEntity.ok(watchList);
             }
