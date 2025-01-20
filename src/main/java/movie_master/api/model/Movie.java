@@ -19,7 +19,6 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
     @JsonAlias("overview")

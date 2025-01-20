@@ -87,10 +87,19 @@ public class DataLoader implements ApplicationRunner {
     public void AddMovies() {OkHttpClient client = new OkHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        for(int i = 1; i <= 5; i++) {
+        for(int i = 1; i <= 6; i++) {
+
+        String movieEndpoint;
+        if(i == 1){
+            // Pull the page of trending movies first
+            movieEndpoint = "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1";
+        } else {
+            movieEndpoint = "https://api.themoviedb.org/3/movie/top_rated?language=en-US&page="+i;
+        }
+
         // Collecting movies from the movie database api
         Request request = new Request.Builder()
-                .url("https://api.themoviedb.org/3/movie/top_rated?language=en-US&page="+i)
+                .url(movieEndpoint)
                 .get()
                 .addHeader("accept", "application/json")
                 .addHeader("Authorization", "Bearer %s".formatted(apiKey))
@@ -103,6 +112,7 @@ public class DataLoader implements ApplicationRunner {
             JsonNode arrayNode = objectMapper.readTree(response.body().string()).get("results");
             for (JsonNode node : arrayNode) {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
+                movie.setId(node.get("id").asLong());
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
 
                 // Retrieve the array of genre id's
