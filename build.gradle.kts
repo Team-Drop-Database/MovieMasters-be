@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
+    id ("org.sonarqube") version "5.0.0.4638"
 }
 
 group = "com.drop_database"
@@ -10,6 +11,14 @@ version = "0.0.1-SNAPSHOT"
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "se-specialization-2024-1_projects-tse3_drop-database_backend_63335d2d-27c8-4950-a932-d6f94f8517e4")
+        property("sonar.projectName", "Backend")
+        property("sonar.qualitygate.wait", true)
     }
 }
 
