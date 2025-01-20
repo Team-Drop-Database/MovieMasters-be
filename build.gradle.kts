@@ -16,9 +16,9 @@ java {
 
 sonar {
     properties {
-        property("sonar.projectKey", "se-specialization-2024-1_projects-tse3_drop-database_backend_63335d2d-27c8-4950-a932-d6f94f8517e4")
-        property("sonar.projectName", "Backend")
-        property("sonar.qualitygate.wait", true)
+        property "sonar.projectKey", "se-specialization-2024-1_projects-tse3_drop-database_backend_ae7bcf3a-4eb9-416f-908b-3242b826462b"
+        property "sonar.projectName", "Backend"
+        property "sonar.qualitygate.wait", true
     }
 }
 
