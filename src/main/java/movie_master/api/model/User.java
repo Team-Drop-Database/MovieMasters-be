@@ -37,6 +37,12 @@ public class User {
     @JsonManagedReference
     private Set<Friendship> friendships = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Topic> topics = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
+
     public User() {}
 
     public User(String email, String username, String password, Role role, boolean enabled, boolean banned) {
