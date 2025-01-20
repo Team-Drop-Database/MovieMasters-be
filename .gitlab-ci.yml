@@ -18,6 +18,8 @@ build-job:
 sonarqube-check:
   stage: sonarqube-check
   image: gradle:jdk21-alpine
+  tags:
+    - hva
   dependencies:
     - build-job
   cache:
@@ -36,6 +38,8 @@ sonarqube-check:
 sonarqube-vulnerability-report:
   stage: sonarqube-vulnerability-report
   image: gradle:jdk21-alpine
+  tags:
+    - hva
   script:
     - 'curl -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/issues/gitlab_sast_export?projectKey=se-specialization-2024-1_projects-tse3_drop-database_backend_ae7bcf3a-4eb9-416f-908b-3242b826462b&branch=${CI_COMMIT_BRANCH}&pullRequest=${CI_MERGE_REQUEST_IID}" -o gl-sast-sonar-report.json'
   allow_failure: true
