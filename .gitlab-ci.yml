@@ -17,7 +17,7 @@ build-job:
 
 sonarqube-check:
   stage: sonarqube-check
-  image: gradle:jdk21-alpine
+  image: gradle:8.2.0-jdk17-jammy
   tags:
     - hva
   cache:
@@ -25,7 +25,7 @@ sonarqube-check:
     key: "${CI_COMMIT_SHORT_SHA}"
     paths:
       - sonar-scanner/
-  script: ./gradlew sonar
+  script: gradle sonar
   allow_failure: true
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -35,7 +35,7 @@ sonarqube-check:
 
 sonarqube-vulnerability-report:
   stage: sonarqube-vulnerability-report
-  image: gradle:jdk21-alpine
+  image: gradle:8.2.0-jdk17-jammy
   tags:
     - hva
   script:
