@@ -18,6 +18,7 @@ public class ReviewDtoMapper {
 
         return new ReviewDto(
             review.getReviewId(),
+            user.getUserId(),
             user.getUsername(),
             user.getProfilePicture(),
             review.getUserMovie().getMovie().getTitle(),
