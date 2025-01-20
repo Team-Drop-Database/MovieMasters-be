@@ -5,23 +5,26 @@ stages:
   - pull_project
   - deploy
 
-variables:
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+build-job:
+  stage: build
+  image: gradle:jdk21-alpine
+  tags:
+    - hva
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      when: always
+  script: ./gradlew build -x test
 
 sonarqube-check:
   stage: sonarqube-check
-  image: gradle:jdk21-alpine
-  dependencies:
-    - get-binaries
-    - build
+  image: gradle:8.2.0-jdk17-jammy
+  tags:
+    - hva
   cache:
     policy: pull
     key: "${CI_COMMIT_SHORT_SHA}"
     paths:
       - sonar-scanner/
-
-
   script: gradle sonar
   allow_failure: true
   rules:
@@ -32,7 +35,9 @@ sonarqube-check:
 
 sonarqube-vulnerability-report:
   stage: sonarqube-vulnerability-report
-  image: gradle:jdk21-alpine
+  image: gradle:8.2.0-jdk17-jammy
+  tags:
+    - hva
   script:
     - 'curl -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/issues/gitlab_sast_export?projectKey=se-specialization-2024-1_projects-tse3_drop-database_backend_63335d2d-27c8-4950-a932-d6f94f8517e4&branch=${CI_COMMIT_BRANCH}&pullRequest=${CI_MERGE_REQUEST_IID}" -o gl-sast-sonar-report.json'
   allow_failure: true
@@ -45,16 +50,6 @@ sonarqube-vulnerability-report:
     expire_in: 1 day
     reports:
       sast: gl-sast-sonar-report.json
-
-build-job:
-  stage: build
-  image: gradle:jdk21-alpine
-  tags:
-    - hva
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
-      when: always
-  script: ./gradlew build -x test
 
 pull_project_job:
   stage: pull_project
