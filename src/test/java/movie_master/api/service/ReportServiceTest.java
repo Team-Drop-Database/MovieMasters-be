@@ -7,6 +7,7 @@ import movie_master.api.mapper.ReportDtoMapper;
 import movie_master.api.model.Report;
 import movie_master.api.model.User;
 import movie_master.api.repository.ReportRepository;
+import movie_master.api.repository.ReviewRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.CreateReportRequest;
 import org.jeasy.random.EasyRandom;
@@ -30,6 +31,7 @@ class ReportServiceTest {
 
     @Mock private ReportRepository reportRepository;
     @Mock private UserRepository userRepository;
+    @Mock private ReviewRepository reviewRepository;
     @Mock private ReportDtoMapper reportDtoMapper;
     @InjectMocks ReportService service;
 
@@ -141,7 +143,8 @@ class ReportServiceTest {
 
         // Assert
         Mockito.verify(userRepository).save(userToBan);
-        Mockito.verify(reportRepository).deleteById(reportId);
+        Mockito.verify(reviewRepository).deleteByUser(userToBan.getUserId());
+        Mockito.verify(reportRepository).deleteByUser(userToBan.getUserId());
     }
 
     @Test
@@ -154,6 +157,7 @@ class ReportServiceTest {
 
         // Act and Assert
         Mockito.verifyNoInteractions(userRepository);
+        Mockito.verifyNoInteractions(reviewRepository);
         Mockito.verifyNoMoreInteractions(reportRepository);
         assertThrows(ReportNotFoundException.class, () -> service.deleteReport(reportId, banUser));
     }
