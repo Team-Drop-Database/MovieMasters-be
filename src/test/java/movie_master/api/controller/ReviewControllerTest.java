@@ -95,7 +95,7 @@ class ReviewControllerTest {
     }
 
     @Test
-    void placeReviewMovieNotFoundTest() throws UserNotFoundException, MovieNotInWatchlistException {
+    void placeReviewMovieNotFoundTest() throws UserNotFoundException, MovieNotInWatchlistException, MovieNotFoundException {
         // Given
         HttpServletRequest httpServletRequest = Mockito.mock(HttpServletRequest.class);
         PostReviewRequest request = createRandomRecord(PostReviewRequest.class, easyRandom);
@@ -111,7 +111,7 @@ class ReviewControllerTest {
     }
 
     @Test
-    void deleteReviewSuccessfulTest() {
+    void deleteReviewSuccessfulTest() throws MovieNotFoundException {
         // Given
         long reviewId = easyRandom.nextObject(Long.class);
 
@@ -127,7 +127,7 @@ class ReviewControllerTest {
     }
 
     @Test
-    void deleteReviewFailureTest() {
+    void deleteReviewFailureTest() throws MovieNotFoundException {
         // Given
         long reviewId = easyRandom.nextObject(Long.class);
         RuntimeException exception = new RuntimeException("Error deleting review");
