@@ -1,6 +1,7 @@
 package movie_master.api.service;
 
 import movie_master.api.dto.ReviewDto;
+import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.exception.MovieNotInWatchlistException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.mapper.ReviewDtoMapper;
@@ -106,7 +107,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void cannotPostExistentReview() throws UserNotFoundException, MovieNotInWatchlistException {
+    void cannotPostExistentReview() throws UserNotFoundException, MovieNotInWatchlistException, MovieNotFoundException {
         // Given
         User user = easyRandom.nextObject(User.class);
         Movie movie = easyRandom.nextObject(Movie.class);
@@ -143,7 +144,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void canPostNonExistentReview() throws UserNotFoundException, MovieNotInWatchlistException {
+    void canPostNonExistentReview() throws UserNotFoundException, MovieNotInWatchlistException, MovieNotFoundException {
         // Given
         User user = easyRandom.nextObject(User.class);
         Movie movie = easyRandom.nextObject(Movie.class);
@@ -200,7 +201,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void canDeleteReviewSuccessfully() {
+    void canDeleteReviewSuccessfully() throws MovieNotFoundException {
         // Given
         long reviewId = easyRandom.nextLong();
         Review review = easyRandom.nextObject(Review.class);

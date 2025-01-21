@@ -2,6 +2,7 @@ package movie_master.api.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import movie_master.api.dto.ReviewDto;
+import movie_master.api.exception.MovieNotFoundException;
 import movie_master.api.exception.MovieNotInWatchlistException;
 import movie_master.api.exception.UserNotFoundException;
 import movie_master.api.request.PostReviewRequest;
@@ -48,7 +49,7 @@ public class ReviewController {
         try {
             ReviewDto postedReview = service.postReview(request);
             return ResponseEntity.created(URI.create(httpServletRequest.getRequestURI())).body(postedReview);
-        } catch (UserNotFoundException | MovieNotInWatchlistException exception) {
+        } catch (UserNotFoundException | MovieNotInWatchlistException | MovieNotFoundException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }
