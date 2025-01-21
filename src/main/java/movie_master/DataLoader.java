@@ -2,7 +2,6 @@ package movie_master;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import movie_master.api.dto.UserDto;
 import movie_master.api.model.Genre;
 import movie_master.api.model.Movie;
@@ -17,18 +16,17 @@ import movie_master.api.service.UserService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
 
 @Component
 public class DataLoader implements ApplicationRunner {
@@ -103,6 +101,7 @@ public class DataLoader implements ApplicationRunner {
             JsonNode arrayNode = objectMapper.readTree(response.body().string()).get("results");
             for (JsonNode node : arrayNode) {
                 Movie movie = objectMapper.treeToValue(node, Movie.class);
+                movie.setTmdbId(node.get("id").asLong());
                 movie.setPosterPath("https://image.tmdb.org/t/p/original%s".formatted(movie.getPosterPath()));
 
                 // Retrieve the array of genre id's

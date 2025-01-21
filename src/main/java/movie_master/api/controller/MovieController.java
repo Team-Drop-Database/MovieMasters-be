@@ -1,21 +1,19 @@
 package movie_master.api.controller;
 
+import movie_master.api.exception.DuplicateMovieException;
 import movie_master.api.exception.GenreNotFoundException;
 import movie_master.api.exception.GenresNotLoadedException;
 import movie_master.api.model.Genre;
 import movie_master.api.model.Movie;
 import movie_master.api.service.MovieService;
-
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -62,6 +60,11 @@ public class MovieController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
             return ResponseEntity.ok(savedMovie);
+        } catch (DataIntegrityViolationException | DuplicateMovieException e) {
+            if (e instanceof DuplicateMovieException) {
+                movie.setId(((DuplicateMovieException) e).movieId);
+            }
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(movie);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

@@ -21,16 +21,25 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(unique = true)
+    private Long tmdbId;
+
     private String title;
+
     @JsonAlias("overview")
     @Column(length = 2000)
     private String description;
+
     @JsonAlias("original_language")
     private String language;
+
     @JsonAlias("release_date")
     private Date releaseDate;
+
     @JsonAlias("poster_path")
     private String posterPath;
+
     @JsonAlias("vote_average")
     private double tmdbRating;
 
@@ -64,6 +73,14 @@ public class Movie {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Long getTmdbId() {
+        return tmdbId;
+    }
+
+    public void setTmdbId(Long tmdbId) {
+        this.tmdbId = tmdbId;
     }
 
     public String getPosterPath() {

@@ -68,7 +68,7 @@ public class DefaultMovieService implements MovieService {
         Optional<Movie> existingMovie = movieRepository.findByTitle(movie.getTitle());
 
         if (existingMovie.isPresent()) {
-            throw new DuplicateMovieException(movie.getTitle());
+            throw new DuplicateMovieException(existingMovie.get().getId(), movie.getTitle());
         }
         return movieRepository.save(movie);
     }
