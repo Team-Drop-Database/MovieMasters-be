@@ -20,12 +20,13 @@ class ReviewDtoMapperTest {
     EasyRandom easyRandom = new EasyRandom();
 
     @Test
-    void testMapping() {
+    void canMapReview() {
         // Given
         Review review = easyRandom.nextObject(Review.class);
         User user = review.getUserMovie().getUser();
         ReviewDto expectedResult = new ReviewDto(
             review.getReviewId(),
+            user.getUserId(),
             user.getUsername(),
             user.getProfilePicture(),
             review.getUserMovie().getMovie().getTitle(),

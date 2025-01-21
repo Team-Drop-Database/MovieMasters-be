@@ -7,6 +7,7 @@ import movie_master.api.mapper.ReportDtoMapper;
 import movie_master.api.model.Report;
 import movie_master.api.model.User;
 import movie_master.api.repository.ReportRepository;
+import movie_master.api.repository.ReviewRepository;
 import movie_master.api.repository.UserRepository;
 import movie_master.api.request.CreateReportRequest;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
     private final ReportDtoMapper reportDtoMapper;
 
     /**
@@ -33,10 +35,12 @@ public class ReportService {
      * @param reportDtoMapper the mapper for converting reports to ReportDto objects
      */
     public ReportService(
-        ReportRepository reportRepository, UserRepository userRepository, ReportDtoMapper reportDtoMapper
+        ReportRepository reportRepository, UserRepository userRepository, ReviewRepository reviewRepository,
+        ReportDtoMapper reportDtoMapper
     ) {
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
         this.reportDtoMapper = reportDtoMapper;
     }
 
@@ -98,6 +102,7 @@ public class ReportService {
             User userToBan = report.getReportedUser();
             userToBan.setBanned(true);
             userRepository.save(userToBan);
+            reviewRepository.deleteByUser(userToBan.getUserId());
             reportRepository.deleteByUser(userToBan.getUserId());
         } else {
             reportRepository.deleteById(reportId);
